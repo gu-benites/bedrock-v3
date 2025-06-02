@@ -70,7 +70,7 @@ export async function updateUserProfile(
   }
 
   let currentAvatarDbPath: string | null = null;
-  let currentBannerDbPath: string | null = null; // Added for banner
+  let currentBannerDbPath: string | null = null; 
   // Fetch current profile to get existing avatar_url and banner_img_url for deletion logic
   try {
     logger.info(`Fetching current profile for user ID: ${user.id} to check existing images.`);
@@ -87,7 +87,7 @@ export async function updateUserProfile(
       currentAvatarDbPath = getStoragePathFromUrl(currentProfileData.avatar_url, 'profiles');
       logger.info(`Found existing avatar_url for user ${user.id}`, { url: currentProfileData.avatar_url, path: currentAvatarDbPath });
     }
-    if (currentProfileData?.banner_img_url) { // Added for banner
+    if (currentProfileData?.banner_img_url) { 
       currentBannerDbPath = getStoragePathFromUrl(currentProfileData.banner_img_url, 'profiles');
       logger.info(`Found existing banner_img_url for user ${user.id}`, { url: currentProfileData.banner_img_url, path: currentBannerDbPath });
     }
@@ -151,7 +151,7 @@ export async function updateUserProfile(
       if (!base64Data) throw new Error("Invalid avatar Data URI format.");
       const buffer = Buffer.from(base64Data, 'base64');
       const fileExtension = avatarDataUri.substring('data:image/'.length, avatarDataUri.indexOf(';base64'));
-      const filePath = `avatars/${user.id}.${fileExtension}`; // Store with user ID and extension
+      const filePath = `avatars/${user.id}.${fileExtension}`; 
       const contentType = `image/${fileExtension}`;
       logger.info(`Attempting to upload new avatar for user ID: ${user.id}`, { filePath, contentType, bufferLength: buffer.length });
 
@@ -204,7 +204,7 @@ export async function updateUserProfile(
 
   // --- Handle Banner Upload ---
   logger.info(`Processing banner for user ID: ${user.id}. bannerImgDataUri provided: ${!!bannerImgDataUri}, current DB path: ${currentBannerDbPath}`);
-  if (bannerImgDataUri) {
+  if (bannerImgDataUri) { // New banner uploaded
     logger.info(`New bannerImgDataUri received for user ${user.id}. Length: ${bannerImgDataUri.length}`);
     if (currentBannerDbPath) {
       logger.info(`Attempting to delete old banner for user ID: ${user.id}`, { path: currentBannerDbPath });
@@ -252,7 +252,7 @@ export async function updateUserProfile(
       logger.error(`Banner upload process failed for user ID: ${user.id}`, { errorName: uploadCatchError.name, errorMessage: uploadCatchError.message, stack: uploadCatchError.stack });
       return { error: `Failed to upload banner: ${uploadCatchError.message}` };
     }
-  } else if (bannerImgDataUri === null) { // If bannerImgDataUri is explicitly null, remove banner
+  } else if (bannerImgDataUri === null) { // Banner explicitly removed
       logger.info(`Banner marked for removal (bannerImgDataUri is null) for user ID: ${user.id}.`);
       if (currentBannerDbPath) {
         logger.info(`Attempting to remove existing banner from storage for user ID: ${user.id}`, { path: currentBannerDbPath });
@@ -338,7 +338,7 @@ export async function updateUserProfile(
     specificAge: updatedProfile.specific_age,
     language: updatedProfile.language,
     avatarUrl: updatedProfile.avatar_url,
-    bannerUrl: updatedProfile.banner_img_url, // Corrected from bannerImgUrl
+    bannerUrl: updatedProfile.banner_img_url, 
     bio: updatedProfile.bio,
     role: updatedProfile.role,
     stripeCustomerId: updatedProfile.stripe_customer_id,
