@@ -116,22 +116,27 @@ export function ProfileView() {
     ProfileFormValues        // Variables type (data passed to mutate)
   >({
     mutationFn: async (formData: ProfileFormValues) => {
-      let latestProfileData: UserProfile | undefined = undefined;
+      console.log('[ProfileView] mutationFn started. FormData:', {
+        ...formData,
+        avatarDataUri: formData.avatarDataUri ? formData.avatarDataUri.substring(0, 50) + '...' : formData.avatarDataUri,
+        bannerDataUri: formData.bannerDataUri ? formData.bannerDataUri.substring(0, 50) + '...' : formData.bannerDataUri,
+      });
+
+      let latestProfileData: UserProfile | undefined = profile || undefined; // Start with existing profile data
       const errors: string[] = [];
 
       // Extract text details and image data URIs
       const { avatarDataUri, bannerDataUri, ...textDataFromForm } = formData;
       
-      // Construct payload for text details, only including fields that changed
       const textDetailsPayload: Partial<UserProfile> = {};
-      const originalProfileForComparison = profile || {}; // Use original profile for diff
+      const originalProfileForComparison = profile || {}; 
       let textFieldsChanged = false;
 
       (Object.keys(UserProfileSchema.shape) as Array<keyof UserProfile>).forEach(key => {
-        // Exclude non-text, non-editable, or image URL fields from direct text update
         if (!['id', 'email', 'avatarUrl', 'bannerUrl', 'createdAt', 'updatedAt', 'role', 
               'stripeCustomerId', 'subscriptionStatus', 'subscriptionTier', 'subscriptionPeriod', 
               'subscriptionStartDate', 'subscriptionEndDate'].includes(key)) {
+          // Check if the field exists in formData and is different from original or original didn't have it
           if (formData[key] !== undefined && formData[key] !== (originalProfileForComparison as any)[key]) {
             (textDetailsPayload as any)[key] = formData[key];
             textFieldsChanged = true;
@@ -140,56 +145,63 @@ export function ProfileView() {
       });
 
       if (textFieldsChanged) {
+        console.log('[ProfileView] Text fields changed. Calling updateProfileTextDetails with payload:', textDetailsPayload);
         const textResult = await updateProfileTextDetails(textDetailsPayload as any);
+        console.log('[ProfileView] updateProfileTextDetails result:', textResult);
         if (textResult.error) errors.push(`Text update error: ${textResult.error}`);
         if (textResult.data) latestProfileData = textResult.data;
+      } else {
+        console.log('[ProfileView] No text fields changed.');
       }
 
-      // Handle Avatar (only if data URI is provided - can be null for removal)
-      if (formData.avatarDataUri !== undefined) {
+      // Handle Avatar (only if data URI is provided explicitly - can be null for removal, or undefined for no change)
+      if (formData.avatarDataUri !== undefined) { // Check for undefined, allowing null for explicit removal
+        console.log('[ProfileView] Avatar data URI provided. Calling updateProfileAvatar.');
         const avatarResult = await updateProfileAvatar(formData.avatarDataUri);
+        console.log('[ProfileView] updateProfileAvatar result:', avatarResult);
         if (avatarResult.error) errors.push(`Avatar update error: ${avatarResult.error}`);
         if (avatarResult.updatedProfile) latestProfileData = avatarResult.updatedProfile;
+      } else {
+        console.log('[ProfileView] Avatar data URI is undefined. Skipping avatar update.');
       }
 
-      // Handle Banner (only if data URI is provided - can be null for removal)
+      // Handle Banner (similarly)
       if (formData.bannerDataUri !== undefined) {
+        console.log('[ProfileView] Banner data URI provided. Calling updateProfileBanner.');
         const bannerResult = await updateProfileBanner(formData.bannerDataUri);
+        console.log('[ProfileView] updateProfileBanner result:', bannerResult);
         if (bannerResult.error) errors.push(`Banner update error: ${bannerResult.error}`);
         if (bannerResult.updatedProfile) latestProfileData = bannerResult.updatedProfile;
+      } else {
+        console.log('[ProfileView] Banner data URI is undefined. Skipping banner update.');
       }
 
       if (errors.length > 0) {
+        console.error('[ProfileView] Errors during mutation:', errors);
         throw new Error(errors.join('; '));
       }
-
-      // If no specific DB update occurred (e.g., no text changes, and image URIs were undefined or null for already null images)
-      // and there were no errors, `latestProfileData` might still be undefined.
-      // Return the original profile in this case, as the form might have been dirty due to client-only changes
-      // that didn't translate to server updates.
-      if (!latestProfileData && errors.length === 0) {
-        return profile || undefined;
-      }
       
+      console.log('[ProfileView] mutationFn finished. Returning latestProfileData:', latestProfileData);
       return latestProfileData;
     },
     onMutate: () => {
-      // setIsUpdatingProfile(true); // This state isn't used anymore directly, use mutation.isPending
+      console.log('[ProfileView] onMutate triggered.');
     },
     onSuccess: (data: UserProfile | undefined) => {
+      console.log('[ProfileView] onSuccess triggered. Data:', data);
       if (data) {
         toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
         queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-        form.reset({ // Reset form with data from server
+        form.reset({ 
           ...data,
-          avatarDataUri: undefined, // Explicitly clear client-side temp states
+          avatarDataUri: undefined, 
           bannerDataUri: undefined,
         });
         updateBioDisplayValue(data.bio || "");
-      } else if (!mutation.isError) { // No data returned, but also no error thrown by mutationFn
+      } else if (!mutation.isError) {
          toast({ title: "Profile Processed", description: "No effective changes were made on the server." });
          queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-         if (profile) { // Reset to original profile if it exists
+         if (profile) { 
             form.reset({
                 ...profile,
                 avatarDataUri: undefined,
@@ -198,9 +210,9 @@ export function ProfileView() {
             updateBioDisplayValue(profile.bio || "");
         }
       }
-      // Error case is handled by onError
     },
     onError: (error: Error) => {
+      console.error('[ProfileView] onError triggered. Error:', error);
       toast({ title: "Update Failed", description: error.message || "An unexpected error occurred.", variant: "destructive" });
       Sentry.captureException(error, {
         tags: { context: 'profileUpdateMutation' },
@@ -208,7 +220,7 @@ export function ProfileView() {
       });
     },
     onSettled: () => {
-      // setIsUpdatingProfile(false); // Not used
+      console.log('[ProfileView] onSettled triggered.');
     }
   });
 
@@ -217,7 +229,7 @@ export function ProfileView() {
     if (profile) {
       form.reset({
         ...profile,
-        avatarDataUri: undefined, // Ensure data URIs are not part of defaultValues from profile
+        avatarDataUri: undefined, 
         bannerDataUri: undefined,
       });
       updateBioDisplayValue(profile.bio || "");
@@ -260,10 +272,10 @@ export function ProfileView() {
 
 
   const onSubmit = (data: ProfileFormValues) => {
-    console.log("Form data being submitted to orchestrating mutation:", {
+    console.log("[ProfileView] onSubmit called. Data being passed to mutation.mutate:", {
         ...data,
-        avatarDataUri: data.avatarDataUri ? data.avatarDataUri.substring(0,30) + '...' : data.avatarDataUri, // Log snippet
-        bannerDataUri: data.bannerDataUri ? data.bannerDataUri.substring(0,30) + '...' : data.bannerDataUri, // Log snippet
+        avatarDataUri: data.avatarDataUri ? data.avatarDataUri.substring(0,30) + '...' : data.avatarDataUri, 
+        bannerDataUri: data.bannerDataUri ? data.bannerDataUri.substring(0,30) + '...' : data.bannerDataUri, 
     });
     mutation.mutate(data);
   };

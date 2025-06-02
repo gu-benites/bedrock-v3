@@ -4,7 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { UserProfileSchema, type UserProfile } from "../schemas/profile.schema";
 import { getServerLogger } from '@/lib/logger';
-import { getStoragePathFromUrl, handleImageProcessing } from "../utils/profile-image.utils"; // Updated import path
+import { getStoragePathFromUrl, handleImageProcessing } from "../utils/profile-image.utils"; 
 
 const logger = getServerLogger('UpdateProfileBannerAction');
 
@@ -16,22 +16,24 @@ interface UpdateProfileImageResult {
 export async function updateProfileBanner(
   bannerDataUri: string | null | undefined
 ): Promise<UpdateProfileImageResult> {
-  logger.info("updateProfileBanner action started.", { hasBannerDataUri: bannerDataUri ? 'Provided' : bannerDataUri });
+  logger.info(`[UpdateProfileBannerAction] Action started. BannerDataUri (first 50 chars): ${bannerDataUri ? bannerDataUri.substring(0, 50) + '...' : bannerDataUri}`);
 
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError) {
-    logger.error("Authentication error.", { error: authError.message });
+    logger.error("[UpdateProfileBannerAction] Authentication error.", { error: authError.message });
     return { error: `Authentication error: ${authError.message}` };
   }
   if (!user) {
-    logger.warn("No authenticated user found.");
+    logger.warn("[UpdateProfileBannerAction] No authenticated user found.");
     return { error: "User not authenticated." };
   }
+  logger.info(`[UpdateProfileBannerAction] Authenticated user: ${user.id}`);
 
   let currentBannerPath: string | null = null;
   try {
+    logger.info(`[UpdateProfileBannerAction] Fetching current banner_img_url for user ${user.id}`);
     const { data: currentProfileData, error: fetchError } = await supabase
       .from('profiles')
       .select('banner_img_url')
@@ -39,15 +41,19 @@ export async function updateProfileBanner(
       .single();
 
     if (fetchError && fetchError.code !== 'PGRST116') {
-      logger.error("Error fetching current banner_img_url.", { userId: user.id, error: fetchError.message });
+      logger.error(`[UpdateProfileBannerAction] Error fetching current banner_img_url for user ${user.id}.`, { error: fetchError.message });
     }
     if (currentProfileData?.banner_img_url) {
       currentBannerPath = getStoragePathFromUrl(currentProfileData.banner_img_url, 'profiles', logger);
+      logger.info(`[UpdateProfileBannerAction] Current banner path for user ${user.id}: ${currentBannerPath}`);
+    } else {
+      logger.info(`[UpdateProfileBannerAction] No current banner_img_url found for user ${user.id}.`);
     }
   } catch (e) {
-    logger.error("Unexpected error fetching current banner_img_url.", { userId: user.id, error: (e as Error).message });
+    logger.error(`[UpdateProfileBannerAction] Unexpected error fetching current banner_img_url for user ${user.id}.`, { error: (e as Error).message });
   }
 
+  logger.info(`[UpdateProfileBannerAction] Calling handleImageProcessing for banner. User: ${user.id}. currentBannerPath: ${currentBannerPath}`);
   const bannerResult = await handleImageProcessing({
     supabase,
     userId: user.id,
@@ -57,6 +63,7 @@ export async function updateProfileBanner(
     baseFolderPath: 'banners',
     loggerInstance: logger,
   });
+  logger.info(`[UpdateProfileBannerAction] handleImageProcessing for banner result:`, bannerResult);
 
   if (bannerResult.error) {
     return { error: bannerResult.error };
@@ -68,7 +75,7 @@ export async function updateProfileBanner(
       updated_at: new Date().toISOString(),
     };
 
-    logger.info(`Attempting to update banner_img_url in DB for user ID: ${user.id}`, { newUrl: bannerResult.newImageUrl });
+    logger.info(`[UpdateProfileBannerAction] Attempting to update banner_img_url in DB for user ID: ${user.id}`, { newUrl: bannerResult.newImageUrl });
     const { data: updatedProfileData, error: updateError } = await supabase
       .from("profiles")
       .update(userDataToUpdate)
@@ -77,15 +84,16 @@ export async function updateProfileBanner(
       .single();
 
     if (updateError) {
-      logger.error(`Failed to update banner_img_url in DB for user ID: ${user.id}`, { error: updateError.message });
+      logger.error(`[UpdateProfileBannerAction] Failed to update banner_img_url in DB for user ID: ${user.id}`, { error: updateError.message });
       return { error: `Failed to update profile: ${updateError.message}` };
     }
      if (!updatedProfileData) {
-      logger.error(`Profile DB update for banner for user ID: ${user.id} did not return data.`);
+      logger.error(`[UpdateProfileBannerAction] Profile DB update for banner for user ID: ${user.id} did not return data.`);
       return { error: "Profile update for banner failed to return data." };
     }
+    logger.info(`[UpdateProfileBannerAction] DB update for banner_img_url successful for user ID: ${user.id}. Updated data:`, updatedProfileData);
 
-     const mappedProfile: UserProfile = { /* ... map all fields ... */ 
+     const mappedProfile: UserProfile = { 
         id: updatedProfileData.id, email: user.email || '', firstName: updatedProfileData.first_name,
         lastName: updatedProfileData.last_name, gender: updatedProfileData.gender,
         ageCategory: updatedProfileData.age_category, specificAge: updatedProfileData.specific_age,
@@ -98,13 +106,13 @@ export async function updateProfileBanner(
     };
     const validationResult = UserProfileSchema.safeParse(mappedProfile);
     if (!validationResult.success) {
-        logger.error('Updated profile data (banner) failed validation.', { errors: validationResult.error.flatten() });
+        logger.error('[UpdateProfileBannerAction] Updated profile data (banner) failed validation.', { errors: validationResult.error.flatten() });
         return { error: 'Updated profile data (banner) is invalid.' };
     }
-    logger.info(`Banner updated successfully for user ID: ${user.id}`);
+    logger.info(`[UpdateProfileBannerAction] Banner updated and profile validated successfully for user ID: ${user.id}`);
     return { updatedProfile: validationResult.data };
   } else {
-    logger.info(`No change to banner for user ID: ${user.id}. Fetching current profile.`);
+    logger.info(`[UpdateProfileBannerAction] No change to banner_img_url needed for user ID: ${user.id}. Fetching current full profile.`);
     const { data: currentFullProfile, error: fetchCurrentError } = await supabase
       .from('profiles')
       .select('*')
@@ -112,14 +120,14 @@ export async function updateProfileBanner(
       .single();
 
     if (fetchCurrentError) {
-        logger.error(`Error fetching current profile after no banner change for user ${user.id}`, { error: fetchCurrentError.message });
+        logger.error(`[UpdateProfileBannerAction] Error fetching current profile after no banner change for user ${user.id}`, { error: fetchCurrentError.message });
         return { error: "No banner change, but failed to re-fetch profile." };
     }
     if (!currentFullProfile) {
-        logger.error(`Could not find profile for user ${user.id} after no banner change.`);
+        logger.error(`[UpdateProfileBannerAction] Could not find profile for user ${user.id} after no banner change.`);
         return { error: "User profile not found after no banner change." };
     }
-    const mappedCurrentProfile: UserProfile = { /* ... map all fields ... */ 
+    const mappedCurrentProfile: UserProfile = { 
         id: currentFullProfile.id, email: user.email || '', firstName: currentFullProfile.first_name,
         lastName: currentFullProfile.last_name, gender: currentFullProfile.gender,
         ageCategory: currentFullProfile.age_category, specificAge: currentFullProfile.specific_age,
@@ -132,9 +140,10 @@ export async function updateProfileBanner(
     };
     const validatedCurrentProfile = UserProfileSchema.safeParse(mappedCurrentProfile);
     if (validatedCurrentProfile.success) {
+        logger.info(`[UpdateProfileBannerAction] Successfully fetched current profile for user ${user.id} after no banner change.`);
         return { updatedProfile: validatedCurrentProfile.data };
     } else {
-        logger.error(`Fetched current profile after no banner change for user ${user.id}, but it failed validation.`, { errors: validatedCurrentProfile.error.flatten() });
+        logger.error(`[UpdateProfileBannerAction] Fetched current profile after no banner change for user ${user.id}, but it failed validation.`, { errors: validatedCurrentProfile.error.flatten() });
         return { error: "Failed to retrieve a valid current profile after no banner change." };
     }
   }
