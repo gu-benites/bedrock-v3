@@ -1,5 +1,5 @@
 // src/features/user-auth-data/utils/profile-image.utils.ts
-"use server";
+// REMOVED 'use server'; directive from here
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Logger as WinstonLogger } from 'winston';
