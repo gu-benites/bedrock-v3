@@ -1,20 +1,22 @@
-# **App Name**: Concierge
+# **App Name**: PassForge
 
 ## Core Features:
 
-- App Router (Page Routing): Multi-page structure with clear navigation.
-- Component Architecture: Modular component design for reusability and maintainability with a featured based structure inside /src.
-- Featured Sections: Featured sections highlight key content at /src/features/{feature-name}.
-- ShadCN themed variables with next-theme: ShadCN themed variables with next-theme
+- Email Input: Email Input: A field for the user to enter their email address to initiate the password reset process that calls Supabase's resetPasswordForEmail.
+- Confirmation Display: Success Message: Displays a message to the user confirming that a password reset email has been sent.
+- Token Exchange: Token Exchange Endpoint: Route handler at /auth/confirm to handle token exchange after user clicks the link in their email, using the utility functions provided by the documentation.
+- Reset Initiation: Initiate Reset: A function that calls Supabase's with the provided email address.
+- Update Password Form: New Password Form: After successful token exchange, show a form with two fields where the user can enter their new password. This form should link to an API endpoint that updates the password in supabase await supabase.auth.updateUser({ password: 'new_password' })
+- Tech Stack: Tech Stack: React, NextJS, Supabase SSR, Supabase JS V2.0
+- Strictly Follow Official Docs: Strictly follow official docs.
+- Official Password Docs: Official documentation: https://supabase.com/docs/guides/auth/passwords?queryGroups=language&language=js&queryGroups=flow&flow=pkce&queryGroups=framework&framework=nextjs
+- Official Server Side Docs: https://supabase.com/docs/guides/auth/server-side/nextjs
 
 ## Style Guidelines:
 
-- Primary color: Soft lavender (#D0BFFF) for a calm and sophisticated feel.
-- Background color: Very light lavender (#F5F3FF) for a clean and modern aesthetic.
-- Accent color: Pale violet-red (#D885A3) to create a feminine and warm tone.
-- Headline font: 'Playfair', serif, for a classy, high-end presentation.
-- Body font: 'PT Sans', sans-serif, for clear and comfortable readability.
-- Grid-based layout for responsive design and content organization.
-- Subtle transitions for smooth navigation.
-- Globals css inside /src/styles
-- :root {  --background: 48 33.3333% 97.0588%;  --foreground: 48 19.6078% 20%;  --card: 48 33.3333% 97.0588%;  --card-foreground: 60 2.5641% 7.6471%;  --popover: 0 0% 100%;  --popover-foreground: 50.7692 19.4030% 13.1373%;  --primary: 15.1111 55.5556% 52.3529%;  --primary-foreground: 0 0% 100%;  --secondary: 46.1538 22.8070% 88.8235%;  --secondary-foreground: 50.7692 8.4967% 30.0000%;  --muted: 44.0000 29.4118% 90%;  --muted-foreground: 50.0000 2.3622% 50.1961%;  --accent: 46.1538 22.8070% 88.8235%;  --accent-foreground: 50.7692 19.4030% 13.1373%;  --destructive: 60 2.5641% 7.6471%;  --destructive-foreground: 0 0% 100%;  --border: 50 7.5000% 84.3137%;  --input: 50.7692 7.9755% 68.0392%;  --ring: 210 74.8031% 49.8039%;  --chart-1: 18.2813 57.1429% 43.9216%;  --chart-2: 251.4545 84.6154% 74.5098%;  --chart-3: 46.1538 28.2609% 81.9608%;  --chart-4: 256.5517 49.1525% 88.4314%;  --chart-5: 17.7778 60% 44.1176%;  --sidebar: 51.4286 25.9259% 94.7059%;  --sidebar-foreground: 60 2.5210% 23.3333%;  --sidebar-primary: 15.1111 55.5556% 52.3529%;  --sidebar-primary-foreground: 0 0% 98.4314%;  --sidebar-accent: 46.1538 22.8070% 88.8235%;  --sidebar-accent-foreground: 0 0% 20.3922%;  --sidebar-border: 0 0% 92.1569%;  --sidebar-ring: 0 0% 70.9804%;  --font-sans: Inter, sans-serif;  --font-serif: Inter, sans-serif;  --font-mono: Inter, sans-serif;  --radius: 0.5rem;  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);} .dark {  --background: 60 2.7027% 14.5098%;  --foreground: 46.1538 9.7744% 73.9216%;  --card: 60 2.7027% 14.5098%;  --card-foreground: 48 33.3333% 97.0588%;  --popover: 60 2.1277% 18.4314%;  --popover-foreground: 60 5.4545% 89.2157%;  --primary: 14.7692 63.1068% 59.6078%;  --primary-foreground: 0 0% 100%;  --secondary: 48 33.3333% 97.0588%;  --secondary-foreground: 60 2.1277% 18.4314%;  --muted: 60 3.8462% 10.1961%;  --muted-foreground: 51.4286 8.8608% 69.0196%;  --accent: 48 10.6383% 9.2157%;  --accent-foreground: 51.4286 25.9259% 94.7059%;  --destructive: 0 84.2365% 60.1961%;  --destructive-foreground: 0 0% 100%;  --border: 60 5.0847% 23.1373%;  --input: 52.5000 5.1282% 30.5882%;  --ring: 210 74.8031% 49.8039%;  --chart-1: 18.2813 57.1429% 43.9216%;  --chart-2: 251.4545 84.6154% 74.5098%;  --chart-3: 48 10.6383% 9.2157%;  --chart-4: 248.2759 25.2174% 22.5490%;  --chart-5: 17.7778 60% 44.1176%;  --sidebar: 30 3.3333% 11.7647%;  --sidebar-foreground: 46.1538 9.7744% 73.9216%;  --sidebar-primary: 0 0% 20.3922%;  --sidebar-primary-foreground: 0 0% 98.4314%;  --sidebar-accent: 60 3.4483% 5.6863%;  --sidebar-accent-foreground: 46.1538 9.7744% 73.9216%;  --sidebar-border: 0 0% 92.1569%;  --sidebar-ring: 0 0% 70.9804%;  --font-sans: Inter, sans-serif;  --font-serif: Inter, sans-serif;  --font-mono: Inter, sans-serif;  --radius: 0.5rem;  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);}
+- Primary color: A gentle sky blue (#77B5FE), reminiscent of clear skies and trust.
+- Background color: A very light, desaturated blue (#F0F8FF) creating a calm, uncluttered atmosphere.
+- Accent color: A soft lavender (#A892EA), adding a touch of elegance.
+- Clean, sans-serif font for form labels and instructions.
+- Simple, centered layout for each step in the password reset process.
+- A subtle fade-in effect for each stage.
