@@ -8,9 +8,8 @@ import { useImageUpload } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { ImagePlus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getServerLogger } from '@/lib/logger'; // Assuming this can be used client-side or a client logger is available
 
-// Placeholder for a client-side logger if getServerLogger isn't appropriate
+// Placeholder for a client-side logger
 const clientLogger = {
   info: (message: string, context?: any) => console.log(`[ClientBannerUploaderINFO] ${message}`, context),
   warn: (message: string, context?: any) => console.warn(`[ClientBannerUploaderWARN] ${message}`, context),
@@ -24,7 +23,7 @@ const ProfileBannerUploader: React.FC<{
   defaultImage?: string | null; // URL of the existing banner image
   disabled?: boolean;
 }> = ({ control, name, defaultImage, disabled }) => {
-  clientLogger.info('ProfileBannerUploader rendered/updated.', { defaultImage, disabled, name });
+  clientLogger.info('ProfileBannerUploader rendered/updated.', { defaultImageProp: defaultImage, disabled, name });
   const { toast } = useToast();
 
   return (
@@ -32,51 +31,40 @@ const ProfileBannerUploader: React.FC<{
       name={name}
       control={control}
       defaultValue={null} // Default to null for the DataURI field
-      render={({ field }) => { // `field` (including field.onChange) is available here
-
-        // Define onUpload *inside* this scope so it can use `field.onChange`
-        // It also needs access to `imageUploadApi.handleRemove` for the case where an image is too large.
+      render={({ field }) => { 
+        
         const onUploadForField = (file: File | null, dataUrl: string | null, imageUploadApiRef?: ReturnType<typeof useImageUpload>) => {
           clientLogger.info('ProfileBannerUploader - onUploadForField called.', { hasFile: !!file, hasDataUrl: !!dataUrl });
           if (disabled) return;
-          if (file && file.size > 5 * 1024 * 1024) { // 5MB limit
+          if (file && file.size > 5 * 1024 * 1024) { 
             toast({ title: "Image too large", description: "Banner image must be less than 5MB.", variant: "destructive" });
-            if (imageUploadApiRef) { // Check if api ref is available
-              imageUploadApiRef.handleRemove(); // Clear the faulty preview using the hook's own remove
+            if (imageUploadApiRef) { 
+              imageUploadApiRef.handleRemove(); 
             }
-            field.onChange(null); // Clear form value using field.onChange
+            field.onChange(null); 
             return;
           }
-          field.onChange(dataUrl); // Update form value using field.onChange
+          field.onChange(dataUrl); 
         };
 
-        // Call useImageUpload here. Pass a wrapper for onUpload that can also pass imageUploadApi itself.
         const imageUploadApi = useImageUpload({
           initialPreviewUrl: defaultImage,
-          // Pass a lambda that calls onUploadForField with the imageUploadApi instance
           onUpload: (file, dataUrl) => onUploadForField(file, dataUrl, imageUploadApi),
         });
         
         const {
-          previewUrl: bannerPreview,
+          previewUrl: bannerPreview, // This is the state from useImageUpload
           fileInputRef: bannerFileInputRef,
           handleTriggerClick: handleBannerTriggerClick,
-          handleFileChange: handleBannerFileChange, // This will call onUploadForField
-          handleRemove: handleBannerRemoveVisualsAndRHF, // Renamed for clarity
-          setPreviewUrlDirectly: setBannerPreviewUrlDirectly
+          handleFileChange: handleBannerFileChange, 
+          handleRemove: handleBannerRemoveVisualsAndRHF, 
         } = imageUploadApi;
-
-        // Effect to sync the preview URL if defaultImage prop changes
-        useEffect(() => {
-          clientLogger.info('ProfileBannerUploader - useEffect for defaultImage sync.', { defaultImage, bannerPreview, currentRef: imageUploadApi.previewRef?.current });
-          if (defaultImage !== bannerPreview && !(bannerPreview && bannerPreview.startsWith('blob:'))) {
-             clientLogger.info('ProfileBannerUploader - Setting preview URL directly from defaultImage.');
-             setBannerPreviewUrlDirectly(defaultImage || null);
-          }
-        }, [defaultImage, bannerPreview, setBannerPreviewUrlDirectly, imageUploadApi.previewRef]);
-
-        const currentImage = bannerPreview || defaultImage;
-        clientLogger.info('ProfileBannerUploader - currentImage to render.', { currentImage });
+        
+        // currentImage will be the one displayed. It prioritizes the hook's previewUrl.
+        // If bannerPreview is null (e.g. after removing a selection, or initially if defaultImage was null),
+        // and defaultImage (the prop from form.watch) is also null, then currentImage will be null.
+        const currentImage = bannerPreview; 
+        clientLogger.info('ProfileBannerUploader - render logic.', { defaultImageProp: defaultImage, bannerPreviewState: bannerPreview, currentImageToRender: currentImage });
 
         return (
           <div className="h-32 sm:h-40 md:h-48 bg-muted relative group rounded-t-lg overflow-hidden">
@@ -116,7 +104,7 @@ const ProfileBannerUploader: React.FC<{
                     size="icon"
                     className="z-10 rounded-full bg-black/60 text-white hover:bg-black/80 border-white/50 hover:border-white focus-visible:ring-white"
                     onClick={() => {
-                      handleBannerRemoveVisualsAndRHF(); // This will call onUpload(null,null) which calls field.onChange(null)
+                      handleBannerRemoveVisualsAndRHF(); 
                     }}
                     aria-label="Remove banner image"
                     disabled={disabled}
@@ -130,7 +118,7 @@ const ProfileBannerUploader: React.FC<{
               type="file"
               ref={bannerFileInputRef}
               onChange={(e) => {
-                handleBannerFileChange(e); // This calls onUploadForField which calls field.onChange
+                handleBannerFileChange(e); 
               }}
               className="hidden"
               accept="image/png, image/jpeg, image/webp"

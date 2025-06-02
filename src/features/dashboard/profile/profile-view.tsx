@@ -1,4 +1,3 @@
-
 // src/features/dashboard/profile/profile-view.tsx
 'use client';
 
@@ -46,6 +45,14 @@ import { useToast } from '@/hooks/use-toast';
 
 const MAX_BIO_LENGTH = 180;
 import { ProfileAccountInfo, ProfileSubscriptionDetails } from './components';
+
+// Placeholder for a client-side logger
+const clientLogger = {
+  info: (message: string, context?: any) => console.log(`[ProfileViewINFO] ${message}`, context),
+  warn: (message: string, context?: any) => console.warn(`[ProfileViewWARN] ${message}`, context),
+  error: (message: string, context?: any) => console.error(`[ProfileViewERROR] ${message}`, context),
+};
+
 
 const languageOptions = [
   { value: 'en', label: 'English' },
@@ -117,16 +124,15 @@ export function ProfileView() {
     ProfileFormValues        // Variables type (data passed to mutate)
   >({
     mutationFn: async (formData: ProfileFormValues) => {
-      console.log('[ProfileView] mutationFn started. FormData:', {
+      clientLogger.info('mutationFn started. FormData (URIs snipped):', {
         ...formData,
         avatarDataUri: formData.avatarDataUri ? formData.avatarDataUri.substring(0, 50) + '...' : formData.avatarDataUri,
         bannerDataUri: formData.bannerDataUri ? formData.bannerDataUri.substring(0, 50) + '...' : formData.bannerDataUri,
       });
 
-      let latestProfileData: UserProfile | undefined = profile || undefined; // Start with existing profile data
+      let latestProfileData: UserProfile | undefined = profile || undefined; 
       const errors: string[] = [];
 
-      // Extract text details and image data URIs
       const { avatarDataUri, bannerDataUri, ...textDataFromForm } = formData;
       
       const textDetailsPayload: Partial<UserProfile> = {};
@@ -137,7 +143,6 @@ export function ProfileView() {
         if (!['id', 'email', 'avatarUrl', 'bannerUrl', 'createdAt', 'updatedAt', 'role', 
               'stripeCustomerId', 'subscriptionStatus', 'subscriptionTier', 'subscriptionPeriod', 
               'subscriptionStartDate', 'subscriptionEndDate'].includes(key)) {
-          // Check if the field exists in formData and is different from original or original didn't have it
           if (formData[key] !== undefined && formData[key] !== (originalProfileForComparison as any)[key]) {
             (textDetailsPayload as any)[key] = formData[key];
             textFieldsChanged = true;
@@ -146,63 +151,61 @@ export function ProfileView() {
       });
 
       if (textFieldsChanged) {
-        console.log('[ProfileView] Text fields changed. Calling updateProfileTextDetails with payload:', textDetailsPayload);
+        clientLogger.info('Text fields changed. Calling updateProfileTextDetails with payload:', textDetailsPayload);
         const textResult = await updateProfileTextDetails(textDetailsPayload as any);
-        console.log('[ProfileView] updateProfileTextDetails result:', textResult);
+        clientLogger.info('updateProfileTextDetails result:', textResult);
         if (textResult.error) errors.push(`Text update error: ${textResult.error}`);
         if (textResult.data) latestProfileData = textResult.data;
       } else {
-        console.log('[ProfileView] No text fields changed.');
+        clientLogger.info('No text fields changed.');
       }
 
-      // Handle Avatar (only if data URI is provided explicitly - can be null for removal, or undefined for no change)
-      if (formData.avatarDataUri !== undefined) { // Check for undefined, allowing null for explicit removal
-        console.log('[ProfileView] Avatar data URI provided. Calling updateProfileAvatar.');
+      if (formData.avatarDataUri !== undefined) { 
+        clientLogger.info('Avatar data URI provided. Calling updateProfileAvatar.');
         const avatarResult = await updateProfileAvatar(formData.avatarDataUri);
-        console.log('[ProfileView] updateProfileAvatar result:', avatarResult);
+        clientLogger.info('updateProfileAvatar result:', avatarResult);
         if (avatarResult.error) errors.push(`Avatar update error: ${avatarResult.error}`);
         if (avatarResult.updatedProfile) latestProfileData = avatarResult.updatedProfile;
       } else {
-        console.log('[ProfileView] Avatar data URI is undefined. Skipping avatar update.');
+        clientLogger.info('Avatar data URI is undefined. Skipping avatar update.');
       }
 
-      // Handle Banner (similarly)
       if (formData.bannerDataUri !== undefined) {
-        console.log('[ProfileView] Banner data URI provided. Calling updateProfileBanner.');
+        clientLogger.info('Banner data URI provided. Calling updateProfileBanner.');
         const bannerResult = await updateProfileBanner(formData.bannerDataUri);
-        console.log('[ProfileView] updateProfileBanner result:', bannerResult);
+        clientLogger.info('updateProfileBanner result:', bannerResult);
         if (bannerResult.error) errors.push(`Banner update error: ${bannerResult.error}`);
         if (bannerResult.updatedProfile) latestProfileData = bannerResult.updatedProfile;
       } else {
-        console.log('[ProfileView] Banner data URI is undefined. Skipping banner update.');
+        clientLogger.info('Banner data URI is undefined. Skipping banner update.');
       }
 
       if (errors.length > 0) {
-        console.error('[ProfileView] Errors during mutation:', errors);
+        clientLogger.error('Errors during mutation:', errors);
         throw new Error(errors.join('; '));
       }
       
-      console.log('[ProfileView] mutationFn finished. Returning latestProfileData:', latestProfileData);
+      clientLogger.info('mutationFn finished. Returning latestProfileData:', latestProfileData);
       return latestProfileData;
     },
     onMutate: () => {
-      console.log('[ProfileView] onMutate triggered.');
+      clientLogger.info('onMutate triggered.');
     },
     onSuccess: (data: UserProfile | undefined) => {
-      console.log('[ProfileView] onSuccess triggered. Data:', data);
+      clientLogger.info('onSuccess triggered. Data from mutation:', data);
       if (data) {
         toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
         queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-        // Form reset is handled by useEffect watching `profile`
-      } else if (!mutation.isError) { // No data returned but also no error, means no effective change was made
+      } else if (!mutation.isError) { 
          toast({ title: "Profile Processed", description: "No effective changes were made to your profile." });
          queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-         // Ensure form still resets to the latest known good state (original profile)
          if (profile) { 
+            const resetBannerUrl = profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
+            clientLogger.info('onSuccess (no data but no error): Resetting form with original profile and timestamped bannerUrl.', { resetBannerUrl });
             form.reset({
                 ...profile,
                 avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-                bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+                bannerUrl: resetBannerUrl,
                 avatarDataUri: undefined,
                 bannerDataUri: undefined,
             });
@@ -211,7 +214,7 @@ export function ProfileView() {
       }
     },
     onError: (error: Error) => {
-      console.error('[ProfileView] onError triggered. Error:', error);
+      clientLogger.error('onError triggered. Error:', error);
       toast({ title: "Update Failed", description: error.message || "An unexpected error occurred.", variant: "destructive" });
       Sentry.captureException(error, {
         tags: { context: 'profileUpdateMutation' },
@@ -219,22 +222,32 @@ export function ProfileView() {
       });
     },
     onSettled: () => {
-      console.log('[ProfileView] onSettled triggered.');
+      clientLogger.info('onSettled triggered.');
     }
   });
 
 
   useEffect(() => {
+    clientLogger.info('useEffect [profile] triggered. Current profile from useAuth:', profile);
     if (profile) {
+      const newAvatarUrl = profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
+      const newBannerUrl = profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
+      clientLogger.info('Profile data available. Resetting form.', {
+        profileId: profile.id,
+        newAvatarUrl,
+        newBannerUrl,
+        originalBannerUrl: profile.bannerUrl
+      });
       form.reset({
         ...profile,
-        avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-        bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+        avatarUrl: newAvatarUrl,
+        bannerUrl: newBannerUrl,
         avatarDataUri: undefined, 
         bannerDataUri: undefined,
       });
       updateBioDisplayValue(profile.bio || "");
     } else if (user && !isLoadingAuth && !profileError) {
+        clientLogger.info('No profile, but user exists and not loading. Initializing form with user data.');
         const initialFormValues = {
             id: user.id, email: user.email,
             firstName: (user.user_metadata?.first_name as string) || "",
@@ -247,6 +260,8 @@ export function ProfileView() {
         };
         form.reset(initialFormValues as ProfileFormValues);
         updateBioDisplayValue("");
+    } else {
+        clientLogger.info('useEffect [profile]: No profile and conditions not met for form init with user data.');
     }
   }, [profile, user, form, updateBioDisplayValue, isLoadingAuth, profileError]);
 
@@ -273,7 +288,7 @@ export function ProfileView() {
 
 
   const onSubmit = (data: ProfileFormValues) => {
-    console.log("[ProfileView] onSubmit called. Data being passed to mutation.mutate:", {
+    clientLogger.info("onSubmit called. Data being passed to mutation.mutate (URIs snipped):", {
         ...data,
         avatarDataUri: data.avatarDataUri ? data.avatarDataUri.substring(0,30) + '...' : data.avatarDataUri, 
         bannerDataUri: data.bannerDataUri ? data.bannerDataUri.substring(0,30) + '...' : data.bannerDataUri, 
@@ -282,16 +297,20 @@ export function ProfileView() {
   };
 
   const handleCancel = () => {
+    clientLogger.info('handleCancel called.');
     if (profile) {
+      const resetBannerUrl = profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
+      clientLogger.info('Canceling: Resetting form with original profile and timestamped bannerUrl.', { resetBannerUrl });
       form.reset({
         ...profile,
         avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-        bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+        bannerUrl: resetBannerUrl,
         avatarDataUri: undefined, 
         bannerDataUri: undefined,
       });
       updateBioDisplayValue(profile.bio || "");
     } else if (user) {
+        clientLogger.info('Canceling: No profile, resetting form with user data.');
         const initialResetValues = {
             id: user.id, email: user.email,
             firstName: (user.user_metadata?.first_name as string) || "",
@@ -369,6 +388,7 @@ export function ProfileView() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-lg overflow-hidden">
           <ProfileBannerUploader
+            key={form.watch('bannerUrl') || 'no-banner-key'} // Key to force re-mount
             control={form.control}
             name="bannerDataUri" 
             defaultImage={form.watch('bannerUrl')}
@@ -377,6 +397,7 @@ export function ProfileView() {
 
           <div className="relative px-6 pb-6 flex flex-col items-center text-center">
             <ProfileAvatarUploader
+              key={form.watch('avatarUrl') || 'no-avatar-key'} // Key to force re-mount
               control={form.control}
               name="avatarDataUri" 
               defaultImage={form.watch('avatarUrl')}
@@ -533,5 +554,3 @@ export function ProfileView() {
     </FormProvider>
   );
 }
-
-    

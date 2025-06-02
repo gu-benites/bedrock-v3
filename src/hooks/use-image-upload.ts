@@ -9,47 +9,24 @@ const clientLogger = {
 };
 
 interface UseImageUploadOptions {
-  onUpload?: (file: File | null, dataUrl: string | null) => void; // dataUrl will now be base64
+  onUpload?: (file: File | null, dataUrl: string | null) => void; 
   initialPreviewUrl?: string | null;
 }
 
 export function useImageUpload({ onUpload, initialPreviewUrl = null }: UseImageUploadOptions = {}) {
-  clientLogger.info('useImageUpload initialized.', { initialPreviewUrl });
+  clientLogger.info('Hook initialized.', { initialPreviewUrlProp: initialPreviewUrl });
   
-  const [previewUrl, setPreviewUrl] = useState<string | null>(initialPreviewUrl); // For displaying preview
-  const previewRef = useRef<string | null>(initialPreviewUrl); // Stores the URL that was last set *as a preview* (can be blob or actual URL)
+  // State for the URL to be displayed in the preview (can be blob or actual URL)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialPreviewUrl);
+  // Ref to store the original initialPreviewUrl prop for comparison if it changes
+  const initialPropRef = useRef<string | null>(initialPreviewUrl);
+  // Ref to store the current blob URL if one is active, for cleanup
+  const currentBlobUrlRef = useRef<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const initialUrlUsedForFirstRender = useRef(initialPreviewUrl);
-
-  // Effect to handle changes to initialPreviewUrl (e.g., after saving and db url updates)
-  useEffect(() => {
-    clientLogger.info('useEffect [initialPreviewUrl] triggered.', { initialPreviewUrl, currentPreviewUrlState: previewUrl, previewRefCurrent: previewRef.current });
-
-    // If initialPreviewUrl prop has changed since the hook was last initialized or this effect ran for it
-    if (initialPreviewUrl !== initialUrlUsedForFirstRender.current) {
-      clientLogger.info('initialPreviewUrl prop has changed.', { newInitial: initialPreviewUrl, oldInitialRef: initialUrlUsedForFirstRender.current });
-      
-      // If there was an old blob URL, revoke it
-      if (previewRef.current && previewRef.current.startsWith('blob:')) {
-        clientLogger.info('Revoking old blob URL from previewRef.current.', { url: previewRef.current });
-        URL.revokeObjectURL(previewRef.current);
-      }
-      
-      setPreviewUrl(initialPreviewUrl); // Directly set the preview to the new initial URL (timestamped from DB)
-      previewRef.current = initialPreviewUrl; // Update ref to match
-      setFileName(null); // Reset file name as this is not a user-selected file
-      initialUrlUsedForFirstRender.current = initialPreviewUrl; // Update the ref for subsequent checks
-      clientLogger.info('Updated previewUrl and previewRef from new initialPreviewUrl.', { newPreviewUrl: initialPreviewUrl });
-    } else if (initialPreviewUrl && !previewUrl && !fileInputRef.current?.files?.length) {
-      // This condition handles the case where initialPreviewUrl was present, but previewUrl is somehow null
-      // and no file is selected by the user (e.g., after a cancel that cleared things, or initial state).
-      // It ensures the preview reverts to initialPreviewUrl if it exists.
-      clientLogger.info('initialPreviewUrl exists but previewUrl is null and no file selected. Resetting to initialPreviewUrl.', { initialPreviewUrl });
-      setPreviewUrl(initialPreviewUrl);
-      previewRef.current = initialPreviewUrl;
-    }
-  }, [initialPreviewUrl]);
+  // New state to explicitly track if a user has selected a file
+  const [userSelectedFile, setUserSelectedFile] = useState<File | null>(null);
 
 
   const handleTriggerClick = useCallback(() => {
@@ -60,18 +37,23 @@ export function useImageUpload({ onUpload, initialPreviewUrl = null }: UseImageU
     (event: React.ChangeEvent<HTMLInputElement>) => {
       clientLogger.info('handleFileChange triggered.');
       const file = event.target.files?.[0];
+
+      // Revoke any existing blob URL first
+      if (currentBlobUrlRef.current) {
+        clientLogger.info('Revoking existing blob URL from currentBlobUrlRef in handleFileChange.', { url: currentBlobUrlRef.current });
+        URL.revokeObjectURL(currentBlobUrlRef.current);
+        currentBlobUrlRef.current = null;
+      }
+
       if (file) {
         clientLogger.info('File selected.', { fileName: file.name, fileSize: file.size });
         setFileName(file.name);
+        setUserSelectedFile(file); // Mark that a user file is now active
 
-        if (previewRef.current && previewRef.current.startsWith('blob:')) {
-          clientLogger.info('Revoking existing blob URL from previewRef.current.', { url: previewRef.current });
-          URL.revokeObjectURL(previewRef.current);
-        }
-        const blobUrl = URL.createObjectURL(file);
-        clientLogger.info('Created new blob URL.', { blobUrl });
-        setPreviewUrl(blobUrl);
-        previewRef.current = blobUrl; 
+        const newBlobUrl = URL.createObjectURL(file);
+        clientLogger.info('Created new blob URL.', { newBlobUrl });
+        setPreviewUrl(newBlobUrl); // Show blob preview
+        currentBlobUrlRef.current = newBlobUrl; // Store it for potential cleanup
         
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -91,56 +73,97 @@ export function useImageUpload({ onUpload, initialPreviewUrl = null }: UseImageU
 
       } else { 
         clientLogger.info('No file selected or selection cancelled.');
-        if (previewRef.current && previewRef.current.startsWith('blob:')) {
-          clientLogger.info('Revoking existing blob URL from previewRef.current due to no file selection.', { url: previewRef.current });
-          URL.revokeObjectURL(previewRef.current);
-        }
-        
-        const newPreview = initialPreviewUrl || null;
-        clientLogger.info('Setting preview URL based on initialPreviewUrl after no file selection.', { newPreview });
-        setPreviewUrl(newPreview);
-        previewRef.current = newPreview;
         setFileName(null);
+        setUserSelectedFile(null); // No user file active
+        // If no file is selected, previewUrl will be handled by the useEffect below,
+        // reverting to initialPreviewUrl.
         if (onUpload) {
           onUpload(null, null); 
         }
       }
     },
-    [onUpload, initialPreviewUrl], 
+    [onUpload], 
   );
 
   const handleRemove = useCallback(() => {
     clientLogger.info('handleRemove called.');
-    if (previewRef.current && previewRef.current.startsWith('blob:')) {
-      clientLogger.info('Revoking blob URL from previewRef.current during remove.', { url: previewRef.current });
-      URL.revokeObjectURL(previewRef.current);
+    if (currentBlobUrlRef.current) {
+      clientLogger.info('Revoking blob URL from currentBlobUrlRef during remove.', { url: currentBlobUrlRef.current });
+      URL.revokeObjectURL(currentBlobUrlRef.current);
+      currentBlobUrlRef.current = null;
     }
     
-    // When explicitly removing, we want to show null (or the placeholder)
-    // unless the initialPreviewUrl was itself null, in which case it's already fine.
-    // If initialPreviewUrl existed, setting previewUrl to null means "show placeholder instead of initial".
-    clientLogger.info('Setting previewUrl to null due to explicit remove.');
-    setPreviewUrl(null); 
-    previewRef.current = null; // Reflect that the current intention is "no preview"
     setFileName(null);
+    setUserSelectedFile(null); // No user file active after removal
     if (fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
+    // previewUrl will be updated by the useEffect to reflect initialPreviewUrl
     if (onUpload) {
-        onUpload(null, null); 
+        onUpload(null, null); // Signal removal to the form
     }
   }, [onUpload]); 
 
-  // Cleanup effect for blob URLs
+  // Effect to manage preview based on initialPreviewUrl and userSelectedFile
   useEffect(() => {
-    const currentBlobUrl = previewRef.current; 
+    clientLogger.info('Effect [initialPreviewUrl, userSelectedFile] running.', {
+      initialPreviewUrl,
+      hasUserSelectedFile: !!userSelectedFile,
+      currentPreviewUrlState: previewUrl, // Current state value of previewUrl
+      initialPropRefValue: initialPropRef.current,
+    });
+
+    if (userSelectedFile) {
+      // If a user has selected a file, handleFileChange already set the blob preview.
+      // This effect should not interfere if the blob URL is already set.
+      if (!previewUrl?.startsWith('blob:')) {
+        clientLogger.warn('User selected file exists, but previewUrl is not a blob. This is unexpected here.');
+        // This state implies handleFileChange might not have completed or was overridden.
+        // For safety, if userSelectedFile exists, force blob (though ideally handleFileChange is sole source for blob)
+        // This part is tricky, normally handleFileChange is authoritative for blob.
+      } else {
+         clientLogger.info('User file selected. Preview is already a blob URL.', { previewUrl });
+      }
+    } else {
+      // No user file is selected (initial state, or after removal/cancel).
+      // Preview should match initialPreviewUrl.
+      if (initialPreviewUrl !== previewUrl) { // Only update if different to avoid re-renders
+        clientLogger.info('No user file selected. Syncing previewUrl with initialPreviewUrl.', {
+          newPreview: initialPreviewUrl,
+          oldPreview: previewUrl,
+        });
+        // If the current previewUrl is a blob, revoke it as we are switching away from it.
+        if (previewUrl && previewUrl.startsWith('blob:')) {
+           clientLogger.info('Revoking existing blob URL as initialPreviewUrl takes precedence.', { url: previewUrl });
+           URL.revokeObjectURL(previewUrl); // Make sure to revoke the state value
+           if (currentBlobUrlRef.current === previewUrl) { // And clear ref if it was this blob
+             currentBlobUrlRef.current = null;
+           }
+        }
+        setPreviewUrl(initialPreviewUrl);
+      } else {
+         clientLogger.info('No user file selected. previewUrl already matches initialPreviewUrl (or both null/same).', { initialPreviewUrl, previewUrl });
+      }
+    }
+    
+    // Update the ref if initialPreviewUrl prop itself has changed
+    if (initialPreviewUrl !== initialPropRef.current) {
+        clientLogger.info('initialPreviewUrl prop changed. Updating initialPropRef.', { newInitial: initialPreviewUrl, oldInitial: initialPropRef.current});
+        initialPropRef.current = initialPreviewUrl;
+    }
+
+  }, [initialPreviewUrl, userSelectedFile, previewUrl]); // Added previewUrl to ensure re-evaluation if it's changed by other means.
+
+  // Cleanup effect specifically for the currentBlobUrlRef on unmount
+  useEffect(() => {
+    const blobToClean = currentBlobUrlRef.current; 
     return () => {
-      if (currentBlobUrl && currentBlobUrl.startsWith('blob:')) {
-        clientLogger.info('Cleaning up blob URL on unmount.', { url: currentBlobUrl });
-        URL.revokeObjectURL(currentBlobUrl);
+      if (blobToClean && blobToClean.startsWith('blob:')) {
+        clientLogger.info('Cleaning up blob URL from currentBlobUrlRef on unmount.', { url: blobToClean });
+        URL.revokeObjectURL(blobToClean);
       }
     };
-  }, []); 
+  }, []); // Runs only on unmount
 
   return {
     previewUrl,
@@ -149,7 +172,6 @@ export function useImageUpload({ onUpload, initialPreviewUrl = null }: UseImageU
     handleTriggerClick,
     handleFileChange,
     handleRemove,
-    setPreviewUrlDirectly: setPreviewUrl, // Expose for direct manipulation if needed
-    previewRef, // Expose ref for components like ProfileBannerUploader to potentially inspect
+    // No setPreviewUrlDirectly, state should be managed internally or via initial prop + user actions
   };
 }
