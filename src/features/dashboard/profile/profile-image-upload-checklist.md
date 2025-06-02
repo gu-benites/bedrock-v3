@@ -6,24 +6,24 @@ This checklist outlines the steps to fully implement the avatar and banner image
 
 This involves refining the server-side logic to handle image uploads, updates, removals, and associated storage cleanup.
 
-- [ ] **1.1 Implement Old Image Deletion Logic**
-    - [ ] **1.1.1 Refactor Image Upload Logic to Include Pre-Upload Deletion Check**
-        - [ ] Modify the avatar upload block in `updateUserProfile`.
-            - [ ] Before uploading a new avatar (`if (avatarDataUri)`), check if the user currently has an `avatar_url` stored in their profile in the database. This likely requires fetching the current profile data first.
-            - [ ] If an `avatar_url` exists, extract the file path from the URL.
-            - [ ] Implement logic to delete the old avatar file from the 'profiles' Supabase Storage bucket using `supabase.storage.from('profiles').remove([filePath])`.
-            - [ ] Add basic error handling for the deletion process (e.g., log errors, but don't necessarily fail the entire update).
+- [x] **1.1 Implement Old Image Deletion Logic**
+    - [x] **1.1.1 Refactor Image Upload Logic to Include Pre-Upload Deletion Check**
+        - [x] Modify the avatar upload block in `updateUserProfile`.
+            - [x] Before uploading a new avatar (`if (avatarDataUri)`), check if the user currently has an `avatar_url` stored in their profile in the database. This likely requires fetching the current profile data first. **(DONE for avatar)**
+            - [x] If an `avatar_url` exists, extract the file path from the URL. **(DONE for avatar)**
+            - [x] Implement logic to delete the old avatar file from the 'profiles' Supabase Storage bucket using `supabase.storage.from('profiles').remove([filePath])`. **(DONE for avatar)**
+            - [x] Add basic error handling for the deletion process (e.g., log errors, but don't necessarily fail the entire update). **(DONE for avatar)**
         - [ ] Modify the banner upload block in `updateUserProfile`.
             - [ ] Before uploading a new banner (`if (bannerImgDataUri)`), check if the user currently has a `banner_img_url` stored in their profile in the database.
             - [ ] If a `banner_img_url` exists, extract the file path from the URL.
             - [ ] Implement logic to delete the old banner file from the 'profiles' Supabase Storage bucket using `supabase.storage.from('profiles').remove([filePath])`.
             - [ ] Add basic error handling for the deletion process.
-    - [ ] **1.1.2 Implement Deletion Logic for Image Removal (Setting URL to null)**
-        - [ ] Modify the avatar removal block (`else if (avatarDataUri === null)`).
-            - [ ] Fetch the current user profile to get the existing `avatar_url`.
-            - [ ] If an `avatar_url` exists, extract the file path from the URL.
-            - [ ] Implement logic to delete the avatar file from the 'profiles' bucket using `supabase.storage.from('profiles').remove([filePath])`.
-            - [ ] Add basic error handling for the deletion process.
+    - [x] **1.1.2 Implement Deletion Logic for Image Removal (Setting URL to null)**
+        - [x] Modify the avatar removal block (`else if (avatarDataUri === null)`).
+            - [x] Fetch the current user profile to get the existing `avatar_url`. **(DONE for avatar)**
+            - [x] If an `avatar_url` exists, extract the file path from the URL. **(DONE for avatar)**
+            - [x] Implement logic to delete the avatar file from the 'profiles' bucket using `supabase.storage.from('profiles').remove([filePath])`. **(DONE for avatar)**
+            - [x] Add basic error handling for the deletion process. **(DONE for avatar)**
         - [ ] Modify the banner removal block (`else if (bannerImgDataUri === null)`).
             - [ ] Fetch the current user profile to get the existing `banner_img_url`.
             - [ ] If a `banner_img_url` exists, extract the file path from the URL.
