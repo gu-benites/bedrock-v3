@@ -50,8 +50,8 @@ export async function updateUserProfile(
   data: UpdateProfileData): Promise<UpdateProfileResult> {
   logger.info("updateUserProfile action started.", {
     providedFields: Object.keys(data),
-    hasAvatarDataUri: !!data.avatarDataUri,
-    hasBannerImgDataUri: !!data.bannerImgDataUri,
+    hasAvatarDataUri: data.avatarDataUri ? data.avatarDataUri.substring(0, 30) + '...' : 'No', // Log start of URI
+    hasBannerImgDataUri: data.bannerImgDataUri ? data.bannerImgDataUri.substring(0, 30) + '...' : 'No', // Log start of URI
   });
 
   const supabase = await createClient();
@@ -70,8 +70,10 @@ export async function updateUserProfile(
   }
 
   let currentAvatarDbPath: string | null = null;
+  let currentBannerDbPath: string | null = null; // Added for banner
   // Fetch current profile to get existing avatar_url and banner_img_url for deletion logic
   try {
+    logger.info(`Fetching current profile for user ID: ${user.id} to check existing images.`);
     const { data: currentProfileData, error: fetchCurrentProfileError } = await supabase
       .from('profiles')
       .select('avatar_url, banner_img_url') // Only select necessary fields
@@ -80,12 +82,15 @@ export async function updateUserProfile(
 
     if (fetchCurrentProfileError && fetchCurrentProfileError.code !== 'PGRST116') { // PGRST116: Row not found, which is fine
       logger.error("Error fetching current profile for image deletion check.", { userId: user.id, error: fetchCurrentProfileError.message });
-      // Don't fail the whole update yet, but log this. Deletion might not occur.
     }
     if (currentProfileData?.avatar_url) {
       currentAvatarDbPath = getStoragePathFromUrl(currentProfileData.avatar_url, 'profiles');
+      logger.info(`Found existing avatar_url for user ${user.id}`, { url: currentProfileData.avatar_url, path: currentAvatarDbPath });
     }
-    // Similarly for banner_img_url if we were handling it now
+    if (currentProfileData?.banner_img_url) { // Added for banner
+      currentBannerDbPath = getStoragePathFromUrl(currentProfileData.banner_img_url, 'profiles');
+      logger.info(`Found existing banner_img_url for user ${user.id}`, { url: currentProfileData.banner_img_url, path: currentBannerDbPath });
+    }
   } catch (e) {
     logger.error("Unexpected error fetching current profile for image deletion check.", { userId: user.id, error: (e as Error).message });
   }
@@ -126,7 +131,9 @@ export async function updateUserProfile(
   userDataToUpdate.updated_at = new Date().toISOString();
 
   // --- Handle Avatar Upload ---
+  logger.info(`Processing avatar for user ID: ${user.id}. avatarDataUri provided: ${!!avatarDataUri}, current DB path: ${currentAvatarDbPath}`);
   if (avatarDataUri) { // New avatar uploaded
+    logger.info(`New avatarDataUri received for user ${user.id}. Length: ${avatarDataUri.length}`);
     if (currentAvatarDbPath) {
       logger.info(`Attempting to delete old avatar for user ID: ${user.id}`, { path: currentAvatarDbPath });
       const { error: deleteOldAvatarError } = await supabase.storage
@@ -134,7 +141,6 @@ export async function updateUserProfile(
         .remove([currentAvatarDbPath]);
       if (deleteOldAvatarError) {
         logger.warn(`Failed to delete old avatar for user ID: ${user.id}`, { path: currentAvatarDbPath, error: deleteOldAvatarError.message });
-        // Non-fatal, continue with upload
       } else {
         logger.info(`Successfully deleted old avatar for user ID: ${user.id}`, { path: currentAvatarDbPath });
       }
@@ -146,99 +152,132 @@ export async function updateUserProfile(
       const buffer = Buffer.from(base64Data, 'base64');
       const fileExtension = avatarDataUri.substring('data:image/'.length, avatarDataUri.indexOf(';base64'));
       const filePath = `avatars/${user.id}.${fileExtension}`; // Store with user ID and extension
+      const contentType = `image/${fileExtension}`;
+      logger.info(`Attempting to upload new avatar for user ID: ${user.id}`, { filePath, contentType, bufferLength: buffer.length });
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: uploadDataResponse, error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(filePath, buffer, {
           cacheControl: '3600',
           upsert: true,
-          contentType: `image/${fileExtension}`
+          contentType: contentType
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        logger.error(`Supabase storage.upload ERROR for avatar user ${user.id}`, { filePath, error: uploadError });
+        throw uploadError;
+      }
+      logger.info(`Supabase storage.upload SUCCESS for avatar user ${user.id}`, { uploadDataResponse });
+
 
       const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(filePath);
       if (publicUrlData?.publicUrl) {
         userDataToUpdate.avatar_url = publicUrlData.publicUrl;
-        logger.info(`Avatar uploaded successfully for user ID: ${user.id}`, { url: publicUrlData.publicUrl });
+        logger.info(`Avatar public URL retrieved successfully for user ID: ${user.id}`, { url: publicUrlData.publicUrl });
       } else {
-         logger.warn(`Failed to get public URL for new avatar for user ID: ${user.id}`);
+         logger.warn(`Failed to get public URL for new avatar for user ID: ${user.id}, path: ${filePath}`);
       }
 
-    } catch (uploadError: any) {
-      logger.error(`Avatar upload failed for user ID: ${user.id}`, { error: uploadError.message });
-      return { error: `Failed to upload avatar: ${uploadError.message}` };
+    } catch (uploadCatchError: any) {
+      logger.error(`Avatar upload process failed for user ID: ${user.id}`, { errorName: uploadCatchError.name, errorMessage: uploadCatchError.message, stack: uploadCatchError.stack });
+      return { error: `Failed to upload avatar: ${uploadCatchError.message}` };
     }
   } else if (avatarDataUri === null) { // Avatar explicitly removed
+      logger.info(`Avatar marked for removal (avatarDataUri is null) for user ID: ${user.id}.`);
       if (currentAvatarDbPath) {
-        logger.info(`Attempting to remove existing avatar for user ID: ${user.id}`, { path: currentAvatarDbPath });
+        logger.info(`Attempting to remove existing avatar from storage for user ID: ${user.id}`, { path: currentAvatarDbPath });
         const { error: deleteExistingAvatarError } = await supabase.storage
           .from('profiles')
           .remove([currentAvatarDbPath]);
         if (deleteExistingAvatarError) {
           logger.warn(`Failed to remove existing avatar from storage for user ID: ${user.id}`, { path: currentAvatarDbPath, error: deleteExistingAvatarError.message });
-          // Non-fatal, will still set DB URL to null
         } else {
           logger.info(`Successfully removed existing avatar from storage for user ID: ${user.id}`, { path: currentAvatarDbPath });
         }
+      } else {
+        logger.info(`No existing avatar in DB to remove from storage for user ${user.id}.`);
       }
       userDataToUpdate.avatar_url = null;
-      logger.info(`Avatar marked for removal for user ID: ${user.id}. DB URL will be set to null.`);
+      logger.info(`Avatar DB URL will be set to null for user ID: ${user.id}.`);
   }
-  // If avatarDataUri is undefined (not "" or null), it means no change was made to the avatar by the user, so we don't touch userDataToUpdate.avatar_url here.
-  // It will retain its existing value or be overwritten if avatarUrl was part of 'data' (which we now filter out).
 
-  // --- Handle Banner Upload (Placeholder for similar logic) ---
+
+  // --- Handle Banner Upload ---
+  logger.info(`Processing banner for user ID: ${user.id}. bannerImgDataUri provided: ${!!bannerImgDataUri}, current DB path: ${currentBannerDbPath}`);
   if (bannerImgDataUri) {
-    // TODO: Implement banner upload logic similar to avatar, including deleting old banner
-    // For now, just log and potentially update if bannerUrl was directly in 'data' (which it shouldn't be)
+    logger.info(`New bannerImgDataUri received for user ${user.id}. Length: ${bannerImgDataUri.length}`);
+    if (currentBannerDbPath) {
+      logger.info(`Attempting to delete old banner for user ID: ${user.id}`, { path: currentBannerDbPath });
+      const { error: deleteOldBannerError } = await supabase.storage
+        .from('profiles')
+        .remove([currentBannerDbPath]);
+      if (deleteOldBannerError) {
+        logger.warn(`Failed to delete old banner for user ID: ${user.id}`, { path: currentBannerDbPath, error: deleteOldBannerError.message });
+      } else {
+        logger.info(`Successfully deleted old banner for user ID: ${user.id}`, { path: currentBannerDbPath });
+      }
+    }
     try {
-      // Extract base64 data
       const base64Data = bannerImgDataUri.split(';base64,').pop();
       if (!base64Data) throw new Error("Invalid banner Data URI format.");
       const buffer = Buffer.from(base64Data, 'base64');
       const fileExtension = bannerImgDataUri.substring('data:image/'.length, bannerImgDataUri.indexOf(';base64'));
       const filePath = `banners/${user.id}.${fileExtension}`;
+      const contentType = `image/${fileExtension}`;
+      logger.info(`Attempting to upload new banner for user ID: ${user.id}`, { filePath, contentType, bufferLength: buffer.length });
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: uploadDataResponse, error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(filePath, buffer, {
           cacheControl: '3600',
           upsert: true,
-          contentType: `image/${fileExtension}`
+          contentType: contentType
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        logger.error(`Supabase storage.upload ERROR for banner user ${user.id}`, { filePath, error: uploadError });
+        throw uploadError;
+      }
+      logger.info(`Supabase storage.upload SUCCESS for banner user ${user.id}`, { uploadDataResponse });
 
       const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(filePath);
       if (publicUrlData?.publicUrl) {
         userDataToUpdate.banner_img_url = publicUrlData.publicUrl;
-        logger.info(`Banner uploaded successfully for user ID: ${user.id}`);
+        logger.info(`Banner public URL retrieved successfully for user ID: ${user.id}`, { url: publicUrlData.publicUrl });
       } else {
-         logger.warn(`Failed to get public URL for banner for user ID: ${user.id}`);
+         logger.warn(`Failed to get public URL for banner for user ID: ${user.id}, path: ${filePath}`);
       }
 
-    } catch (uploadError: any) {
-      logger.error(`Banner upload failed for user ID: ${user.id}`, { error: uploadError.message });
-      return { error: `Failed to upload banner: ${uploadError.message}` };
+    } catch (uploadCatchError: any) {
+      logger.error(`Banner upload process failed for user ID: ${user.id}`, { errorName: uploadCatchError.name, errorMessage: uploadCatchError.message, stack: uploadCatchError.stack });
+      return { error: `Failed to upload banner: ${uploadCatchError.message}` };
     }
   } else if (bannerImgDataUri === null) { // If bannerImgDataUri is explicitly null, remove banner
-      // TODO: Implement deletion of old banner from storage if currentProfileDb.banner_img_url exists
+      logger.info(`Banner marked for removal (bannerImgDataUri is null) for user ID: ${user.id}.`);
+      if (currentBannerDbPath) {
+        logger.info(`Attempting to remove existing banner from storage for user ID: ${user.id}`, { path: currentBannerDbPath });
+        const { error: deleteExistingBannerError } = await supabase.storage
+          .from('profiles')
+          .remove([currentBannerDbPath]);
+        if (deleteExistingBannerError) {
+          logger.warn(`Failed to remove existing banner from storage for user ID: ${user.id}`, { path: currentBannerDbPath, error: deleteExistingBannerError.message });
+        } else {
+          logger.info(`Successfully removed existing banner from storage for user ID: ${user.id}`, { path: currentBannerDbPath });
+        }
+      } else {
+        logger.info(`No existing banner in DB to remove from storage for user ${user.id}.`);
+      }
       userDataToUpdate.banner_img_url = null;
-      logger.info(`Banner marked for removal for user ID: ${user.id}. DB URL will be set to null.`);
+      logger.info(`Banner DB URL will be set to null for user ID: ${user.id}.`);
   }
 
 
   // Only proceed with database update if there are fields to update
-  if (Object.keys(userDataToUpdate).length === 1 && userDataToUpdate.updated_at) {
-      // Only updated_at is present, meaning no actual profile data changed by the user
-      // This can happen if only images were interacted with but resulted in no change (e.g., upload failed, or removed an already null image)
-      // Or if no data fields were provided other than the URI fields which resolved to no change
-      // We should still return success if image operations occurred and were logged, but maybe with current profile
-      // For now, let's just return the current profile if no actual DB fields changed other than updated_at
-      logger.info(`No actual data fields to update for user ID: ${user.id}, other than potentially images. Returning current profile if fetched.`);
+  if (Object.keys(userDataToUpdate).length === 1 && userDataToUpdate.updated_at && !avatarDataUri && !bannerImgDataUri && avatarDataUri !== null && bannerImgDataUri !== null) {
+      // This condition means only updated_at is present, and no image interactions (new upload or explicit removal) were performed.
+      logger.info(`No actual data fields to update for user ID: ${user.id} (excluding images not explicitly changed). Returning current profile if fetched.`);
       const { data: currentProfileForReturn, error: fetchErrorForReturn } = await supabase.from("profiles").select().eq("id", user.id).single();
-      if (fetchErrorForReturn) {
+      if (fetchErrorForReturn && fetchErrorForReturn.code !== 'PGRST116') {
         logger.error(`Error fetching profile for no-op update return for user ${user.id}`, { error: fetchErrorForReturn.message });
         return { error: "Profile update attempted, but no changes made and failed to re-fetch profile." };
       }
@@ -248,7 +287,7 @@ export async function updateUserProfile(
             lastName: currentProfileForReturn.last_name, gender: currentProfileForReturn.gender,
             ageCategory: currentProfileForReturn.age_category, specificAge: currentProfileForReturn.specific_age,
             language: currentProfileForReturn.language, avatarUrl: currentProfileForReturn.avatar_url,
-            bannerUrl: currentProfileForReturn.banner_img_url, // Correct mapping
+            bannerUrl: currentProfileForReturn.banner_img_url, 
             bio: currentProfileForReturn.bio, role: currentProfileForReturn.role,
             stripeCustomerId: currentProfileForReturn.stripe_customer_id,
             subscriptionStatus: currentProfileForReturn.subscription_status,
@@ -260,9 +299,11 @@ export async function updateUserProfile(
         };
         const validatedProfile = UserProfileSchema.safeParse(mappedProfile);
         if (validatedProfile.success) {
+            logger.info(`Returning current (unchanged) profile for user ${user.id}.`);
             return { data: validatedProfile.data };
         }
       }
+      logger.warn(`No changes to apply, and could not retrieve current profile for user ${user.id}.`);
       return { error: "No changes to apply, and could not retrieve current profile." };
   }
 
@@ -289,7 +330,7 @@ export async function updateUserProfile(
   // Map back to camelCase for consistency with UserProfileSchema
   const resultProfile: UserProfile = {
     id: updatedProfile.id,
-    email: user.email,
+    email: user.email || '', // Ensure email is not undefined
     firstName: updatedProfile.first_name,
     lastName: updatedProfile.last_name,
     gender: updatedProfile.gender,
@@ -319,3 +360,4 @@ export async function updateUserProfile(
   logger.info(`Profile updated successfully in DB for user ID: ${user.id}`);
   return { data: validationResult.data };
 }
+
