@@ -8,6 +8,15 @@ import { useImageUpload } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { ImagePlus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getServerLogger } from '@/lib/logger'; // Assuming this can be used client-side or a client logger is available
+
+// Placeholder for a client-side logger if getServerLogger isn't appropriate
+const clientLogger = {
+  info: (message: string, context?: any) => console.log(`[ClientBannerUploaderINFO] ${message}`, context),
+  warn: (message: string, context?: any) => console.warn(`[ClientBannerUploaderWARN] ${message}`, context),
+  error: (message: string, context?: any) => console.error(`[ClientBannerUploaderERROR] ${message}`, context),
+};
+
 
 const ProfileBannerUploader: React.FC<{
   control: any; // react-hook-form control object
@@ -15,6 +24,7 @@ const ProfileBannerUploader: React.FC<{
   defaultImage?: string | null; // URL of the existing banner image
   disabled?: boolean;
 }> = ({ control, name, defaultImage, disabled }) => {
+  clientLogger.info('ProfileBannerUploader rendered/updated.', { defaultImage, disabled, name });
   const { toast } = useToast();
 
   return (
@@ -27,6 +37,7 @@ const ProfileBannerUploader: React.FC<{
         // Define onUpload *inside* this scope so it can use `field.onChange`
         // It also needs access to `imageUploadApi.handleRemove` for the case where an image is too large.
         const onUploadForField = (file: File | null, dataUrl: string | null, imageUploadApiRef?: ReturnType<typeof useImageUpload>) => {
+          clientLogger.info('ProfileBannerUploader - onUploadForField called.', { hasFile: !!file, hasDataUrl: !!dataUrl });
           if (disabled) return;
           if (file && file.size > 5 * 1024 * 1024) { // 5MB limit
             toast({ title: "Image too large", description: "Banner image must be less than 5MB.", variant: "destructive" });
@@ -57,12 +68,15 @@ const ProfileBannerUploader: React.FC<{
 
         // Effect to sync the preview URL if defaultImage prop changes
         useEffect(() => {
+          clientLogger.info('ProfileBannerUploader - useEffect for defaultImage sync.', { defaultImage, bannerPreview, currentRef: imageUploadApi.previewRef?.current });
           if (defaultImage !== bannerPreview && !(bannerPreview && bannerPreview.startsWith('blob:'))) {
+             clientLogger.info('ProfileBannerUploader - Setting preview URL directly from defaultImage.');
              setBannerPreviewUrlDirectly(defaultImage || null);
           }
-        }, [defaultImage, bannerPreview, setBannerPreviewUrlDirectly]);
+        }, [defaultImage, bannerPreview, setBannerPreviewUrlDirectly, imageUploadApi.previewRef]);
 
         const currentImage = bannerPreview || defaultImage;
+        clientLogger.info('ProfileBannerUploader - currentImage to render.', { currentImage });
 
         return (
           <div className="h-32 sm:h-40 md:h-48 bg-muted relative group rounded-t-lg overflow-hidden">
