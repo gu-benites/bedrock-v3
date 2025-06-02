@@ -4,7 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { UserProfileSchema, type UserProfile } from "../schemas/profile.schema";
 import { getServerLogger } from '@/lib/logger';
-import { getStoragePathFromUrl, handleImageProcessing } from "./utils/profile-image.utils";
+import { getStoragePathFromUrl, handleImageProcessing } from "../utils/profile-image.utils"; // Updated import path
 
 const logger = getServerLogger('UpdateProfileAvatarAction');
 
