@@ -1,3 +1,4 @@
+
 // src/features/dashboard/profile/profile-view.tsx
 'use client';
 
@@ -192,18 +193,16 @@ export function ProfileView() {
       if (data) {
         toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
         queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-        form.reset({ 
-          ...data,
-          avatarDataUri: undefined, 
-          bannerDataUri: undefined,
-        });
-        updateBioDisplayValue(data.bio || "");
-      } else if (!mutation.isError) {
-         toast({ title: "Profile Processed", description: "No effective changes were made on the server." });
+        // Form reset is handled by useEffect watching `profile`
+      } else if (!mutation.isError) { // No data returned but also no error, means no effective change was made
+         toast({ title: "Profile Processed", description: "No effective changes were made to your profile." });
          queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
+         // Ensure form still resets to the latest known good state (original profile)
          if (profile) { 
             form.reset({
                 ...profile,
+                avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+                bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
                 avatarDataUri: undefined,
                 bannerDataUri: undefined,
             });
@@ -229,6 +228,8 @@ export function ProfileView() {
     if (profile) {
       form.reset({
         ...profile,
+        avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+        bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
         avatarDataUri: undefined, 
         bannerDataUri: undefined,
       });
@@ -284,6 +285,8 @@ export function ProfileView() {
     if (profile) {
       form.reset({
         ...profile,
+        avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
+        bannerUrl: profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
         avatarDataUri: undefined, 
         bannerDataUri: undefined,
       });
@@ -530,3 +533,5 @@ export function ProfileView() {
     </FormProvider>
   );
 }
+
+    
