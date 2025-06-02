@@ -1,3 +1,4 @@
+
 // src/features/dashboard/components/dashboard-user-menu.tsx
 "use client";
 
@@ -84,9 +85,8 @@ export function DashboardUserMenu({
   const {
     user, 
     profile, 
-    isSessionLoading, // Used for the primary skeleton display
-    sessionError,  // Error from AuthSessionProvider
-    // isLoadingAuth is still available if needed for fine-grained profile loading state
+    isSessionLoading,
+    sessionError, 
   } = useAuth();
 
   useEffect(() => {
@@ -140,9 +140,12 @@ export function DashboardUserMenu({
     return initials || <UserCircle2 size={18} />;
   };
 
-  const avatarUrl = profile?.avatarUrl || (user?.user_metadata?.avatar_url as string | undefined);
+  // Compute timestamped avatar URL directly in render logic if profile and avatarUrl exist
+  const currentBaseAvatarUrl = profile?.avatarUrl || (user?.user_metadata?.avatar_url as string | undefined);
+  const timestampedAvatarUrl = currentBaseAvatarUrl 
+    ? `${currentBaseAvatarUrl.split('?')[0]}?t=${new Date().getTime()}` 
+    : null;
   
-  // Skeleton logic aligned with HeroHeader
   const showSkeletons = !mounted || isSessionLoading;
 
 
@@ -166,7 +169,7 @@ export function DashboardUserMenu({
              <Skeleton className="h-9 w-9 rounded-full" />
            ) : user ? ( 
             <Avatar className="h-9 w-9 text-sm">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt={getDisplayName()} />}
+                {timestampedAvatarUrl && <AvatarImage src={timestampedAvatarUrl} alt={getDisplayName()} />}
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                     {getInitials()}
                 </AvatarFallback>
