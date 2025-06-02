@@ -11,7 +11,7 @@ export function getStoragePathFromUrl(publicUrl: string, bucketName: string, log
   try {
     const url = new URL(publicUrl);
     // Pathname might be like /storage/v1/object/public/bucketName/folder/file.png
-    const pathSegments = url.pathname.split('/'); 
+    const pathSegments = url.pathname.split('/');
     const bucketIndex = pathSegments.indexOf(bucketName);
     if (bucketIndex !== -1 && bucketIndex < pathSegments.length - 1) {
       // Join all segments after the bucket name
@@ -29,7 +29,7 @@ interface ProcessImageOptions {
   supabase: SupabaseClient;
   userId: string;
   dataUri: string | null | undefined; // Can be new image data, null for removal, or undefined for no change
-  currentImagePathInStorage: string | null; // DB current path (e.g. "avatars/userid.png")
+  currentImagePathInStorage: string | null; // DB current path (e.g. "avatars/userid.png") - Used for explicit deletion
   imageType: 'avatar' | 'banner';
   baseFolderPath: 'avatars' | 'banners';
   loggerInstance: WinstonLogger;
@@ -47,28 +47,20 @@ export async function handleImageProcessing({
   supabase,
   userId,
   dataUri,
-  currentImagePathInStorage,
+  currentImagePathInStorage, // This is passed from the action, primarily for explicit deletion now
   imageType,
   baseFolderPath,
   loggerInstance,
 }: ProcessImageOptions): Promise<ProcessImageResult> {
-  loggerInstance.info(`Processing ${imageType} for user ID: ${userId}. DataURI provided: ${!!dataUri}, current DB path: ${currentImagePathInStorage}`);
+  loggerInstance.info(`Processing ${imageType} for user ID: ${userId}. DataURI provided: ${!!dataUri}, current DB path for potential deletion: ${currentImagePathInStorage}`);
 
   // Case 1: New image data URI is provided (upload or replace)
   if (typeof dataUri === 'string' && dataUri.startsWith('data:image')) {
     loggerInstance.info(`New ${imageType} DataURI received for user ${userId}. Length: ${dataUri.length}`);
-    if (currentImagePathInStorage) {
-      loggerInstance.info(`Attempting to delete old ${imageType} for user ID: ${userId}`, { path: currentImagePathInStorage });
-      const { error: deleteOldImageError } = await supabase.storage
-        .from('profiles') // Assuming 'profiles' is your bucket name
-        .remove([currentImagePathInStorage]);
-      if (deleteOldImageError) {
-        loggerInstance.warn(`Failed to delete old ${imageType} for user ID: ${userId}`, { path: currentImagePathInStorage, error: deleteOldImageError.message });
-        // Non-critical, proceed with upload
-      } else {
-        loggerInstance.info(`Successfully deleted old ${imageType} for user ID: ${userId}`, { path: currentImagePathInStorage });
-      }
-    }
+    // Relying on upsert:true for the upload to handle overwriting if the path is the same.
+    // Explicit pre-deletion of currentImagePathInStorage is removed from this block.
+    // Note: If file extension changes, old file with old extension might be orphaned.
+    // This simplification prioritizes `upsert:true` as requested.
 
     try {
       const mimeTypeMatch = dataUri.match(/^data:(image\/(png|jpeg|webp));base64,/);
@@ -77,20 +69,20 @@ export async function handleImageProcessing({
       }
       const contentType = mimeTypeMatch[1];
       const fileExtension = mimeTypeMatch[2];
-      
+
       const base64Data = dataUri.split(';base64,').pop();
       if (!base64Data) throw new Error(`Invalid ${imageType} Data URI format (missing base64 data).`);
-      
+
       const buffer = Buffer.from(base64Data, 'base64');
-      const filePath = `${baseFolderPath}/${userId}.${fileExtension}`;
-      
+      const filePath = `${baseFolderPath}/${userId}.${fileExtension}`; // Path for the new/updated file
+
       loggerInstance.info(`Attempting to upload new ${imageType} for user ID: ${userId}`, { filePath, contentType, bufferLength: buffer.length });
 
       const { data: uploadDataResponse, error: uploadError } = await supabase.storage
         .from('profiles') // Assuming 'profiles' is your bucket name
         .upload(filePath, buffer, {
           cacheControl: '3600',
-          upsert: true,
+          upsert: true, // upsert:true handles overwriting existing files at the same path
           contentType: contentType,
         });
 
@@ -116,7 +108,7 @@ export async function handleImageProcessing({
   // Case 2: Image explicitly marked for removal (dataUri is null)
   else if (dataUri === null) {
     loggerInstance.info(`${imageType} marked for removal (dataUri is null) for user ID: ${userId}.`);
-    if (currentImagePathInStorage) {
+    if (currentImagePathInStorage) { // We still need this to know what to delete
       loggerInstance.info(`Attempting to remove existing ${imageType} from storage for user ID: ${userId}`, { path: currentImagePathInStorage });
       const { error: deleteExistingImageError } = await supabase.storage
         .from('profiles') // Assuming 'profiles' is your bucket name
@@ -124,7 +116,6 @@ export async function handleImageProcessing({
       if (deleteExistingImageError) {
         loggerInstance.warn(`Failed to remove existing ${imageType} from storage for user ID: ${userId}`, { path: currentImagePathInStorage, error: deleteExistingImageError.message });
         // Potentially critical if DB update expects storage removal to succeed.
-        // For now, let's make it critical to ensure DB and storage are in sync.
         return { error: `Failed to remove existing ${imageType} from storage. DB update for this image aborted.` };
       } else {
         loggerInstance.info(`Successfully removed existing ${imageType} from storage for user ID: ${userId}`, { path: currentImagePathInStorage });
