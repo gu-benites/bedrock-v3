@@ -1,5 +1,134 @@
 {
-  "user": null,
-  "session": null,
+  "session": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ilc5UXFMUlp1UVlpVklibUgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2l1dHh6cHpiem5iZ3BrZHdiemRzLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlM2QwZjZhZi05NjU3LTRjOGMtYmVmZi00NGQwZDU0ZjIxZGYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ4OTMxNzg2LCJpYXQiOjE3NDg5MjgxODYsImVtYWlsIjoiZ3VzdGF2b0Bpbm92YWRvLmNvbS5iciIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZ29vZ2xlIiwicHJvdmlkZXJzIjpbImdvb2dsZSJdfSwidXNlcl9tZXRhZGF0YSI6eyJhdmF0YXJfdXJsIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTHdHMWFhQXdvV3ktb1F3a0ZTbEVyYU9vNUFJcEI2dUJWWXBzOF9xS1UxRE1XRWpqMjk9czk2LWMiLCJjdXN0b21fY2xhaW1zIjp7ImhkIjoiaW5vdmFkby5jb20uYnIifSwiZW1haWwiOiJndXN0YXZvQGlub3ZhZG8uY29tLmJyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ikd1c3Rhdm8gQmVuaXRlcyIsImlzcyI6Imh0dHBzOi8vYWNjb3VudHMuZ29vZ2xlLmNvbSIsIm5hbWUiOiJHdXN0YXZvIEJlbml0ZXMiLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NMd0cxYWFBd29XeS1vUXdrRlNsRXJhT281QUlwQjZ1QlZZcHM4X3FLVTFETVdFamoyOT1zOTYtYyIsInByb3ZpZGVyX2lkIjoiMTEwNDA4Njc2MjQwMDU4ODQyOTY4Iiwic3ViIjoiMTEwNDA4Njc2MjQwMDU4ODQyOTY4In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoib2F1dGgiLCJ0aW1lc3RhbXAiOjE3NDg5MjgxODZ9XSwic2Vzc2lvbl9pZCI6ImI2MDY2MDJlLWUyZWUtNGEzZS05ODI2LTAxYzA5MGI1MDFiOSIsImlzX2Fub255bW91cyI6ZmFsc2V9.wgWO0rJ4xe_-9xv4ZuOndUBExiXewcAfoGmjHUtAq94",
+    "token_type": "bearer",
+    "expires_in": 3600,
+    "expires_at": 1748931786,
+    "refresh_token": "egkrdar4kmgi",
+    "user": {
+      "id": "e3d0f6af-9657-4c8c-beff-44d0d54f21df",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "gustavo@inovado.com.br",
+      "email_confirmed_at": "2025-06-03T05:23:06.199093Z",
+      "phone": "",
+      "confirmed_at": "2025-06-03T05:23:06.199093Z",
+      "last_sign_in_at": "2025-06-03T05:23:06.600413588Z",
+      "app_metadata": {
+        "provider": "google",
+        "providers": [
+          "google"
+        ]
+      },
+      "user_metadata": {
+        "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+        "custom_claims": {
+          "hd": "inovado.com.br"
+        },
+        "email": "gustavo@inovado.com.br",
+        "email_verified": true,
+        "full_name": "Gustavo Benites",
+        "iss": "https://accounts.google.com",
+        "name": "Gustavo Benites",
+        "phone_verified": false,
+        "picture": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+        "provider_id": "110408676240058842968",
+        "sub": "110408676240058842968"
+      },
+      "identities": [
+        {
+          "identity_id": "4d113def-cbdb-4f99-841b-3938019cd711",
+          "id": "110408676240058842968",
+          "user_id": "e3d0f6af-9657-4c8c-beff-44d0d54f21df",
+          "identity_data": {
+            "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+            "custom_claims": {
+              "hd": "inovado.com.br"
+            },
+            "email": "gustavo@inovado.com.br",
+            "email_verified": true,
+            "full_name": "Gustavo Benites",
+            "iss": "https://accounts.google.com",
+            "name": "Gustavo Benites",
+            "phone_verified": false,
+            "picture": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+            "provider_id": "110408676240058842968",
+            "sub": "110408676240058842968"
+          },
+          "provider": "google",
+          "last_sign_in_at": "2025-06-03T05:23:06.191802Z",
+          "created_at": "2025-06-03T05:23:06.191859Z",
+          "updated_at": "2025-06-03T05:23:06.191859Z",
+          "email": "gustavo@inovado.com.br"
+        }
+      ],
+      "created_at": "2025-06-03T05:23:06.1854Z",
+      "updated_at": "2025-06-03T05:23:06.605263Z",
+      "is_anonymous": false
+    },
+    "provider_token": "ya29.a0AW4XtxjsOmFbp-X8n8RQdX46zL9_X7FGlxgDRywVT3pHlaSxdkqKFBjxa_2yZcmQfmq4aVZLT2Xz2VdaRwruEnjHop_xyE7ojXXBREu7Lyv8K4WBMKih2dfMBS0TyMzcJkszXKAzCsS5zF8C1P-Hzqa3R0uTMs6kkGkm7OJWaCgYKAe0SARESFQHGX2Mil2iZCZ3eWoeiFvRkPhJjSw0175",
+    "provider_refresh_token": "1//0hV_uslF6u4nFCgYIARAAGBESNwF-L9IrFx2yL-67_4VAHZMetNOVnrttD3r6dx3l3Zz3j2Ctz72F2jEIIpKQY91G0_bUKf9xvlM"
+  },
+  "user": {
+    "id": "e3d0f6af-9657-4c8c-beff-44d0d54f21df",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "gustavo@inovado.com.br",
+    "email_confirmed_at": "2025-06-03T05:23:06.199093Z",
+    "phone": "",
+    "confirmed_at": "2025-06-03T05:23:06.199093Z",
+    "last_sign_in_at": "2025-06-03T05:23:06.600413588Z",
+    "app_metadata": {
+      "provider": "google",
+      "providers": [
+        "google"
+      ]
+    },
+    "user_metadata": {
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+      "custom_claims": {
+        "hd": "inovado.com.br"
+      },
+      "email": "gustavo@inovado.com.br",
+      "email_verified": true,
+      "full_name": "Gustavo Benites",
+      "iss": "https://accounts.google.com",
+      "name": "Gustavo Benites",
+      "phone_verified": false,
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+      "provider_id": "110408676240058842968",
+      "sub": "110408676240058842968"
+    },
+    "identities": [
+      {
+        "identity_id": "4d113def-cbdb-4f99-841b-3938019cd711",
+        "id": "110408676240058842968",
+        "user_id": "e3d0f6af-9657-4c8c-beff-44d0d54f21df",
+        "identity_data": {
+          "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+          "custom_claims": {
+            "hd": "inovado.com.br"
+          },
+          "email": "gustavo@inovado.com.br",
+          "email_verified": true,
+          "full_name": "Gustavo Benites",
+          "iss": "https://accounts.google.com",
+          "name": "Gustavo Benites",
+          "phone_verified": false,
+          "picture": "https://lh3.googleusercontent.com/a/ACg8ocLwG1aaAwoWy-oQwkFSlEraOo5AIpB6uBVYps8_qKU1DMWEjj29=s96-c",
+          "provider_id": "110408676240058842968",
+          "sub": "110408676240058842968"
+        },
+        "provider": "google",
+        "last_sign_in_at": "2025-06-03T05:23:06.191802Z",
+        "created_at": "2025-06-03T05:23:06.191859Z",
+        "updated_at": "2025-06-03T05:23:06.191859Z",
+        "email": "gustavo@inovado.com.br"
+      }
+    ],
+    "created_at": "2025-06-03T05:23:06.1854Z",
+    "updated_at": "2025-06-03T05:23:06.605263Z",
+    "is_anonymous": false
+  },
   "redirectType": null
 }
