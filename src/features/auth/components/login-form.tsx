@@ -12,7 +12,7 @@ import { PassForgeLogo, GoogleLogo, MicrosoftLogo } from "@/components/icons";
 import { LogIn, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import * as Sentry from '@sentry/nextjs';
 import { useSearchParams } from "next/navigation";
-import OneTapComponent from './one-tap-component'; // Import the OneTapComponent
+import OneTapComponent from './one-tap-component'; 
 
 /**
  * A button component that displays a loading spinner while the form action is pending.
@@ -165,6 +165,30 @@ export default function LoginForm(): JSX.Element {
             <CardDescription>Log in to your PassForge account.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Social Logins First */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <form action={signInWithGoogleRedirectAction} className="w-full sm:flex-1">
+                  <GoogleSignInButton />
+                </form>
+                <form action={signInWithAzureRedirectAction} className="w-full sm:flex-1">
+                  <MicrosoftSignInButton />
+                </form>
+              </div>
+            </div>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* Email/Password Form */}
             <form action={formActionPassword} className="space-y-6">
               <div className="space-y-2">
                 <label
@@ -181,7 +205,7 @@ export default function LoginForm(): JSX.Element {
                     type="email"
                     placeholder="you@example.com"
                     required
-                    className="pl-10 focus:ring-accent"
+                    className="pl-10 focus:ring-accent focus:placeholder-transparent"
                     aria-describedby={statePassword?.errorFields?.email ? "email-error" : undefined}
                   />
                 </div>
@@ -207,7 +231,7 @@ export default function LoginForm(): JSX.Element {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     required
-                    className="pl-10 pr-10 focus:ring-accent"
+                    className="pl-10 pr-10 focus:ring-accent focus:placeholder-transparent"
                     aria-describedby={statePassword?.errorFields?.password ? "password-error" : undefined}
                   />
                   <Button
@@ -225,28 +249,8 @@ export default function LoginForm(): JSX.Element {
               </div>
               <SubmitButton />
             </form>
-
-            <div className="relative my-4"> {/* Adjusted margin */}
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3"> {/* Added space-y-3 for button spacing */}
-              <form action={signInWithGoogleRedirectAction} className="w-full">
-                <GoogleSignInButton />
-              </form>
-              <form action={signInWithAzureRedirectAction} className="w-full">
-                <MicrosoftSignInButton />
-              </form>
-            </div>
           </CardContent>
-           <CardFooter className="flex-col items-center text-sm pt-4"> {/* Adjusted padding-top */}
+           <CardFooter className="flex-col items-center text-sm pt-4">
               <p className="text-muted-foreground">
                 Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-primary font-medium hover:underline">
