@@ -1,17 +1,17 @@
 - [ ] 1.0 Backend Implementation (Server-Side Auth - PKCE flow)
-  - [x] 1.1 Create the callback route handler
-    - [x] 1.1.1 Create file at `src/app/(auth)/auth/confirm/callback/route.ts`.
-    - [x] 1.1.2 Import `NextResponse` from `next/server`.
-    - [x] 1.1.3 Use the existing import for `createClient` from `@/utils/supabase/server`.
-    - [x] 1.1.4 Define an asynchronous GET function that takes a `Request` object.
-    - [x] 1.1.5 Extract `searchParams` and `origin` from the request URL.
-    - [x] 1.1.6 Get the `code` from `searchParams`.
-    - [x] 1.1.7 Determine the `next` redirect URL, defaulting to '/' if not provided or not a relative URL.
-    - [x] 1.1.8 If `code` exists:
-      - [x] 1.1.8.1 Create a Supabase client using `createClient()`.
-      - [x] 1.1.8.2 Exchange the code for a session using `supabase.auth.exchangeCodeForSession(code)`.
-      - [x] 1.1.8.3 If there's no error, redirect the user to the `next` URL, handling `x-forwarded-host` for production and `origin` for development.
-    - [x] 1.1.9 If `code` does not exist or there's an error during code exchange, redirect the user to an error page (`${origin}/auth/auth-code-error`).
+  - [ ] 1.1 Create the callback route handler
+    - [ ] 1.1.1 Create file at `src/app/(auth)/auth/confirm/callback/route.ts`.
+    - [ ] 1.1.2 Import `NextResponse` from `next/server`.
+    - [ ] 1.1.3 Use the existing import for `createClient` from `@/utils/supabase/server`.
+    - [ ] 1.1.4 Define an asynchronous GET function that takes a `Request` object.
+    - [ ] 1.1.5 Extract `searchParams` and `origin` from the request URL.
+    - [ ] 1.1.6 Get the `code` from `searchParams`.
+    - [ ] 1.1.7 Determine the `next` redirect URL, defaulting to '/' if not provided or not a relative URL.
+    - [ ] 1.1.8 If `code` exists:
+      - [ ] 1.1.8.1 Create a Supabase client using `createClient()`.
+      - [ ] 1.1.8.2 Exchange the code for a session using `supabase.auth.exchangeCodeForSession(code)`.
+      - [ ] 1.1.8.3 If there's no error, redirect the user to the `next` URL, handling `x-forwarded-host` for production and `origin` for development.
+    - [ ] 1.1.9 If `code` does not exist or there's an error during code exchange, redirect the user to an error page (`${origin}/auth/auth-code-error`).
   - [ ] 1.2 Modify login action to initiate OAuth flow
     - [ ] 1.2.1 Locate the appropriate server action or API route for login initiation (e.g., `src/features/auth/actions/auth.actions.ts`).
     - [ ] 1.2.2 Add a new function or modify the existing login function to handle Google OAuth.
