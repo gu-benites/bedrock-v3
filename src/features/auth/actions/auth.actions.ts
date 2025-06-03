@@ -320,92 +320,87 @@ export async function signOutUserAction(): Promise<void> {
   redirect('/login');
 }
 
+interface OAuthSignInOptions {
+  provider: 'google' | 'azure'; // Add other providers as needed
+  options?: {
+    redirectTo?: string;
+    scopes?: string;
+    queryParams?: { [key: string]: string };
+    // Add other provider-specific options here
+  };
+}
 
 /**
- * Server Action to initiate Google OAuth sign-in.
- * Redirects the user to Google's authentication page.
+ * Generic helper function to initiate an OAuth sign-in flow for a given provider.
+ * Handles origin check, Supabase client creation, signInWithOAuth call,
+ * error handling, and redirection.
+ *
+ * @param {OAuthSignInOptions} options - Configuration for the OAuth sign-in.
+ * @returns {Promise<AuthActionState | void>} Returns a state object on failure, or void on successful redirect.
  */
-export async function signInWithGoogleRedirectAction() {
+async function handleOAuthSignIn({ provider, options = {} }: OAuthSignInOptions): Promise<AuthActionState | void> {
   const origin = headers().get("origin");
   if (!origin) {
-    logger.error('signInWithGoogleRedirectAction: Could not determine application origin.');
+    logger.error(`handleOAuthSignIn (${provider}): Could not determine application origin.`);
     return {
         success: false,
-        message: "Cannot determine application origin. Google Sign-In failed.",
+        message: `Cannot determine application origin. ${provider} Sign-In failed.`,
     };
   }
 
   const supabase = await createClient();
-  logger.info('signInWithGoogleRedirectAction: Initiating Google OAuth flow.');
+  logger.info(`handleOAuthSignIn (${provider}): Initiating OAuth flow.`);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${origin}/auth/callback?next=/dashboard`, // User lands on dashboard after successful callback
-      queryParams: {
-        access_type: 'offline', // To get a refresh token
-        prompt: 'consent',      // To ensure the user sees the consent screen
-      },
-    },
+    provider: provider,
+    options: { redirectTo: `${origin}/auth/callback?next=/dashboard`, ...options },
   });
 
   if (error) {
-    logger.error('signInWithGoogleRedirectAction: Error initiating Google OAuth.', { 
-      errorName: error.name, 
-      errorMessage: error.message 
+    logger.error(`handleOAuthSignIn (${provider}): Error initiating OAuth.`, {
+ errorName: error.name,
+ errorMessage: error.message
     });
-    return redirect(`/login?error=oauth_init_failed&message=${encodeURIComponent(error.message)}`);
+ return redirect(`/login?error=${provider}_oauth_init_failed&message=${encodeURIComponent(error.message)}`);
   }
 
   if (data.url) {
-    logger.info('signInWithGoogleRedirectAction: Redirecting to Google OAuth URL.');
-    redirect(data.url); // Redirect the user to Google's OAuth consent screen
+    logger.info(`handleOAuthSignIn (${provider}): Redirecting to OAuth URL.`);
+    redirect(data.url); // Redirect the user to the provider's OAuth consent screen
   } else {
-    logger.error('signInWithGoogleRedirectAction: Google OAuth initiated but no URL returned from Supabase.');
-    return redirect('/login?error=oauth_no_url&message=Failed to get Google OAuth URL.');
+    logger.error(`handleOAuthSignIn (${provider}): OAuth initiated but no URL returned from Supabase.`);
+    return redirect(`/login?error=${provider}_oauth_no_url&message=Failed to get ${provider} OAuth URL.`);
   }
 }
 
 /**
- * Server Action to initiate Microsoft Azure OAuth sign-in.
- * Redirects the user to Microsoft's authentication page.
- * Includes the 'email' scope as required by Supabase for Azure.
+ * Server Action to initiate Google OAuth sign-in.
+ * Calls the generic handler for Google.
+ * @returns {Promise<AuthActionState | void>}
  */
-export async function signInWithAzureRedirectAction() {
-  const origin = headers().get("origin");
-  if (!origin) {
-    logger.error('signInWithAzureRedirectAction: Could not determine application origin.');
-    return {
-        success: false,
-        message: "Cannot determine application origin. Microsoft Sign-In failed.",
-    };
-  }
-
-  const supabase = await createClient();
-  logger.info('signInWithAzureRedirectAction: Initiating Microsoft Azure OAuth flow.');
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'azure',
+export async function signInWithGoogleRedirectAction(): Promise<AuthActionState | void> {
+  return handleOAuthSignIn({
+    provider: 'google',
     options: {
-      scopes: 'email', // Required scope for Azure to return an email
-      redirectTo: `${origin}/auth/callback?next=/dashboard`, // User lands on dashboard after successful callback
-      // queryParams for Azure could be added here if needed, e.g., for tenant or domain hint
+      queryParams: {
+ access_type: 'offline', // To get a refresh token
+ prompt: 'consent',      // To ensure the user sees the consent screen
+      },
     },
   });
+}
 
-  if (error) {
-    logger.error('signInWithAzureRedirectAction: Error initiating Microsoft Azure OAuth.', { 
-      errorName: error.name, 
-      errorMessage: error.message 
-    });
-    return redirect(`/login?error=azure_oauth_init_failed&message=${encodeURIComponent(error.message)}`);
-  }
-
-  if (data.url) {
-    logger.info('signInWithAzureRedirectAction: Redirecting to Microsoft Azure OAuth URL.');
-    redirect(data.url); // Redirect the user to Microsoft's OAuth consent screen
-  } else {
-    logger.error('signInWithAzureRedirectAction: Microsoft Azure OAuth initiated but no URL returned from Supabase.');
-    return redirect('/login?error=azure_oauth_no_url&message=Failed to get Microsoft Azure OAuth URL.');
-  }
+/**
+ * Server Action to initiate Microsoft Azure OAuth sign-in.
+ * Calls the generic handler for Azure.
+ * Includes the 'email' scope as required by Supabase for Azure.
+ * @returns {Promise<AuthActionState | void>}
+ */
+export async function signInWithAzureRedirectAction() {
+ return handleOAuthSignIn({
+    provider: 'azure',
+    options: {
+      scopes: 'openid profile email', // Required scopes for Azure to return basic profile info and email
+    },
+  });
 }
