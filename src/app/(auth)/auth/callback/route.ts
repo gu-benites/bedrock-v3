@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     const logFile = path.join(logDir, 'oauth_callback_data.json');
     try {
       mkdirSync(logDir, { recursive: true }); // Create directory if it doesn't exist
-      writeFileSync(logFile, JSON.stringify(data, null, 2), 'utf-8');
+      writeFileSync(logFile, JSON.stringify(data, null, 2) + ',\n---\n\n', { flag: 'a+' }); // Append with separator
       await logCallbackStep(`OAuth callback data saved to ${logFile}`);
     } catch (fileError) {
       await logCallbackStep(`Error saving OAuth callback data to file: ${fileError}`);
