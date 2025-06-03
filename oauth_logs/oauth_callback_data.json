@@ -65,10 +65,8 @@
       "created_at": "2025-06-03T05:23:06.1854Z",
       "updated_at": "2025-06-03T05:23:06.605263Z",
       "is_anonymous": false
+    }
     },
-    "provider_token": "ya29.a0AW4XtxjsOmFbp-X8n8RQdX46zL9_X7FGlxgDRywVT3pHlaSxdkqKFBjxa_2yZcmQfmq4aVZLT2Xz2VdaRwruEnjHop_xyE7ojXXBREu7Lyv8K4WBMKih2dfMBS0TyMzcJkszXKAzCsS5zF8C1P-Hzqa3R0uTMs6kkGkm7OJWaCgYKAe0SARESFQHGX2Mil2iZCZ3eWoeiFvRkPhJjSw0175",
-    "provider_refresh_token": "1//0hV_uslF6u4nFCgYIARAAGBESNwF-L9IrFx2yL-67_4VAHZMetNOVnrttD3r6dx3l3Zz3j2Ctz72F2jEIIpKQY91G0_bUKf9xvlM"
-  },
   "user": {
     "id": "e3d0f6af-9657-4c8c-beff-44d0d54f21df",
     "aud": "authenticated",
