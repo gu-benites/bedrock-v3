@@ -329,10 +329,6 @@ export async function signInWithGoogleRedirectAction() {
   const origin = headers().get("origin");
   if (!origin) {
     logger.error('signInWithGoogleRedirectAction: Could not determine application origin.');
-    // Potentially redirect to an error page or return an error state
-    // For now, we'll let it fail if Supabase client can't be created,
-    // or throw if redirect is called with undefined origin.
-    // A more robust solution might redirect to `/login?error=origin_error`
     return {
         success: false,
         message: "Cannot determine application origin. Google Sign-In failed.",
@@ -345,7 +341,7 @@ export async function signInWithGoogleRedirectAction() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/auth/confirm/callback?next=/dashboard`, // User lands on dashboard after successful callback
+      redirectTo: `${origin}/auth/callback?next=/dashboard`, // User lands on dashboard after successful callback
       queryParams: {
         access_type: 'offline', // To get a refresh token
         prompt: 'consent',      // To ensure the user sees the consent screen
@@ -358,7 +354,6 @@ export async function signInWithGoogleRedirectAction() {
       errorName: error.name, 
       errorMessage: error.message 
     });
-    // Redirect to login with an error message
     return redirect(`/login?error=oauth_init_failed&message=${encodeURIComponent(error.message)}`);
   }
 
