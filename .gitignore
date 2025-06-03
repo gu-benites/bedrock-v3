@@ -49,3 +49,4 @@ firestore-debug.log
 
 # oauth logs
 oauth_callback_data.json
+oauth_logs/oauth_callback_data.json
