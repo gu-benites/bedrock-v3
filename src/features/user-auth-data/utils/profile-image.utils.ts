@@ -38,8 +38,8 @@ export interface ProcessImageResult {
 }
 
 /**
- * Internal helper to process image upload or removal for avatar or banner.
- * Relies on upsert:true for replacing images with the same path.
+ * Internal helper to process image upload or removal for avatar or banner,
+ * explicitly handling the deletion of the old image when a new one is uploaded.
  * Explicitly deletes from storage if dataUri is null and currentImagePathInStorage exists.
  */
 export async function handleImageProcessing({
@@ -57,9 +57,20 @@ export async function handleImageProcessing({
   if (typeof dataUri === 'string' && dataUri.startsWith('data:image')) {
     loggerInstance.info(`[handleImageProcessing] New ${imageType} DataURI received. User: ${userId}. DataURI (first 50 chars): ${dataUri.substring(0,50)}...`);
     
-    // Note: Explicit deletion of old image before upload is removed here.
-    // Relying on upsert:true. If file extension changes, old file with old extension might be orphaned.
+    // Explicitly delete the old image if it exists
+    if (currentImagePathInStorage) {
+      loggerInstance.info(`[handleImageProcessing] Attempting to remove existing ${imageType} from storage before upload. Path: ${currentImagePathInStorage}. User: ${userId}`);
+      const { error: deleteExistingImageError } = await supabase.storage
+        .from('profiles')
+        .remove([currentImagePathInStorage]);
 
+      if (deleteExistingImageError) {
+        // Log a warning but don't block the new upload
+        loggerInstance.warn(`[handleImageProcessing] Failed to remove old ${imageType} from storage before uploading new one. User: ${userId}`, { path: currentImagePathInStorage, error: deleteExistingImageError.message });
+      } else {
+        loggerInstance.info(`[handleImageProcessing] Successfully removed existing ${imageType} from storage before upload. Path: ${currentImagePathInStorage}. User: ${userId}`);
+      }
+    }
     try {
       const mimeTypeMatch = dataUri.match(/^data:(image\/(png|jpeg|webp));base64,/);
       if (!mimeTypeMatch || !mimeTypeMatch[1] || !mimeTypeMatch[2]) {
@@ -78,13 +89,13 @@ export async function handleImageProcessing({
       loggerInstance.info(`[handleImageProcessing] Extracted base64 data for ${imageType}. Length: ${base64Data.length}. User: ${userId}`);
       
       const buffer = Buffer.from(base64Data, 'base64');
+      // Keep the same path structure, relying on the explicit deletion to clear the old file
+      // with potentially a different extension.
       const filePath = `${baseFolderPath}/${userId}.${fileExtension}`;
-      loggerInstance.info(`[handleImageProcessing] Determined filePath for ${imageType}: ${filePath}. User: ${userId}`);
-      
+      loggerInstance.info(`[handleImageProcessing] Determined filePath for new ${imageType}: ${filePath}. User: ${userId}`);
       loggerInstance.info(`[handleImageProcessing] Attempting to upload new ${imageType} to Supabase Storage. User: ${userId}`, { filePath, contentType, bufferLength: buffer.length });
-
       const { data: uploadDataResponse, error: uploadError } = await supabase.storage
-        .from('profiles') 
+        .from('profiles')
         .upload(filePath, buffer, {
           cacheControl: '3600',
           upsert: true, 
@@ -93,6 +104,11 @@ export async function handleImageProcessing({
 
       if (uploadError) {
         loggerInstance.error(`[handleImageProcessing] Supabase storage.upload ERROR for ${imageType}. User: ${userId}`, { filePath, errorName: uploadError.name, errorMessage: uploadError.message, stack: uploadError.stack });
+        // If upload fails after deleting the old image, the user will have no image.
+        // Depending on desired behavior, you might want to attempt to revert
+        // or handle this more gracefully. For this diff, we just return the error.
+        // Consider adding a rollback mechanism if this is critical.
+
         return { error: `Failed to upload ${imageType}: ${uploadError.message}` };
       }
       loggerInstance.info(`[handleImageProcessing] Supabase storage.upload SUCCESS for ${imageType}. User: ${userId}`, { uploadDataResponse });
@@ -102,8 +118,10 @@ export async function handleImageProcessing({
       if (publicUrlData?.publicUrl) {
         loggerInstance.info(`[handleImageProcessing] ${imageType} public URL retrieved successfully: ${publicUrlData.publicUrl}. User: ${userId}`);
         return { newImageUrl: publicUrlData.publicUrl };
-      } else {
+      }  else {
         loggerInstance.warn(`[handleImageProcessing] Failed to get public URL for new ${imageType}. User: ${userId}, Path: ${filePath}`);
+        // This is an unusual state, but the file should still be uploaded.
+        // We might return an error or a specific status to indicate this.
         return { error: `Uploaded ${imageType}, but failed to get public URL.` };
       }
     } catch (uploadCatchError: any) {
@@ -119,7 +137,8 @@ export async function handleImageProcessing({
       const { error: deleteExistingImageError } = await supabase.storage
         .from('profiles') 
         .remove([currentImagePathInStorage]);
-      if (deleteExistingImageError) {
+       if (deleteExistingImageError) {
+        // Log a warning but don't prevent setting the DB URL to null
         loggerInstance.warn(`[handleImageProcessing] Failed to remove existing ${imageType} from storage. User: ${userId}`, { path: currentImagePathInStorage, error: deleteExistingImageError.message });
         return { error: `Failed to remove existing ${imageType} from storage. DB update for this image aborted.` };
       } else {

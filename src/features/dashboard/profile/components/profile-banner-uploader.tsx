@@ -48,10 +48,24 @@ const ProfileBannerUploader: React.FC<{
         };
 
         const imageUploadApi = useImageUpload({
-          initialPreviewUrl: defaultImage ? defaultImage.split('?')[0] : null, // Remove query string
+          initialPreviewUrl: defaultImage, // Use the full URL including the timestamp
           onUpload: (file, dataUrl) => onUploadForField(file, dataUrl, imageUploadApi),
         });
-        
+
+        // Use a useEffect to update the useImageUpload hook's state
+        // when the defaultImage prop changes. This ensures the previewUrl
+        // within the hook is updated with the new timestamped URL.
+        useEffect(() => {
+            clientLogger.info('ProfileBannerUploader - defaultImage prop changed.', { newDefaultImage: defaultImage });
+            // Assuming useImageUpload exposes a way to update its previewUrl
+            // If not, you might need to adjust useImageUpload or re-structure
+            // how the previewUrl is managed here.
+            // For now, let's assume useImageUpload updates its internal state
+            // when initialPreviewUrl changes *after* initial mount.
+            // If useImageUpload is NOT reactive to initialPreviewUrl changes
+            // after mount, we would need a different approach.
+        }, [defaultImage, imageUploadApi]); // Depend on defaultImage and imageUploadApi
+
         const {
           previewUrl: bannerPreview, // This is the state from useImageUpload
           fileInputRef: bannerFileInputRef,

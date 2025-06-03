@@ -1,0 +1,56 @@
+- [ ] 1.0 Backend Implementation (Server-Side Auth - PKCE flow)
+  - [x] 1.1 Create the callback route handler
+    - [x] 1.1.1 Create file at `src/app/(auth)/auth/confirm/callback/route.ts`.
+    - [x] 1.1.2 Import `NextResponse` from `next/server`.
+    - [x] 1.1.3 Use the existing import for `createClient` from `@/utils/supabase/server`.
+    - [x] 1.1.4 Define an asynchronous GET function that takes a `Request` object.
+    - [x] 1.1.5 Extract `searchParams` and `origin` from the request URL.
+    - [x] 1.1.6 Get the `code` from `searchParams`.
+    - [x] 1.1.7 Determine the `next` redirect URL, defaulting to '/' if not provided or not a relative URL.
+    - [x] 1.1.8 If `code` exists:
+      - [x] 1.1.8.1 Create a Supabase client using `createClient()`.
+      - [x] 1.1.8.2 Exchange the code for a session using `supabase.auth.exchangeCodeForSession(code)`.
+      - [x] 1.1.8.3 If there's no error, redirect the user to the `next` URL, handling `x-forwarded-host` for production and `origin` for development.
+    - [x] 1.1.9 If `code` does not exist or there's an error during code exchange, redirect the user to an error page (`${origin}/auth/auth-code-error`).
+  - [ ] 1.2 Modify login action to initiate OAuth flow
+    - [ ] 1.2.1 Locate the appropriate server action or API route for login initiation (e.g., `src/features/auth/actions/auth.actions.ts`).
+    - [ ] 1.2.2 Add a new function or modify the existing login function to handle Google OAuth.
+    - [ ] 1.2.3 Inside the function, call `supabase.auth.signInWithOAuth`.
+    - [ ] 1.2.4 Set the `provider` to `'google'`.
+    - [ ] 1.2.5 Include `options.redirectTo` pointing to the callback route (`/auth/confirm/callback`).
+    - [ ] 1.2.6 (Optional) Include `options.queryParams` for `access_type: 'offline'` and `prompt: 'consent'` to get a refresh token.
+    - [ ] 1.2.7 Handle the response: if `data.url` exists, redirect the user to that URL using the appropriate redirect API for your server framework (e.g., `redirect(data.url)`).
+    - [ ] 1.2.8 Handle potential errors during the sign-in initiation.
+  - [ ] 1.3 (Optional) Implement logic to save Google tokens
+    - [ ] 1.3.1 After successful code exchange in the callback route, access the `data.session` object.
+    - [ ] 1.3.2 Extract the `provider_token` and `provider_refresh_token` (if requested).
+    - [ ] 1.3.3 Store these tokens in a secure storage medium (e.g., your database, encrypted cookies).
+- [ ] 2.0 Login Form UX/UI Integration
+  - [ ] 2.1 Add a "Sign in with Google" button to the login form.
+    - [ ] 2.1.1 Locate the login form component (e.g., `src/features/auth/components/login-form.tsx`).
+    - [ ] 2.1.2 Add a new button element for Google sign-in.
+    - [ ] 2.1.3 Style the button according to your project's design.
+  - [ ] 2.2 Link the button to the backend OAuth initiation.
+    - [ ] 2.2.1 Create a client-side function to handle the button click.
+    - [ ] 2.2.2 This function should call the backend action/API route created in task 1.2 to initiate the OAuth flow.
+    - [ ] 2.2.3 Handle potential loading states or errors in the UI.
+  - [ ] 2.3 (Optional) Implement Google pre-built sign-in (One Tap)
+    - [ ] 2.3.1 Include the Google client library script in your app (e.g., in your root layout or a specific page component).
+    - [ ] 2.3.2 Use the HTML Code Generator to create the necessary HTML elements for the sign-in button or One Tap.
+    - [ ] 2.3.3 Include the `data-use_fedcm_for_prompt="true"` attribute.
+    - [ ] 2.3.4 Create a global callback function (`handleSignInWithGoogle`) to handle the `CredentialResponse`.
+    - [ ] 2.3.5 Inside the callback function, call `supabase.auth.signInWithIdToken`.
+    - [ ] 2.3.6 Pass the `response.credential` as the `token`.
+    - [ ] 2.3.7 (Optional) Generate and pass a `nonce` to both the HTML attributes and the `signInWithIdToken` options.
+    - [ ] 2.3.8 For One-Tap with Next.js, consider using the provided example component (`OneTapComponent`).
+- [ ] 3.0 Testing
+  - [ ] 3.1 Test the end-to-end OAuth flow in a development environment.
+    - [ ] 3.1.1 Click the "Sign in with Google" button.
+    - [ ] 3.1.2 Verify that you are redirected to the Google consent screen.
+    - [ ] 3.1.3 After consenting, verify that you are redirected back to your application via the callback route.
+    - [ ] 3.1.4 Verify that a user session is successfully created in your application.
+  - [ ] 3.2 Test with different Google accounts.
+  - [ ] 3.3 Test error handling scenarios (e.g., user denies consent).
+  - [ ] 3.4 Test in a production-like environment (if possible), ensuring the `x-forwarded-host` logic works correctly.
+  - [ ] 3.5 (If implemented) Verify that Google tokens are saved correctly.
+  - [ ] 3.6 (If using pre-built) Test the Google pre-built sign-in button or One Tap functionality.

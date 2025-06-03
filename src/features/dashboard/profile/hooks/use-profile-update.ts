@@ -156,8 +156,8 @@ export function useProfileUpdate({
         onSuccess: (data: UserProfile | undefined) => {
             clientLogger.info('useProfileUpdate - Global onSuccess triggered. Data:', data);
             if (user?.id) {
-                queryClient.invalidateQueries({ queryKey: ['userProfile', user.id] });
-                logger.info(`Invalidated userProfile query for user: ${user.id}`);
+                queryClient.invalidateQueries({ queryKey: ['userProfile', user.id] }); // Corrected line
+                clientLogger.info(`Invalidated userProfile query for user: ${user.id}`);
             }
             // Generic success toast (optional, as component might show a more specific one)
             // toast({ title: "Profile Update Processed", description: "Your changes have been processed." });

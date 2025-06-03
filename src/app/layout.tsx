@@ -1,7 +1,7 @@
 
 // Providers like ThemeProvider handle their own client boundaries.
 import type { Metadata } from 'next';
-import { Inter, Geist, Geist_Mono } from 'next/font/google'; // Added Inter
+import { Inter } from 'next/font/google'; // Added Inter
 import '../styles/globals.css';
 import { Toaster } from "@/components/ui";
 import { AuthSessionProvider, QueryClientProvider, ThemeProvider } from '@/providers';
