@@ -1,3 +1,4 @@
+
 // src/features/auth/actions/auth.actions.ts
 "use server";
 
@@ -12,6 +13,7 @@ import {
 } from "@/features/auth/schemas";
 import { loginPasswordSchema } from "@/features/auth/schemas/login.schema"; // Ensure this path is correct
 import { getServerLogger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 const logger = getServerLogger('AuthActions');
 
@@ -277,9 +279,6 @@ export async function signUpNewUser(prevState: AuthActionState, formData: FormDa
     };
   }
 
-  // Check if user is already confirmed (e.g., if auto-confirm is on, or if it's an existing unconfirmed user re-signing up)
-  // Supabase returns user and session null if email requires confirmation and it's a new user.
-  // It might return a user if the user already exists (e.g., unconfirmed)
   if (data.user && data.user.email_confirmed_at) {
     logger.info(`Sign-up successful and user already confirmed for email: ${email?.substring(0,3)}... User ID: ${data.user.id}`);
     return {
@@ -296,10 +295,9 @@ export async function signUpNewUser(prevState: AuthActionState, formData: FormDa
     };
   }
   
-  // Fallback for unexpected states, log and provide a generic message
   logger.warn('Sign-up completed with unexpected state from Supabase.', { email: email?.substring(0,3), data });
   return {
-    success: true, // Still, consider it a success in terms of initiating the flow
+    success: true, 
     message: "Sign up process initiated. Please check your email.",
   };
 }
@@ -315,10 +313,60 @@ export async function signOutUserAction(): Promise<void> {
   const { error } = await authService.signOutWithSupabase();
 
   if (error) {
-    // The service already logs this error. Here, we just log that the action encountered it.
     logger.error("Sign-out action encountered an error from the service.", { serviceError: error.message });
   } else {
     logger.info('Sign-out action successful, redirecting to /login.');
   }
   redirect('/login');
+}
+
+
+/**
+ * Server Action to initiate Google OAuth sign-in.
+ * Redirects the user to Google's authentication page.
+ */
+export async function signInWithGoogleRedirectAction() {
+  const origin = headers().get("origin");
+  if (!origin) {
+    logger.error('signInWithGoogleRedirectAction: Could not determine application origin.');
+    // Potentially redirect to an error page or return an error state
+    // For now, we'll let it fail if Supabase client can't be created,
+    // or throw if redirect is called with undefined origin.
+    // A more robust solution might redirect to `/login?error=origin_error`
+    return {
+        success: false,
+        message: "Cannot determine application origin. Google Sign-In failed.",
+    };
+  }
+
+  const supabase = await createClient();
+  logger.info('signInWithGoogleRedirectAction: Initiating Google OAuth flow.');
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/confirm/callback?next=/dashboard`, // User lands on dashboard after successful callback
+      queryParams: {
+        access_type: 'offline', // To get a refresh token
+        prompt: 'consent',      // To ensure the user sees the consent screen
+      },
+    },
+  });
+
+  if (error) {
+    logger.error('signInWithGoogleRedirectAction: Error initiating Google OAuth.', { 
+      errorName: error.name, 
+      errorMessage: error.message 
+    });
+    // Redirect to login with an error message
+    return redirect(`/login?error=oauth_init_failed&message=${encodeURIComponent(error.message)}`);
+  }
+
+  if (data.url) {
+    logger.info('signInWithGoogleRedirectAction: Redirecting to Google OAuth URL.');
+    redirect(data.url); // Redirect the user to Google's OAuth consent screen
+  } else {
+    logger.error('signInWithGoogleRedirectAction: Google OAuth initiated but no URL returned from Supabase.');
+    return redirect('/login?error=oauth_no_url&message=Failed to get Google OAuth URL.');
+  }
 }
