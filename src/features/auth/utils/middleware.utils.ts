@@ -124,7 +124,7 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isPublicPath && !pathname.startsWith('/_next/')) {
     // no user, and not a public path, redirect to login page
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = '/';
     // Optionally, you can add a 'redirectedFrom' query parameter
     // url.searchParams.set('redirectedFrom', pathname);
     return NextResponse.redirect(url);

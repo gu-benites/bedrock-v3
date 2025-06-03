@@ -258,7 +258,7 @@ export async function signUpNewUser(prevState: AuthActionState, formData: FormDa
       message: "Could not determine application origin. Sign up failed.",
     };
   }
-  const emailRedirectTo = `${origin}/auth/confirm?next=/login`;
+  const emailRedirectTo = `${origin}/auth/confirm?next=/`;
 
   const { data, error } = await authService.signUpWithSupabase(
     { email, password },
