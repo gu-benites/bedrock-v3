@@ -3,10 +3,10 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { UserProfileSchema, type UserProfile } from "../schemas/profile.schema";
-import { getServerLogger } from '@/lib/logger';
+import { getServerLogger } from '@/lib/logger'; // Re-added import
 import { getStoragePathFromUrl, handleImageProcessing } from "../utils/profile-image.utils"; 
 
-const logger = getServerLogger('UpdateProfileAvatarAction');
+const logger = getServerLogger('UpdateProfileAvatarAction'); // Re-added instantiation
 
 interface UpdateProfileImageResult {
   updatedProfile?: UserProfile;
@@ -16,24 +16,24 @@ interface UpdateProfileImageResult {
 export async function updateProfileAvatar(
   avatarDataUri: string | null | undefined
 ): Promise<UpdateProfileImageResult> {
-  logger.info(`[UpdateProfileAvatarAction] Action started. AvatarDataUri (first 50 chars): ${avatarDataUri ? avatarDataUri.substring(0, 50) + '...' : avatarDataUri}`);
+  logger.info(`[UpdateProfileAvatarAction] Action started. AvatarDataUri (first 50 chars): ${avatarDataUri ? avatarDataUri.substring(0, 50) + '...' : avatarDataUri}`); // Uncommented logger call
 
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError) {
-    logger.error("[UpdateProfileAvatarAction] Authentication error.", { error: authError.message });
+    logger.error("[UpdateProfileAvatarAction] Authentication error.", { error: authError.message }); // Uncommented logger call
     return { error: `Authentication error: ${authError.message}` };
   }
   if (!user) {
-    logger.warn("[UpdateProfileAvatarAction] No authenticated user found.");
+    logger.warn("[UpdateProfileAvatarAction] No authenticated user found."); // Uncommented logger call
     return { error: "User not authenticated." };
   }
-  logger.info(`[UpdateProfileAvatarAction] Authenticated user: ${user.id}`);
+  logger.info(`[UpdateProfileAvatarAction] Authenticated user: ${user.id}`); // Uncommented logger call
 
   let currentAvatarPath: string | null = null;
   try {
-    logger.info(`[UpdateProfileAvatarAction] Fetching current avatar_url for user ${user.id}`);
+    logger.info(`[UpdateProfileAvatarAction] Fetching current avatar_url for user ${user.id}`); // Uncommented logger call
     const { data: currentProfileData, error: fetchError } = await supabase
       .from('profiles')
       .select('avatar_url')
@@ -41,19 +41,19 @@ export async function updateProfileAvatar(
       .single();
 
     if (fetchError && fetchError.code !== 'PGRST116') { 
-      logger.error(`[UpdateProfileAvatarAction] Error fetching current avatar_url for user ${user.id}.`, { error: fetchError.message });
+      logger.error(`[UpdateProfileAvatarAction] Error fetching current avatar_url for user ${user.id}.`, { error: fetchError.message }); // Uncommented logger call
     }
     if (currentProfileData?.avatar_url) {
       currentAvatarPath = getStoragePathFromUrl(currentProfileData.avatar_url, 'profiles', logger);
-      logger.info(`[UpdateProfileAvatarAction] Current avatar path for user ${user.id}: ${currentAvatarPath}`);
+      logger.info(`[UpdateProfileAvatarAction] Current avatar path for user ${user.id}: ${currentAvatarPath}`); // Uncommented logger call
     } else {
-      logger.info(`[UpdateProfileAvatarAction] No current avatar_url found for user ${user.id}.`);
+      logger.info(`[UpdateProfileAvatarAction] No current avatar_url found for user ${user.id}.`); // Uncommented logger call
     }
   } catch (e) {
-    logger.error(`[UpdateProfileAvatarAction] Unexpected error fetching current avatar_url for user ${user.id}.`, { error: (e as Error).message });
+    logger.error(`[UpdateProfileAvatarAction] Unexpected error fetching current avatar_url for user ${user.id}.`, { error: (e as Error).message }); // Uncommented logger call
   }
   
-  logger.info(`[UpdateProfileAvatarAction] Calling handleImageProcessing for avatar. User: ${user.id}. currentAvatarPath: ${currentAvatarPath}`);
+  logger.info(`[UpdateProfileAvatarAction] Calling handleImageProcessing for avatar. User: ${user.id}. currentAvatarPath: ${currentAvatarPath}`); // Uncommented logger call
   const avatarResult = await handleImageProcessing({
     supabase,
     userId: user.id,
@@ -63,7 +63,7 @@ export async function updateProfileAvatar(
     baseFolderPath: 'avatars',
     loggerInstance: logger,
   });
-  logger.info(`[UpdateProfileAvatarAction] handleImageProcessing for avatar result:`, avatarResult);
+  logger.info(`[UpdateProfileAvatarAction] handleImageProcessing for avatar result:`, avatarResult); // Uncommented logger call
 
 
   if (avatarResult.error) {
@@ -76,7 +76,7 @@ export async function updateProfileAvatar(
       updated_at: new Date().toISOString(),
     };
 
-    logger.info(`[UpdateProfileAvatarAction] Attempting to update avatar_url in DB for user ID: ${user.id}`, { newUrl: avatarResult.newImageUrl });
+    logger.info(`[UpdateProfileAvatarAction] Attempting to update avatar_url in DB for user ID: ${user.id}`, { newUrl: avatarResult.newImageUrl }); // Uncommented logger call
     const { data: updatedProfileData, error: updateError } = await supabase
       .from("profiles")
       .update(userDataToUpdate)
@@ -85,14 +85,14 @@ export async function updateProfileAvatar(
       .single();
 
     if (updateError) {
-      logger.error(`[UpdateProfileAvatarAction] Failed to update avatar_url in DB for user ID: ${user.id}`, { error: updateError.message });
+      logger.error(`[UpdateProfileAvatarAction] Failed to update avatar_url in DB for user ID: ${user.id}`, { error: updateError.message }); // Uncommented logger call
       return { error: `Failed to update profile: ${updateError.message}` };
     }
     if (!updatedProfileData) {
-      logger.error(`[UpdateProfileAvatarAction] Profile DB update for avatar for user ID: ${user.id} did not return data.`);
+      logger.error(`[UpdateProfileAvatarAction] Profile DB update for avatar for user ID: ${user.id} did not return data.`); // Uncommented logger call
       return { error: "Profile update for avatar failed to return data." };
     }
-    logger.info(`[UpdateProfileAvatarAction] DB update for avatar_url successful for user ID: ${user.id}. Updated data:`, updatedProfileData);
+    logger.info(`[UpdateProfileAvatarAction] DB update for avatar_url successful for user ID: ${user.id}. Updated data:`, updatedProfileData); // Uncommented logger call
     
     const mappedProfile: UserProfile = {
         id: updatedProfileData.id,
@@ -119,14 +119,14 @@ export async function updateProfileAvatar(
 
     const validationResult = UserProfileSchema.safeParse(mappedProfile);
     if (!validationResult.success) {
-        logger.error('[UpdateProfileAvatarAction] Updated profile data (avatar) failed validation.', { errors: validationResult.error.flatten() });
+        logger.error('[UpdateProfileAvatarAction] Updated profile data (avatar) failed validation.', { errors: validationResult.error.flatten() }); // Uncommented logger call
         return { error: 'Updated profile data (avatar) is invalid.' };
     }
-    logger.info(`[UpdateProfileAvatarAction] Avatar updated and profile validated successfully for user ID: ${user.id}`);
+    logger.info(`[UpdateProfileAvatarAction] Avatar updated and profile validated successfully for user ID: ${user.id}`); // Uncommented logger call
     return { updatedProfile: validationResult.data };
 
   } else {
-    logger.info(`[UpdateProfileAvatarAction] No change to avatar_url needed for user ID: ${user.id}. Fetching current full profile.`);
+    logger.info(`[UpdateProfileAvatarAction] No change to avatar_url needed for user ID: ${user.id}. Fetching current full profile.`); // Uncommented logger call
      const { data: currentFullProfile, error: fetchCurrentError } = await supabase
       .from('profiles')
       .select('*')
@@ -134,11 +134,11 @@ export async function updateProfileAvatar(
       .single();
 
     if (fetchCurrentError) {
-        logger.error(`[UpdateProfileAvatarAction] Error fetching current profile after no avatar change for user ${user.id}`, { error: fetchCurrentError.message });
+        logger.error(`[UpdateProfileAvatarAction] Error fetching current profile after no avatar change for user ${user.id}`, { error: fetchCurrentError.message }); // Uncommented logger call
         return { error: "No avatar change, but failed to re-fetch profile." };
     }
      if (!currentFullProfile) {
-        logger.error(`[UpdateProfileAvatarAction] Could not find profile for user ${user.id} after no avatar change.`);
+        logger.error(`[UpdateProfileAvatarAction] Could not find profile for user ${user.id} after no avatar change.`); // Uncommented logger call
         return { error: "User profile not found after no avatar change." };
     }
      const mappedCurrentProfile: UserProfile = { 
@@ -154,10 +154,10 @@ export async function updateProfileAvatar(
     };
     const validatedCurrentProfile = UserProfileSchema.safeParse(mappedCurrentProfile);
      if (validatedCurrentProfile.success) {
-        logger.info(`[UpdateProfileAvatarAction] Successfully fetched current profile for user ${user.id} after no avatar change.`);
+        logger.info(`[UpdateProfileAvatarAction] Successfully fetched current profile for user ${user.id} after no avatar change.`); // Uncommented logger call
         return { updatedProfile: validatedCurrentProfile.data };
     } else {
-        logger.error(`[UpdateProfileAvatarAction] Fetched current profile after no avatar change for user ${user.id}, but it failed validation.`, { errors: validatedCurrentProfile.error.flatten() });
+        logger.error(`[UpdateProfileAvatarAction] Fetched current profile after no avatar change for user ${user.id}, but it failed validation.`, { errors: validatedCurrentProfile.error.flatten() }); // Uncommented logger call
         return { error: "Failed to retrieve a valid current profile after no avatar change." };
     }
   }

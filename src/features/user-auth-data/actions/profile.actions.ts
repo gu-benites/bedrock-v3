@@ -3,9 +3,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { UserProfileSchema, type UserProfile } from "../schemas/profile.schema";
-import { getServerLogger } from '@/lib/logger';
+import { getServerLogger } from '@/lib/logger'; // Re-added import
 
-const logger = getServerLogger('UpdateProfileTextAction');
+const logger = getServerLogger('UpdateProfileTextAction'); // Re-added instantiation
 
 interface UpdateProfileTextResult {
   data?: UserProfile;
@@ -22,17 +22,17 @@ type UpdateProfileTextData = Pick<
 export async function updateProfileTextDetails(
   data: UpdateProfileTextData
 ): Promise<UpdateProfileTextResult> {
-  logger.info("updateProfileTextDetails action started.", { providedFields: Object.keys(data) });
+  logger.info("updateProfileTextDetails action started.", { providedFields: Object.keys(data) }); // Uncommented logger call
 
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError) {
-    logger.error("Authentication error.", { error: authError.message });
+    logger.error("Authentication error.", { error: authError.message }); // Uncommented logger call
     return { error: `Authentication error: ${authError.message}` };
   }
   if (!user) {
-    logger.warn("No authenticated user found.");
+    logger.warn("No authenticated user found."); // Uncommented logger call
     return { error: "User not authenticated." };
   }
 
@@ -48,15 +48,15 @@ export async function updateProfileTextDetails(
   if (data.bio !== undefined) userDataToUpdate.bio = data.bio;
 
   if (Object.keys(userDataToUpdate).length === 0) {
-    logger.info(`No text details to update for user ID: ${user.id}. Fetching current profile.`);
+    logger.info(`No text details to update for user ID: ${user.id}. Fetching current profile.`); // Uncommented logger call
     // Fetch current profile to return if no changes.
     const { data: currentProfileData, error: fetchError } = await supabase.from("profiles").select().eq("id", user.id).single();
     if (fetchError && fetchError.code !== 'PGRST116') {
-      logger.error(`Error fetching profile for no-op update return for user ${user.id}`, { error: fetchError.message });
+      logger.error(`Error fetching profile for no-op update return for user ${user.id}`, { error: fetchError.message }); // Uncommented logger call
       return { error: "No changes made and failed to re-fetch profile." };
     }
      if (!currentProfileData) { // Should not happen if user exists and profile is expected
-        logger.error(`Could not find profile for user ${user.id} after no-op text update.`);
+        logger.error(`Could not find profile for user ${user.id} after no-op text update.`); // Uncommented logger call
         return { error: "User profile not found." };
     }
     const mappedProfile: UserProfile = { /* map all fields */
@@ -74,14 +74,14 @@ export async function updateProfileTextDetails(
     if (validatedProfile.success) {
       return { data: validatedProfile.data };
     } else {
-      logger.error(`Fetched current profile for no-op text update for user ${user.id}, but it failed validation.`, { errors: validatedProfile.error.flatten() });
+      logger.error(`Fetched current profile for no-op text update for user ${user.id}, but it failed validation.`, { errors: validatedProfile.error.flatten() }); // Uncommented logger call
       return { error: "Failed to retrieve a valid current profile after no-op text update." };
     }
   }
   
   userDataToUpdate.updated_at = new Date().toISOString();
 
-  logger.info(`Attempting to update profile text details in DB for user ID: ${user.id}`, { fieldsToUpdate: Object.keys(userDataToUpdate) });
+  logger.info(`Attempting to update profile text details in DB for user ID: ${user.id}`, { fieldsToUpdate: Object.keys(userDataToUpdate) }); // Uncommented logger call
 
   const { data: updatedProfile, error: updateError } = await supabase
     .from("profiles")
@@ -91,12 +91,12 @@ export async function updateProfileTextDetails(
     .single();
 
   if (updateError) {
-    logger.error(`Failed to update profile text details in DB for user ID: ${user.id}`, { error: updateError.message });
+    logger.error(`Failed to update profile text details in DB for user ID: ${user.id}`, { error: updateError.message }); // Uncommented logger call
     return { error: `Failed to update profile: ${updateError.message}` };
   }
 
   if (!updatedProfile) {
-    logger.error(`Profile text details DB update for user ID: ${user.id} did not return data.`);
+    logger.error(`Profile text details DB update for user ID: ${user.id} did not return data.`); // Uncommented logger call
     return { error: "Profile update failed to return data." };
   }
 
@@ -126,10 +126,10 @@ export async function updateProfileTextDetails(
   
   const validationResult = UserProfileSchema.safeParse(resultProfile);
   if (!validationResult.success) {
-      logger.error('Updated profile text data failed validation after mapping.', { errors: validationResult.error.flatten() });
+      logger.error('Updated profile text data failed validation after mapping.', { errors: validationResult.error.flatten() }); // Uncommented logger call
       return { error: 'Updated profile text data is invalid.' };
   }
 
-  logger.info(`Profile text details updated successfully for user ID: ${user.id}`);
+  logger.info(`Profile text details updated successfully for user ID: ${user.id}`); // Uncommented logger call
   return { data: validationResult.data };
 }
