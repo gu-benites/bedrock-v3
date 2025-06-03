@@ -61,12 +61,6 @@ const ProfileAvatarUploader: React.FC<{
         } = imageUploadApi;
 
 
-        useEffect(() => {
-          if (defaultImage !== avatarPreview && !(avatarPreview && avatarPreview.startsWith('blob:'))) {
-            setAvatarPreviewUrlDirectly(defaultImage || null);
-          }
-        }, [defaultImage, avatarPreview, setAvatarPreviewUrlDirectly]);
-     
         const currentAvatarSrc = avatarPreview || defaultImage;
 
         return (

@@ -48,7 +48,7 @@ const ProfileBannerUploader: React.FC<{
         };
 
         const imageUploadApi = useImageUpload({
-          initialPreviewUrl: defaultImage,
+          initialPreviewUrl: defaultImage ? defaultImage.split('?')[0] : null, // Remove query string
           onUpload: (file, dataUrl) => onUploadForField(file, dataUrl, imageUploadApi),
         });
         
