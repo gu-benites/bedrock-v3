@@ -1,50 +1,46 @@
 // src/features/dashboard/profile/hooks/use-profile-update.ts
 'use client';
 
-import { UseFormReturn } from 'react-hook-form';
+import { useFormReturn } from 'react-hook-form';
 import { useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
-import { User } from '@supabase/supabase-js'; // Assuming Supabase User type
+import { User } from '@supabase/supabase-js'; 
 import { UserProfileSchema, type UserProfile } from '@/features/user-auth-data/schemas';
 import {
     updateProfileTextDetails,
     updateProfileAvatar,
     updateProfileBanner,
 } from '@/features/user-auth-data/actions';
-import { useToast } from '@/hooks/use-toast';
-import { UseCharacterLimitReturn } from '@/hooks'; // Assuming type exists
+import { useToast as useShadcnToast } from '@/hooks/use-toast'; // Renamed to avoid conflict with local toast
+import { UseCharacterLimitReturn } from '@/hooks'; 
 import * as Sentry from '@sentry/nextjs';
 
-// Placeholder for a client-side logger
 const clientLogger = {
     info: (message: string, context?: any) => console.log(`[ProfileUpdateHookINFO] ${message}`, context),
     warn: (message: string, context?: any) => console.warn(`[ProfileUpdateHookWARN] ${message}`, context),
     error: (message: string, context?: any) => console.error(`[ProfileUpdateHookERROR] ${message}`, context),
 };
 
-// Constants (can be moved later if needed elsewhere)
-const languageOptions = [
+export const languageOptions = [
     { value: 'en', label: 'English' },
     { value: 'es', label: 'Español' },
     { value: 'fr', label: 'Français' },
     { value: 'de', label: 'Deutsch' },
 ];
 
-const ageCategoryOptions = [
+export const ageCategoryOptions = [
     { value: 'child', label: 'Child' },
     { value: 'teen', label: 'Teen' },
     { value: 'adult', label: 'Adult' },
     { value: 'senior', label: 'Senior' },
 ];
 
-// Form type including client-side data URIs
-type ProfileFormValues = UserProfile & {
+export type ProfileFormValues = UserProfile & {
     avatarDataUri?: string | null;
     bannerDataUri?: string | null;
 };
 
-// Extend UserProfileSchema for form validation, making client-side URI fields optional
-const ProfileFormSchema = UserProfileSchema.extend({
+export const ProfileFormSchema = UserProfileSchema.extend({
     avatarDataUri: z.string().optional().nullable(),
     bannerDataUri: z.string().optional().nullable(),
 });
@@ -52,26 +48,24 @@ const ProfileFormSchema = UserProfileSchema.extend({
 
 interface UseProfileUpdateOptions {
     user: User | null | undefined;
-    profile: UserProfile | null | undefined;
-    form: UseFormReturn<ProfileFormValues>;
+    profile: UserProfile | null | undefined; // Original profile data for comparison or context
     queryClient: QueryClient;
-    toast: ReturnType<typeof useToast>['toast'];
-    updateBioDisplayValue: UseCharacterLimitReturn['updateValue'];
+    toast: ReturnType<typeof useShadcnToast>['toast'];
+    // Removed form and updateBioDisplayValue from direct hook options
+    // They will be handled by the calling component in its onSuccess callback
 }
 
 export function useProfileUpdate({
     user,
-    profile,
-    form,
+    profile: originalProfile, // Renamed for clarity within the hook
     queryClient,
     toast,
-    updateBioDisplayValue,
 }: UseProfileUpdateOptions) {
 
-    const { mutate, isPending, isError, error } = useMutation<
-        UserProfile | undefined, // Success data type from the last successful action
-        Error,                   // Error type
-        ProfileFormValues        // Variables type (data passed to mutate)
+    const { mutate, isPending, error, ...rest } = useMutation<
+        UserProfile | undefined, 
+        Error,                   
+        ProfileFormValues        
     >({
         mutationFn: async (formData: ProfileFormValues) => {
             clientLogger.info('mutationFn started. FormData (URIs snipped):', {
@@ -80,21 +74,29 @@ export function useProfileUpdate({
                 bannerDataUri: formData.bannerDataUri ? formData.bannerDataUri.substring(0, 50) + '...' : formData.bannerDataUri,
             });
 
-            let latestProfileData: UserProfile | undefined = profile || undefined;
+            let latestProfileData: UserProfile | undefined = originalProfile || undefined;
             const errors: string[] = [];
 
             const { avatarDataUri, bannerDataUri, ...textDataFromForm } = formData;
 
             const textDetailsPayload: Partial<UserProfile> = {};
-            const originalProfileForComparison = profile || {};
+            const originalProfileForComparison = originalProfile || {};
             let textFieldsChanged = false;
 
             (Object.keys(UserProfileSchema.shape) as Array<keyof UserProfile>).forEach(key => {
                 if (!['id', 'email', 'avatarUrl', 'bannerUrl', 'createdAt', 'updatedAt', 'role',
                     'stripeCustomerId', 'subscriptionStatus', 'subscriptionTier', 'subscriptionPeriod',
                     'subscriptionStartDate', 'subscriptionEndDate'].includes(key)) {
-                    if (formData[key] !== undefined && formData[key] !== (originalProfileForComparison as any)[key]) {
-                        (textDetailsPayload as any)[key] = formData[key];
+                    
+                    const formValue = (formData as any)[key];
+                    const originalValue = (originalProfileForComparison as any)[key];
+
+                    // Handle null vs empty string for optional fields, and basic comparison
+                    const formValueForCompare = formValue === "" ? null : formValue;
+                    const originalValueForCompare = originalValue === "" ? null : originalValue;
+                    
+                    if (formValueForCompare !== originalValueForCompare) {
+                        (textDetailsPayload as any)[key] = formValue; // Send what's in the form
                         textFieldsChanged = true;
                     }
                 }
@@ -102,7 +104,7 @@ export function useProfileUpdate({
 
             if (textFieldsChanged) {
                 clientLogger.info('Text fields changed. Calling updateProfileTextDetails with payload:', textDetailsPayload);
-                const textResult = await updateProfileTextDetails(textDetailsPayload as any);
+                const textResult = await updateProfileTextDetails(textDetailsPayload as any); // Cast as any to satisfy Pick
                 clientLogger.info('updateProfileTextDetails result:', textResult);
                 if (textResult.error) errors.push(`Text update error: ${textResult.error}`);
                 if (textResult.data) latestProfileData = textResult.data;
@@ -110,137 +112,70 @@ export function useProfileUpdate({
                 clientLogger.info('No text fields changed.');
             }
 
+            // Check if avatarDataUri is explicitly provided (not undefined)
+            // A value of `null` means remove, `string` means update, `undefined` means no change intended by user action
             if (formData.avatarDataUri !== undefined) {
-                clientLogger.info('Avatar data URI provided. Calling updateProfileAvatar.');
+                clientLogger.info('Avatar data URI provided or explicitly null. Calling updateProfileAvatar.');
                 const avatarResult = await updateProfileAvatar(formData.avatarDataUri);
                 clientLogger.info('updateProfileAvatar result:', avatarResult);
                 if (avatarResult.error) errors.push(`Avatar update error: ${avatarResult.error}`);
                 if (avatarResult.updatedProfile) latestProfileData = avatarResult.updatedProfile;
             } else {
-                clientLogger.info('Avatar data URI is undefined. Skipping avatar update.');
+                clientLogger.info('Avatar data URI is undefined. Skipping avatar update action.');
             }
 
             if (formData.bannerDataUri !== undefined) {
-                clientLogger.info('Banner data URI provided. Calling updateProfileBanner.');
+                clientLogger.info('Banner data URI provided or explicitly null. Calling updateProfileBanner.');
                 const bannerResult = await updateProfileBanner(formData.bannerDataUri);
                 clientLogger.info('updateProfileBanner result:', bannerResult);
                 if (bannerResult.error) errors.push(`Banner update error: ${bannerResult.error}`);
                 if (bannerResult.updatedProfile) latestProfileData = bannerResult.updatedProfile;
             } else {
-                clientLogger.info('Banner data URI is undefined. Skipping banner update.');
+                clientLogger.info('Banner data URI is undefined. Skipping banner update action.');
             }
 
             if (errors.length > 0) {
                 clientLogger.error('Errors during mutation:', errors);
-                // Combine errors into a single message for the user toast
                 const errorMessage = `Profile update failed: ${errors.join('; ')}`;
-                throw new Error(errorMessage); // Throw to trigger onError
+                throw new Error(errorMessage); 
             }
 
+            // If no specific updates were made (no text changes, no image changes signaled)
+            // and no errors, it's possible latestProfileData is still the originalProfile or undefined.
+            // We should ensure we return something, preferably the most up-to-date profile if possible.
+            if (!textFieldsChanged && formData.avatarDataUri === undefined && formData.bannerDataUri === undefined && errors.length === 0) {
+                 clientLogger.info('mutationFn finished. No changes were made. Returning original profile data if available.');
+                 // In this case, the onSuccess in ProfileView will reset the form to its original state,
+                 // which is correct as no changes were pushed.
+                 return originalProfile || undefined;
+            }
+            
             clientLogger.info('mutationFn finished. Returning latestProfileData:', latestProfileData);
             return latestProfileData;
         },
-        onMutate: () => {
-            clientLogger.info('onMutate triggered.');
-        },
         onSuccess: (data: UserProfile | undefined) => {
-            clientLogger.info('onSuccess triggered. Data from mutation:', data);
-            if (data) {
-                toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
-                queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-                // Update form fields and bio with fresh data from the mutation response
-                 const resetBannerUrl = data.bannerUrl ? `${data.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
-                form.reset({
-                    ...data,
-                    avatarUrl: data.avatarUrl ? `${data.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-                    bannerUrl: resetBannerUrl,
-                    avatarDataUri: undefined,
-                    bannerDataUri: undefined,
-                });
-                updateBioDisplayValue(data.bio || "");
-
-            } else if (!isError) {
-                // This case happens if mutationFn returns undefined without throwing an error.
-                // It implies no changes were deemed necessary or the process finished without new data.
-                toast({ title: "Profile Processed", description: "No effective changes were made to your profile." });
-                 queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] });
-                 // It's still good practice to re-fetch or reset form to ensure consistency,
-                 // especially if server might have made implicit changes or for cache coherence.
-                 if (profile) { // Use the original profile data for reset if no new data was returned
-                    const resetBannerUrl = profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
-                    clientLogger.info('onSuccess (no data but no error): Resetting form with original profile and timestamped bannerUrl.', { resetBannerUrl });
-                    form.reset({
-                        ...profile,
-                        avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-                        bannerUrl: resetBannerUrl,
-                        avatarDataUri: undefined,
-                        bannerDataUri: undefined,
-                    });
-                    updateBioDisplayValue(profile.bio || "");
-                } else {
-                     // If no profile was available initially, reset to empty/default user data
-                    clientLogger.info('onSuccess (no data, no error, no original profile): Resetting form with default user data.');
-                     const initialResetValues = {
-                        id: user?.id, email: user?.email,
-                        firstName: (user?.user_metadata?.first_name as string) || "",
-                        lastName: (user?.user_metadata?.last_name as string) || "",
-                        avatarUrl: (user?.user_metadata?.avatar_url as string) || null,
-                        bannerUrl: null, bio: "", language: "en", ageCategory: null, specificAge: null,
-                        role: 'user', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-                        avatarDataUri: undefined,
-                        bannerDataUri: undefined,
-                    };
-                    form.reset(initialResetValues as ProfileFormValues);
-                    updateBioDisplayValue("");
-                }
+            clientLogger.info('useProfileUpdate - Global onSuccess triggered. Data:', data);
+            if (user?.id) {
+                queryClient.invalidateQueries({ queryKey: ['userProfile', user.id] });
+                logger.info(`Invalidated userProfile query for user: ${user.id}`);
             }
+            // Generic success toast (optional, as component might show a more specific one)
+            // toast({ title: "Profile Update Processed", description: "Your changes have been processed." });
         },
         onError: (error: Error) => {
-            clientLogger.error('onError triggered. Error:', error);
+            clientLogger.error('useProfileUpdate - Global onError triggered. Error:', error);
             toast({ title: "Update Failed", description: error.message || "An unexpected error occurred.", variant: "destructive" });
             Sentry.captureException(error, {
-                tags: { context: 'profileUpdateMutation' },
+                tags: { context: 'profileUpdateMutationHook' },
                 extra: { userId: user?.id },
             });
-            // Note: Form state remains dirty/with errors by default, allowing user to fix and resubmit.
-            // No explicit form reset here.
         },
-        onSettled: () => {
-            clientLogger.info('onSettled triggered.');
-            // Potentially re-enable form fields if they were disabled onMutate
-        }
     });
 
-    const handleCancel = () => {
-        clientLogger.info('handleCancel called.');
-        if (profile) {
-            const resetBannerUrl = profile.bannerUrl ? `${profile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
-            clientLogger.info('Canceling: Resetting form with original profile and timestamped bannerUrl.', { resetBannerUrl });
-            form.reset({
-                ...profile,
-                avatarUrl: profile.avatarUrl ? `${profile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
-                bannerUrl: resetBannerUrl,
-                avatarDataUri: undefined,
-                bannerDataUri: undefined,
-            });
-            updateBioDisplayValue(profile.bio || "");
-        } else if (user) {
-            clientLogger.info('Canceling: No profile, resetting form with user data.');
-            const initialResetValues = {
-                id: user.id, email: user.email,
-                firstName: (user.user_metadata?.first_name as string) || "",
-                lastName: (user.user_metadata?.last_name as string) || "",
-                avatarUrl: (user.user_metadata?.avatar_url as string) || null,
-                bannerUrl: null, bio: "", language: "en", ageCategory: null, specificAge: null,
-                role: 'user', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-            };
-            form.reset(initialResetValues as ProfileFormValues);
-            updateBioDisplayValue("");
-        }
-        toast({ title: "Changes Canceled", description: "Your changes have been discarded."});
-    };
-
     return {
-        mutate, isPending, isError, error, handleCancel
+        performUpdate: mutate, // Expose the mutate function
+        isPending,
+        error,
+        ...rest, // Includes isError, status, etc.
     };
 }
