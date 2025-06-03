@@ -6,9 +6,9 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Input, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Separator } from "@/components/ui";
-import { signInWithPassword, signInWithGoogleRedirectAction } from "@/features/auth/actions";
+import { signInWithPassword, signInWithGoogleRedirectAction, signInWithAzureRedirectAction } from "@/features/auth/actions";
 import { useToast } from "@/hooks";
-import { PassForgeLogo, GoogleLogo } from "@/components/icons";
+import { PassForgeLogo, GoogleLogo, MicrosoftLogo } from "@/components/icons";
 import { LogIn, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import * as Sentry from '@sentry/nextjs';
 import { useSearchParams } from "next/navigation";
@@ -33,7 +33,7 @@ function SubmitButton() {
  * @returns {JSX.Element} The Google Sign-In button.
  */
 function GoogleSignInButton() {
-  const { pending } = useFormStatus(); // Get pending state if this button is in a form being submitted
+  const { pending } = useFormStatus(); 
   return (
     <Button type="submit" variant="outline" className="w-full" disabled={pending}>
       {pending ? (
@@ -46,6 +46,24 @@ function GoogleSignInButton() {
   );
 }
 
+/**
+ * A button component for Microsoft Sign-In.
+ * @returns {JSX.Element} The Microsoft Sign-In button.
+ */
+function MicrosoftSignInButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" variant="outline" className="w-full" disabled={pending}>
+      {pending ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <MicrosoftLogo className="mr-2 h-5 w-5" />
+      )}
+      Sign in with Microsoft
+    </Button>
+  );
+}
+
 
 // List of common user-facing error messages that shouldn't be sent to Sentry as system errors.
 const USER_FACING_ERROR_SUBSTRINGS = [
@@ -54,13 +72,15 @@ const USER_FACING_ERROR_SUBSTRINGS = [
   "invalid login credentials",
   "please check your credentials",
   "oauth_init_failed",
-  "oauth_no_url"
+  "oauth_no_url",
+  "azure_oauth_init_failed",
+  "azure_oauth_no_url"
 ];
 
 /**
  * Renders the login form.
- * Allows users to sign in with their email and password or via Google.
- * Uses Server Actions (`signInWithPassword`, `signInWithGoogleRedirectAction`) to handle authentication.
+ * Allows users to sign in with their email and password or via Google or Microsoft.
+ * Uses Server Actions to handle authentication.
  * Displays success or error messages using toasts and handles redirection on success.
  * Includes a password visibility toggle.
  * Integrates Google One-Tap sign-in.
@@ -77,7 +97,6 @@ export default function LoginForm(): JSX.Element {
   const [googleClientIdExists, setGoogleClientIdExists] = useState(false);
 
   useEffect(() => {
-    // Check for Google Client ID on mount to conditionally render OneTapComponent
     if (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
       setGoogleClientIdExists(true);
     }
@@ -87,12 +106,16 @@ export default function LoginForm(): JSX.Element {
     const oauthError = searchParams.get('error');
     const oauthMessage = searchParams.get('message');
     if (oauthError) {
+      let title = "OAuth Sign-In Failed";
+      if (oauthError.includes('google')) title = "Google Sign-In Failed";
+      if (oauthError.includes('azure')) title = "Microsoft Sign-In Failed";
+      
       toast({
-        title: "Google Sign-In Failed",
-        description: oauthMessage || "An error occurred during Google Sign-In.",
+        title: title,
+        description: oauthMessage || "An error occurred during OAuth Sign-In.",
         variant: "destructive",
       });
-      Sentry.captureMessage(`Google OAuth Error on Login Page: ${oauthError}`, {
+      Sentry.captureMessage(`OAuth Error on Login Page: ${oauthError}`, {
         level: 'warning',
         extra: { errorMessage: oauthMessage },
       });
@@ -102,7 +125,6 @@ export default function LoginForm(): JSX.Element {
   useEffect(() => {
     if (statePassword?.message) {
       if (statePassword.success) {
-        // Redirection happens in the server action, so a success toast here might not be seen often.
         toast({
           title: "Success!",
           description: statePassword.message,
@@ -204,7 +226,7 @@ export default function LoginForm(): JSX.Element {
               <SubmitButton />
             </form>
 
-            <div className="relative my-6">
+            <div className="relative my-4"> {/* Adjusted margin */}
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -215,11 +237,16 @@ export default function LoginForm(): JSX.Element {
               </div>
             </div>
 
-            <form action={signInWithGoogleRedirectAction} className="w-full">
-              <GoogleSignInButton />
-            </form>
+            <div className="space-y-3"> {/* Added space-y-3 for button spacing */}
+              <form action={signInWithGoogleRedirectAction} className="w-full">
+                <GoogleSignInButton />
+              </form>
+              <form action={signInWithAzureRedirectAction} className="w-full">
+                <MicrosoftSignInButton />
+              </form>
+            </div>
           </CardContent>
-           <CardFooter className="flex-col items-center text-sm">
+           <CardFooter className="flex-col items-center text-sm pt-4"> {/* Adjusted padding-top */}
               <p className="text-muted-foreground">
                 Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-primary font-medium hover:underline">

@@ -365,3 +365,47 @@ export async function signInWithGoogleRedirectAction() {
     return redirect('/login?error=oauth_no_url&message=Failed to get Google OAuth URL.');
   }
 }
+
+/**
+ * Server Action to initiate Microsoft Azure OAuth sign-in.
+ * Redirects the user to Microsoft's authentication page.
+ * Includes the 'email' scope as required by Supabase for Azure.
+ */
+export async function signInWithAzureRedirectAction() {
+  const origin = headers().get("origin");
+  if (!origin) {
+    logger.error('signInWithAzureRedirectAction: Could not determine application origin.');
+    return {
+        success: false,
+        message: "Cannot determine application origin. Microsoft Sign-In failed.",
+    };
+  }
+
+  const supabase = await createClient();
+  logger.info('signInWithAzureRedirectAction: Initiating Microsoft Azure OAuth flow.');
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: {
+      scopes: 'email', // Required scope for Azure to return an email
+      redirectTo: `${origin}/auth/callback?next=/dashboard`, // User lands on dashboard after successful callback
+      // queryParams for Azure could be added here if needed, e.g., for tenant or domain hint
+    },
+  });
+
+  if (error) {
+    logger.error('signInWithAzureRedirectAction: Error initiating Microsoft Azure OAuth.', { 
+      errorName: error.name, 
+      errorMessage: error.message 
+    });
+    return redirect(`/login?error=azure_oauth_init_failed&message=${encodeURIComponent(error.message)}`);
+  }
+
+  if (data.url) {
+    logger.info('signInWithAzureRedirectAction: Redirecting to Microsoft Azure OAuth URL.');
+    redirect(data.url); // Redirect the user to Microsoft's OAuth consent screen
+  } else {
+    logger.error('signInWithAzureRedirectAction: Microsoft Azure OAuth initiated but no URL returned from Supabase.');
+    return redirect('/login?error=azure_oauth_no_url&message=Failed to get Microsoft Azure OAuth URL.');
+  }
+}
