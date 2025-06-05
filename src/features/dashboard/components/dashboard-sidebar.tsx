@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDashboardLoading } from "../context/dashboard-loading-context";
+import { useDashboardLoading } from "@/features/ui/providers/loading-provider";
 import { DashboardUserMenu } from "./dashboard-user-menu"; // Updated import
 
 type SubMenuItem = {

@@ -1,59 +1,72 @@
-// src/app/page.tsx
-import { HomepageLayout } from '@/features/homepage/layout'; // Updated import path
-import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { getCurrentUserProfile } from '@/features/user-auth-data/queries'; 
-import { createClient } from '@/lib/supabase/server';
 import { getServerLogger } from '@/lib/logger';
+import { getServerAuthState } from '@/features/auth/services/auth-state.service';
+import { getCurrentUserProfile } from '@/features/user-auth-data/services/profile.service';
+import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
+import { HomepageLayout } from '@/features/homepage/layout/homepage-layout';
 
 const logger = getServerLogger('RootPage');
-const getTimestampLog = () => new Date().toISOString();
 
 /**
- * Renders the main homepage of the PassForge application.
- * This component serves as the entry point for the '/' route.
- * It renders the HomepageLayout component, which contains the actual structure and content of the homepage.
- * If a user is authenticated, it attempts to prefetch their profile data on the server
- * to make it available for client-side hydration, benefiting components like HeroHeader.
- *
- * @returns {Promise<JSX.Element>} The homepage component.
+ * Optimized root page component
+ * Uses centralized auth state service and optimized profile service
+ * for efficient data prefetching and consistent error handling
  */
-export default async function RootPage(): Promise<JSX.Element> {
-  const queryClient = new QueryClient();
-  const supabase = await createClient();
-  // Fetch the user session on the server
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    logger.error(`[${getTimestampLog()}] RootPage (Server): Error fetching user session.`, { error: userError.message });
-    // Continue rendering homepage as public, HeroHeader will adapt.
-  }
-
-  if (user) {
-    logger.info(`[${getTimestampLog()}] RootPage (Server): User ${user.id} is authenticated. Attempting to prefetch profile.`);
-    try {
-      await queryClient.prefetchQuery({
-        queryKey: ['userProfile', user.id],
-        queryFn: getCurrentUserProfile,
+export default async function RootPage() {
+  try {
+    const { user, error: authError } = await getServerAuthState();
+    
+    if (authError) {
+      // Error already logged in getServerAuthState, just add context
+      logger.warn('Auth error in root page', {
+        error: authError.message,
+        stack: authError.stack,
+        operation: 'RootPage'
       });
-      logger.info(`[${getTimestampLog()}] RootPage (Server): Successfully prefetched user profile for ${user.id}.`);
-    } catch (error) {
-      const castError = error instanceof Error ? error : new Error(String(error));
-      // Log the error, but don't block rendering. The client-side query will handle fetching if prefetch fails.
-      logger.error(`[${getTimestampLog()}] RootPage (Server): FAILED to prefetch user profile for ${user.id}.`, { error: castError.message, stack: castError.stack });
     }
-  } else {
-    logger.info(`[${getTimestampLog()}] RootPage (Server): No authenticated user. Skipping profile prefetch for homepage.`);
+    
+    const queryClient = new QueryClient();
+    
+    // Only prefetch profile if user is authenticated
+    if (user?.id) {
+      // Mask userId for privacy in logs
+      const maskedUserId = `${user.id.substring(0, 6)}...`;
+      
+      logger.info('Prefetching profile for authenticated user', {
+        userId: maskedUserId,
+        operation: 'RootPage'
+      });
+      
+      try {
+        await queryClient.prefetchQuery({
+          queryKey: ['userProfile', user.id],
+          queryFn: () => getCurrentUserProfile(user.id),
+        });
+      } catch (err) {
+        logger.warn('Error prefetching user profile', {
+          userId: maskedUserId,
+          error: err instanceof Error ? err.message : String(err),
+          operation: 'RootPage'
+        });
+      }
+    } else {
+      logger.info('No authenticated user. Skipping profile prefetch for homepage', {
+        operation: 'RootPage'
+      });
+    }
+    
+    return (
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <HomepageLayout />
+      </HydrationBoundary>
+    );
+  } catch (err) {
+    logger.error('Critical error in root page', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      operation: 'RootPage'
+    });
+    
+    // Fallback rendering
+    return <HomepageLayout />;
   }
-
-  const dehydratedState = dehydrate(queryClient);
-  if (user) { // Log dehydrated state only if we attempted to prefetch
-    logger.info(`[${getTimestampLog()}] RootPage (Server): Dehydrated state for user ${user.id}:`, JSON.stringify(dehydratedState, null, 2).substring(0, 300) + '...');
-  }
-
-
-  return (
-    <HydrationBoundary state={dehydratedState}>
-      <HomepageLayout />
-    </HydrationBoundary>
-  );
 }

@@ -1,7 +1,7 @@
 
 import { DashboardLayout as DashboardLayoutComponent } from '@/features/dashboard/layout';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { getCurrentUserProfile } from '@/features/user-auth-data/queries'; // Corrected import path
+import { getCurrentUserProfile } from '@/features/user-auth-data/services/profile.service';
 import { createClient } from '@/lib/supabase/server';
 // Removed: import { redirect } from 'next/navigation';
 import { getServerLogger } from '@/lib/logger';
@@ -42,7 +42,7 @@ export default async function DashboardLayout({
       // Race prefetch against timeout to prevent blocking rendering
       const profilePromise = queryClient.prefetchQuery({
         queryKey: ['userProfile', user.id],
-        queryFn: getCurrentUserProfile,
+        queryFn: () => getCurrentUserProfile(user.id),
         staleTime: 10 * 1000, // 10 seconds
       });
 

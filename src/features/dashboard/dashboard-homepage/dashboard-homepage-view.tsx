@@ -17,7 +17,6 @@ import {
 import { BarChart, CheckCircle, LineChart, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/hooks';
-import { useDashboardLoading } from '@/features/dashboard/context/dashboard-loading-context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function LoadingCard() {
@@ -35,8 +34,8 @@ function LoadingCard() {
 }
 
 export function DashboardHomepageView() {
-  const { user, profile } = useAuth();
-  const { isLoading: showSkeletons } = useDashboardLoading();
+  const { user, profile, isLoading } = useAuth();
+  const showSkeletons = isLoading;
 
   const getDisplayName = () => {
     if (profile?.firstName) return profile.firstName;

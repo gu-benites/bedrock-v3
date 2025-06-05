@@ -1,7 +1,7 @@
 // src/features/homepage/layout/homepage-layout.tsx
 // This file was formerly src/features/homepage/hero-section.tsx
 import React from 'react';
-import { LoadingProvider } from '@/features/auth/context/loading-context';
+import { LoadingProvider } from '@/features/ui/providers/loading-provider';
 import HeroHeader from '../components/hero-header/hero-header';
 import HeroCanvasBackground from '../components/hero-canvas-background/hero-canvas-background';
 import HeroContent from '../components/hero-content/hero-content';

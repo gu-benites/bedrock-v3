@@ -3,7 +3,7 @@
 
 import { ReactNode, useState, useEffect, useCallback } from "react";
 import { DashboardSidebar, DashboardHeader } from "../components"; // Updated import path
-import { DashboardLoadingProvider } from "../context/dashboard-loading-context";
+import { LoadingProvider as DashboardLoadingProvider } from "@/features/ui/providers/loading-provider";
 import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {

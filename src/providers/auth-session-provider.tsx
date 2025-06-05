@@ -1,4 +1,3 @@
-// src/providers/auth-session-provider.tsx
 'use client';
 
 import { type User } from '@supabase/supabase-js';
@@ -15,15 +14,13 @@ import * as Sentry from '@sentry/nextjs';
 
 interface AuthSessionContextType {
   user: User | null;
-  isLoading: boolean; // True until a definitive session state is known or timeout
+  isLoading: boolean;
   error: Error | null;
 }
 
 const AuthSessionContext = createContext<AuthSessionContextType | undefined>(
   undefined,
 );
-
-const getTimestampLog = () => new Date().toISOString();
 
 export const AuthSessionProvider = ({
   children,
@@ -33,100 +30,126 @@ export const AuthSessionProvider = ({
   preloadedUser?: User | null;
 }) => {
   const [user, setUser] = useState<User | null>(preloadedUser);
-  const [isLoading, setIsLoading] = useState(!preloadedUser);
+  const [isLoading, setIsLoading] = useState<boolean>(!preloadedUser);
   const [error, setError] = useState<Error | null>(null);
-  const [supabaseClient] = useState(() => createClient());
-
-  const isMountedRef = useRef(true);
-  const initialSessionProcessedRef = useRef(!!preloadedUser); // Tracks if INITIAL_SESSION event logic has run
-
+  
+  // Conditional logging for development only
+  const shouldLog = process.env.NODE_ENV === 'development' && 
+                    process.env.NEXT_PUBLIC_DEBUG_AUTH === 'true';
+  
   useEffect(() => {
-    isMountedRef.current = true;
-    initialSessionProcessedRef.current = !!preloadedUser;
-
-    // This log helps see the state when the effect that sets up subscription runs.
-    // On initial mount, isLoading is false if preloadedUser exists.
-    console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): Subscribing to onAuthStateChange. Initial isLoading: ${isLoading}, User: ${user?.id}, PreloadedUser: ${!!preloadedUser}`);
-
-    const { data: { subscription: authSubscription }, error: subscriptionErrorHook } = supabaseClient.auth.onAuthStateChange(
-      (event, session) => {
-        if (!isMountedRef.current) {
-          console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): onAuthStateChange received but component unmounted. Event: ${event}`);
-          return;
-        }
-
-        // Use the `isLoading` state variable directly from the closure of this callback.
-        console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): onAuthStateChange event: ${event}. Session user ID: ${session?.user?.id}. Current isLoading state variable: ${isLoading}, initialSessionProcessedRef: ${initialSessionProcessedRef.current}`);
-        
-        setUser(session?.user ?? null);
-        
-        const sessionWithError = session as (typeof session & { error?: any });
-        if (sessionWithError?.user && sessionWithError?.error) {
-          const detailedError = sessionWithError.error;
-          console.warn(`[${getTimestampLog()}] AuthSessionProvider (Client): Auth event '${event}' included an error object for user ${sessionWithError.user.id}. Error: ${detailedError?.message}`);
-          setError(new Error(detailedError?.message || 'Unknown session error'));
-          Sentry.captureMessage(`Auth event '${event}' included an error`, {
-            level: 'warning',
-            extra: { userId: sessionWithError.user.id, sessionErrorName: detailedError?.name, sessionErrorMessage: detailedError?.message },
+    if (!preloadedUser) {
+      const supabase = createClient();
+      
+      // Initial session check
+      const getInitialSession = async () => {
+        try {
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            // Dev-only console logging
+            if (shouldLog) {
+              console.warn('[AuthSessionProvider] Error getting initial session:', sessionError.message);
+            }
+            setError(sessionError);
+            
+            // Always report to Sentry with context
+            Sentry.captureException(sessionError, {
+              tags: { component: 'AuthSessionProvider', type: 'sessionError' },
+              extra: { 
+                operation: 'getInitialSession',
+                message: 'Error getting initial session'
+              }
+            });
+          }
+          
+          setUser(session?.user || null);
+          setIsLoading(false);
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          
+          // Dev-only console logging
+          if (shouldLog) {
+            console.error('[AuthSessionProvider] Critical error getting initial session:', error.message);
+          }
+          setError(error);
+          setIsLoading(false);
+          
+          // Always report to Sentry with context
+          Sentry.captureException(error, {
+            tags: { component: 'AuthSessionProvider', type: 'criticalError' },
+            extra: { 
+              operation: 'getInitialSession',
+              message: 'Critical error getting initial session'
+            }
           });
-        } else if (event !== 'USER_UPDATED' && event !== 'PASSWORD_RECOVERY' && event !== 'MFA_CHALLENGE_VERIFIED') {
+        }
+      };
+      
+      getInitialSession();
+      
+      // Subscribe to auth changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (shouldLog) {
+          console.log(`[AuthSessionProvider] Auth state changed: ${event}`);
+        }
+        
+        // Handle auth events
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setUser(session?.user || null);
+          
+          // Log significant events to Sentry
+          if (event === 'SIGNED_IN' && session?.user) {
+            // Set user context with masked email for privacy
+            Sentry.setUser({ 
+              id: session.user.id, 
+              email: session.user.email ? `${session.user.email.substring(0, 3)}***` : undefined 
+            });
+            
+            Sentry.captureMessage('User signed in', {
+              level: 'info',
+              tags: { event, component: 'AuthSessionProvider' },
+              extra: { 
+                userId: `${session.user.id.substring(0, 6)}...`,
+                operation: 'authStateChange'
+              }
+            });
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          Sentry.setUser(null);
+          Sentry.captureMessage('User signed out', {
+            level: 'info',
+            tags: { event, component: 'AuthSessionProvider' },
+            extra: { operation: 'authStateChange' }
+          });
+        }
+        
+        // Handle errors in session
+        const sessionWithError = session as (typeof session & { error?: any });
+        if (sessionWithError?.error) {
+          const sessionError = new Error(sessionWithError.error.message || 'Unknown session error');
+          setError(sessionError);
+          
+          Sentry.captureException(sessionError, {
+            tags: { component: 'AuthSessionProvider', event, type: 'sessionError' },
+            extra: { 
+              userId: sessionWithError.user?.id ? `${sessionWithError.user.id.substring(0, 6)}...` : 'none',
+              errorName: sessionWithError.error.name,
+              operation: 'authStateChange'
+            }
+          });
+        } else {
           setError(null);
         }
-        
-        if (event === 'INITIAL_SESSION') {
-          if (!initialSessionProcessedRef.current) { // Ensure this block runs only once per subscription lifecycle
-            if (session?.user) {
-              console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): INITIAL_SESSION received with user. Setting isLoading to false.`);
-              setIsLoading(false);
-            } else {
-              console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): INITIAL_SESSION received with NO user. isLoading remains true, awaiting timeout or subsequent event like SIGNED_IN.`);
-              // isLoading remains true, will be set to false by a subsequent event or the timeout.
-            }
-            initialSessionProcessedRef.current = true; 
-          }
-        } else if (isLoading) { // If a non-INITIAL_SESSION event occurs AND we are still in the initial loading phase
-          if (session?.user || event === 'SIGNED_OUT') { // Any event that definitively resolves session state
-            console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): Event ${event} received while still initial loading. Setting isLoading to false.`);
-            setIsLoading(false);
-            if (!initialSessionProcessedRef.current) initialSessionProcessedRef.current = true; // Should be true if INITIAL_SESSION already fired
-          }
-        }
-      }
-    );
-
-    if (subscriptionErrorHook) {
-        console.error(`[${getTimestampLog()}] AuthSessionProvider (Client): Error subscribing to onAuthStateChange:`, subscriptionErrorHook);
-        if (isMountedRef.current) { // Check mounted before setting state
-            Sentry.captureMessage('Supabase onAuthStateChange subscription failed', {
-              level: 'error',
-              extra: { errorName: subscriptionErrorHook.name, errorMessage: subscriptionErrorHook.message },
-            });
-            setError(subscriptionErrorHook);
-            if (isLoading) setIsLoading(false); // If subscription fails, stop loading
-            initialSessionProcessedRef.current = true; // Mark initial processing as done/failed
-        }
+      });
+      
+      return () => {
+        subscription.unsubscribe();
+      };
     }
-
-    const loadingFallbackTimeoutId = setTimeout(() => {
-      if (isMountedRef.current && isLoading) {
-        console.warn(`[${getTimestampLog()}] AuthSessionProvider (Client): isLoading fallback timeout (1.5s). Forcing isLoading to false as initial session state not definitively resolved by an event with a user.`);
-        setIsLoading(false);
-        initialSessionProcessedRef.current = true;
-      }
-    }, 1500);
-
-    return () => {
-      isMountedRef.current = false; 
-      authSubscription?.unsubscribe();
-      clearTimeout(loadingFallbackTimeoutId);
-      console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): useEffect cleanup. Unsubscribed from onAuthStateChange.`);
-    };
-  }, [supabaseClient]); // Effect only depends on the stable supabaseClient
-
-  useEffect(() => {
-    console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): State update render. isLoading: ${isLoading}, user ID: ${user?.id}`);
-  }, [isLoading, user]);
-
+  }, [preloadedUser, shouldLog]);
+  
   return (
     <AuthSessionContext.Provider value={{ user, isLoading, error }}>
       {children}

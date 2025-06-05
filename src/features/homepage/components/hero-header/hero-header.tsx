@@ -12,7 +12,6 @@ import { MenuIcon, CloseIcon } from './icons';
 import { NAV_ITEMS_DESKTOP, NAV_ITEMS_MOBILE, LOGO_TEXT } from '../../constants';
 import type { NavItem as NavItemType } from '../../types';
 import { useAuth } from '@/features/auth/hooks';
-import { useLoading } from '@/features/auth/context/loading-context';
 import { signOutUserAction } from '@/features/auth/actions';
 import { Button } from '@/components/ui/button';
 import { PassForgeLogo } from '@/components/icons';
@@ -39,8 +38,8 @@ const HeroHeader: React.FC = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { user, profile } = useAuth();
-  const { isLoading: showSkeletons, isAuthenticated } = useLoading();
+  const { user, profile, isAuthenticated, isLoading } = useAuth();
+  const showSkeletons = isLoading;
 
   const handleDropdownEnter = (label: string) => {
     if (dropdownTimeoutRef.current) {
@@ -226,8 +225,8 @@ const HeroHeader: React.FC = () => {
         isOpen={isMobileMenuOpen}
         items={NAV_ITEMS_MOBILE}
         onClose={toggleMobileMenu}
-        isSessionLoading={showSkeletons} // Pass the comprehensive loading state
-        isAuthenticated={isAuthenticated} // Pass the derived authenticated state
+        isSessionLoading={showSkeletons}
+        isAuthenticated={isAuthenticated}
       />
     </motion.header>
   );

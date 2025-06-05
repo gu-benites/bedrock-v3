@@ -1,61 +1,103 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/middleware';
+import * as Sentry from '@sentry/nextjs';
 
-import { type NextRequest } from 'next/server';
-import { updateSession } from '@/features/auth/utils';
+// Define public paths that don't require authentication
+const PUBLIC_PATHS = ['/login', '/register', '/reset-password', '/'];
 
-/**
- * Next.js middleware entry point.
- * This function is invoked for requests matching the `config.matcher` patterns.
- * Its primary responsibility is to call the `updateSession` utility to manage
- * user sessions (refreshing them if necessary) and handle route protection
- * by redirecting unauthenticated users from protected paths.
- *
- * @param {NextRequest} request - The incoming Next.js request object.
- * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse,
- *                                  which may include updated cookies or be a redirect.
- */
 export async function middleware(request: NextRequest) {
-  // Ensure environment variables are available for the utility function.
-  // While the utility itself checks, this is an early check.
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  try {
+    // Create supabase middleware client
+    const { supabase, response } = createClient(request);
+    
+    // Check if path is public
+    const isPublicPath = PUBLIC_PATHS.some(path => 
+      request.nextUrl.pathname === path || 
+      request.nextUrl.pathname.startsWith(`${path}/`)
+    );
+    
+    // Get session with minimal logging
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    // Handle session errors
+    if (sessionError && !isPublicPath) {
+      // Expected auth errors (not logged to console or Sentry)
+      if (sessionError.message === "Auth session missing!") {
+        // Just redirect without logging
+        const redirectUrl = new URL('/login', request.url);
+        redirectUrl.searchParams.set('next', request.nextUrl.pathname);
+        return NextResponse.redirect(redirectUrl);
+      }
+      // Unexpected auth errors (logged to console and Sentry)
+      else {
+        console.warn(`[Middleware] Auth error: ${sessionError.message}`);
+        
+        // Report to Sentry with proper context
+        Sentry.captureException(sessionError, {
+          tags: { component: 'Middleware', type: 'sessionError' },
+          extra: { 
+            path: request.nextUrl.pathname,
+            operation: 'middleware',
+            message: "Session error in middleware"
+          }
+        });
+        
+        // Redirect to login
+        const redirectUrl = new URL('/login', request.url);
+        redirectUrl.searchParams.set('next', request.nextUrl.pathname);
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+    
+    // Handle protected routes
+    if (!session && !isPublicPath) {
+      const redirectUrl = new URL('/login', request.url);
+      redirectUrl.searchParams.set('next', request.nextUrl.pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
+    
+    // Handle auth routes when already authenticated
+    if (session && (
+      request.nextUrl.pathname === '/login' || 
+      request.nextUrl.pathname === '/register'
+    )) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    
+    // Continue with the response
+    return response;
+  } catch (err) {
+    // Simple error handling for Edge Runtime (no Winston logger available)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Middleware] Critical error:', err);
+    }
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Supabase URL or Anon Key is not defined at middleware entry. Please check environment variables.");
-    // If Supabase isn't configured, bypass session updates to avoid errors,
-    // but this means auth features will not work correctly.
-    // Consider how to handle this case based on your app's requirements.
-    // For now, we'll let the request proceed, and the utility will log another error.
+    // Report to Sentry
+    Sentry.captureException(err, {
+      tags: { component: 'Middleware', type: 'criticalError' },
+      extra: {
+        path: request.nextUrl.pathname,
+        operation: 'middleware',
+        message: "Critical error in middleware"
+      }
+    });
+
+    // For critical errors, allow the request to proceed
+    // The application's error boundaries will handle rendering
+    return NextResponse.next();
   }
-  
-  return await updateSession(request);
 }
 
-/**
- * Configuration object for the Next.js middleware.
- * The `matcher` property specifies the paths for which this middleware will run.
- *
- * It's configured to match all request paths except for:
- * - `_next/static` (static files)
- * - `_next/image` (image optimization files)
- * - `favicon.ico` (favicon file)
- * - `api/` (API routes, including Genkit)
- * - `assets/` (any static assets folder)
- * - `fonts/` (any static font folder)
- * - Files with common image extensions (`.svg`, `.png`, `.jpg`, etc.)
- */
+// Configure middleware to run on specific paths
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match all request paths except:
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - api/ (API routes, including Genkit)
-     * - assets/ (any static assets folder)
-     * -fonts/ (any static font folder)
-     * - *.png, *.jpg, etc. (image files)
-     * Feel free to modify this pattern to include more paths.
+     * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|assets/|fonts/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
 };

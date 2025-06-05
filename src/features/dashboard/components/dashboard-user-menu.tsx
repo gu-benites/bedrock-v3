@@ -22,7 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks";
-import { useDashboardLoading } from "@/features/dashboard/context/dashboard-loading-context";
+import { useDashboardLoading } from "@/features/ui/providers/loading-provider";
 import { signOutUserAction } from "@/features/auth/actions";
 import {
   AlertDialog,
@@ -31,8 +31,7 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction as AlertDialogConfirm
+  AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
@@ -82,8 +81,9 @@ export function DashboardUserMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const { user, profile } = useAuth();
-  const { isLoading: showSkeletons, isAuthenticated, isSigningOut, setIsSigningOut } = useDashboardLoading();
+  const { user, profile, isLoading } = useAuth();
+  const { isSigningOut, setIsSigningOut } = useDashboardLoading(); // Only for sign-out optimistic UI
+  const showSkeletons = isLoading;
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
