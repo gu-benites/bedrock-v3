@@ -8,12 +8,15 @@ import { useAuth } from '@/features/auth/hooks';
 import type { UserProfile } from '@/features/user-auth-data/schemas';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { 
-  useProfileUpdate, 
+import {
+  useProfileUpdate,
   ProfileFormSchema, // Schema for validation
   type ProfileFormValues, // Type for form values
-  languageOptions, 
-  ageCategoryOptions 
+  type ProfileUpdateProgress,
+  type ProfileUpdateError,
+  languageOptions,
+  ageCategoryOptions,
+  genderOptions
 } from './hooks/use-profile-update';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +37,15 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Separator } from '@/components/ui/separator';
 import { UserCircle2, Mail, Save, Loader2, Ban } from 'lucide-react';
 import { useCharacterLimit } from '@/hooks';
-import { ProfileBannerUploader, ProfileAvatarUploader, ProfileAccountInfo, ProfileSubscriptionDetails } from './components';
+import {
+  ProfileBannerUploader,
+  ProfileAvatarUploader,
+  ProfileAccountInfo,
+  ProfileSubscriptionDetails,
+  FormSubmissionFeedback,
+  ImageRemoveButton
+} from './components';
+import { LanguageSelect, GenderSelect, AgeCategorySelect } from './components/enhanced-select';
 
 import * as Sentry from '@sentry/nextjs';
 import { cn } from '@/lib/utils';
@@ -60,11 +71,16 @@ export function ProfileView() {
     profileError,
   } = useAuth();
 
+  // Enhanced state management for progress tracking and error handling
+  const [currentProgress, setCurrentProgress] = useState<ProfileUpdateProgress | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(ProfileFormSchema),
     defaultValues: originalProfile || { // Initialize with empty strings or defaults for controlled components
-        firstName: "", lastName: "", bio: "", language: "en", 
-        ageCategory: null, specificAge: null,
+        firstName: "", lastName: "", bio: "", language: "en",
+        gender: null, ageCategory: null, specificAge: null,
         avatarUrl: null, bannerUrl: null,
         // other fields from UserProfile can be defaulted here
     },
@@ -109,7 +125,7 @@ export function ProfileView() {
         ...originalProfile,
         avatarUrl: newAvatarUrl,
         bannerUrl: newBannerUrl,
-        avatarDataUri: undefined, 
+        avatarDataUri: undefined,
         bannerDataUri: undefined,
       });
       updateBioDisplayValue(originalProfile.bio || "");
@@ -124,7 +140,7 @@ export function ProfileView() {
             avatarUrl: (user.user_metadata?.avatar_url as string) || null,
             // Default other fields
             gender: null, ageCategory: null, specificAge: null, language: "en",
-            bannerUrl: null, bio: "", role: 'user', 
+            bannerUrl: null, bio: "", role: 'user',
             createdAt: new Date().toISOString(), // Placeholder
             updatedAt: new Date().toISOString(), // Placeholder
             // Ensure all UserProfile fields have a default
@@ -139,10 +155,40 @@ export function ProfileView() {
      // If isLoadingAuth is true, or sessionError exists, form reset is deferred until data is stable.
   }, [originalProfile, user, form, updateBioDisplayValue, isLoadingAuth, profileError]);
 
+  // Enhanced progress tracking callback
+  const handleProgress = useCallback((progress: ProfileUpdateProgress) => {
+    setCurrentProgress(progress);
+    setShowFeedback(true);
+    clientLogger.info('ProfileView: Progress update:', progress);
+  }, []);
+
+  // Enhanced error handling callback
+  const handleError = useCallback((error: ProfileUpdateError) => {
+    setShowFeedback(true);
+    clientLogger.error('ProfileView: Error occurred:', error);
+    // Toast for immediate feedback, FormSubmissionFeedback will show detailed errors
+    toast({
+      title: "Update Error",
+      description: error.message || "An error occurred while updating your profile.",
+      variant: "destructive"
+    });
+  }, [toast]);
+
   // Define the success handler for the mutation
   const handleSuccessfulUpdate = (updatedData?: UserProfile) => {
     clientLogger.info('ProfileView: handleSuccessfulUpdate called.', { updatedData });
+
+    // Set success state and show feedback
+    setIsSuccess(true);
+    setShowFeedback(true);
+    setCurrentProgress({
+      step: 'complete',
+      message: 'Profile updated successfully!',
+      progress: 100
+    });
+
     toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
+
     if (updatedData) {
       // Reset the form with the new data returned from the server action
       // This ensures the form reflects the true state after update, including new image URLs
@@ -169,15 +215,52 @@ export function ProfileView() {
         });
         updateBioDisplayValue(originalProfile.bio || "");
     }
+
+    // Auto-hide feedback after success
+    setTimeout(() => {
+      setShowFeedback(false);
+      setIsSuccess(false);
+      setCurrentProgress(null);
+    }, 3000);
+
     // queryClient.invalidateQueries({ queryKey: ['userProfile', user?.id] }); // Invalidation is now in the hook's onSuccess
   };
   
-  const { performUpdate, isPending } = useProfileUpdate({
+  const {
+    performUpdate,
+    isPending,
+    imageErrors,
+    currentProgress: hookProgress,
+    clearErrors
+  } = useProfileUpdate({
     user,
     profile: originalProfile,
     queryClient,
     toast,
+    onProgress: handleProgress,
+    onError: handleError,
   });
+
+  // Image removal handlers
+  const handleAvatarRemove = useCallback(() => {
+    clientLogger.info('[ProfileView] handleAvatarRemove called');
+    form.setValue('avatarDataUri', null, { shouldDirty: true, shouldValidate: true });
+    toast({ title: "Avatar Removed", description: "Your profile picture will be removed when you save changes." });
+  }, [form, toast]);
+
+  const handleBannerRemove = useCallback(() => {
+    clientLogger.info('[ProfileView] handleBannerRemove called');
+    form.setValue('bannerDataUri', null, { shouldDirty: true, shouldValidate: true });
+    toast({ title: "Banner Removed", description: "Your banner image will be removed when you save changes." });
+  }, [form, toast]);
+
+  // Feedback dismissal handler
+  const handleDismissFeedback = useCallback(() => {
+    setShowFeedback(false);
+    setIsSuccess(false);
+    setCurrentProgress(null);
+    clearErrors();
+  }, [clearErrors]);
 
   const onSubmit = (data: ProfileFormValues) => {
     clientLogger.info('[ProfileView] onSubmit triggered. FormData (URIs snipped):', {
@@ -185,6 +268,12 @@ export function ProfileView() {
       avatarDataUri: data.avatarDataUri ? data.avatarDataUri.substring(0, 50) + '...' : data.avatarDataUri,
       bannerDataUri: data.bannerDataUri ? data.bannerDataUri.substring(0, 50) + '...' : data.bannerDataUri,
     });
+
+    // Reset feedback state on new submission
+    setShowFeedback(false);
+    setIsSuccess(false);
+    setCurrentProgress(null);
+
     performUpdate(data, { onSuccess: handleSuccessfulUpdate });
   };
 
@@ -203,6 +292,13 @@ export function ProfileView() {
 
   const handleCancel = () => {
     clientLogger.info('[ProfileView] handleCancel called.');
+
+    // Clear feedback state
+    setShowFeedback(false);
+    setIsSuccess(false);
+    setCurrentProgress(null);
+    clearErrors();
+
     if (originalProfile) {
         const resetBannerUrl = originalProfile.bannerUrl ? `${originalProfile.bannerUrl.split('?')[0]}?t=${new Date().getTime()}` : null;
         clientLogger.info('Canceling: Resetting form with original profile and timestamped bannerUrl.', { resetBannerUrl });
@@ -210,7 +306,7 @@ export function ProfileView() {
             ...originalProfile,
             avatarUrl: originalProfile.avatarUrl ? `${originalProfile.avatarUrl.split('?')[0]}?t=${new Date().getTime()}` : null,
             bannerUrl: resetBannerUrl,
-            avatarDataUri: undefined, 
+            avatarDataUri: undefined,
             bannerDataUri: undefined,
         });
         updateBioDisplayValue(originalProfile.bio || "");
@@ -221,7 +317,7 @@ export function ProfileView() {
             firstName: (user.user_metadata?.first_name as string) || "",
             lastName: (user.user_metadata?.last_name as string) || "",
             avatarUrl: (user.user_metadata?.avatar_url as string) || null,
-            bannerUrl: null, bio: "", language: "en", ageCategory: null, specificAge: null,
+            bannerUrl: null, bio: "", language: "en", gender: null, ageCategory: null, specificAge: null,
             role: 'user', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
             stripeCustomerId: null, subscriptionStatus: null, subscriptionTier: null,
             subscriptionPeriod: null, subscriptionStartDate: null, subscriptionEndDate: null,
@@ -289,23 +385,44 @@ export function ProfileView() {
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-lg overflow-hidden">
-           <ProfileBannerUploader
-            key={form.watch('bannerUrl') || 'no-banner-key'} 
+          {/* Enhanced Form Submission Feedback */}
+          {showFeedback && (
+            <div className="p-4 border-b">
+              <FormSubmissionFeedback
+                isSubmitting={isPending}
+                isSuccess={isSuccess}
+                isError={Object.keys(imageErrors).length > 0}
+                progress={currentProgress || hookProgress}
+                errors={imageErrors}
+                successMessage="Profile updated successfully!"
+                onDismiss={handleDismissFeedback}
+              />
+            </div>
+          )}
+
+          <ProfileBannerUploader
+            key={form.watch('bannerUrl') || 'no-banner-key'}
             control={form.control}
             name="bannerDataUri"
             defaultImage={form.watch('bannerUrl')}
             disabled={isPending}
+            isPending={isPending}
+            error={imageErrors.banner?.message}
+            onRemove={form.watch('bannerUrl') ? handleBannerRemove : undefined}
           />
 
           <div className="relative px-6 pb-6 flex flex-col items-center text-center">
             <ProfileAvatarUploader
-              key={form.watch('avatarUrl') || 'no-avatar-key'} 
+              key={form.watch('avatarUrl') || 'no-avatar-key'}
               control={form.control}
-              name="avatarDataUri" 
+              name="avatarDataUri"
               defaultImage={form.watch('avatarUrl')}
               displayName={displayName}
               getInitialsFn={getInitials}
               disabled={isPending}
+              isPending={isPending}
+              error={imageErrors.avatar?.message}
+              onRemove={form.watch('avatarUrl') ? handleAvatarRemove : undefined}
             />
             <CardTitle className="text-2xl font-semibold mt-3">{displayName}</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
@@ -401,48 +518,60 @@ export function ProfileView() {
 
                 <Separator className="my-6 !mt-6 !mb-4"/>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="language"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
                         <FormLabel>Preferred Language</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || undefined} disabled={isPending}>
-                          <FormControl>
-                            <SelectTrigger id={`${idPrefix}-language`}>
-                              <SelectValue placeholder="Select a language" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {languageOptions.map(option => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <LanguageSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isPending}
+                          id={`${idPrefix}-language`}
+                        />
+                        <FormDescription className="text-xs">
+                          Choose your preferred language for the interface
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                   )} />
+
+                  <FormField
+                    control={form.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Gender</FormLabel>
+                        <GenderSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isPending}
+                          id={`${idPrefix}-gender`}
+                        />
+                        <FormDescription className="text-xs">
+                          Optional - helps us personalize your experience
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                  )} />
+
                   <FormField
                     control={form.control}
                     name="ageCategory"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
                         <FormLabel>Age Category</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || undefined} disabled={isPending}>
-                            <FormControl>
-                                <SelectTrigger id={`${idPrefix}-ageCategory`}>
-                                    <SelectValue placeholder="Select age category" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {ageCategoryOptions.map(option => (
-                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <AgeCategorySelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isPending}
+                          id={`${idPrefix}-ageCategory`}
+                        />
+                        <FormDescription className="text-xs">
+                          Optional - used for age-appropriate content recommendations
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                   )} />

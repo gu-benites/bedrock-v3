@@ -52,7 +52,8 @@ export async function getProfileByUserId(userId: string, userEmail: string | nul
       specificAge: profileData?.specific_age ?? null,
       language: profileData?.language ?? 'en',
       avatarUrl: profileData?.avatar_url ?? null,
-      bannerUrl: profileData?.banner_img_url ?? null, // Add this line
+      bannerUrl: profileData?.banner_img_url ?? null,
+      bio: profileData?.bio ?? null, // ✅ FIXED: Added missing bio field mapping
       role: profileData?.role ?? 'user',
       stripeCustomerId: profileData?.stripe_customer_id ?? null,
       subscriptionStatus: profileData?.subscription_status ?? null,

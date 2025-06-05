@@ -6,6 +6,7 @@ import '../styles/globals.css';
 import { Toaster } from "@/components/ui";
 import { AuthSessionProvider, QueryClientProvider, ThemeProvider } from '@/providers';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { createClient } from '@/lib/supabase/server';
 
 const inter = Inter({
   variable: '--font-sans', // Changed to --font-sans for Tailwind compatibility
@@ -22,16 +23,19 @@ export const metadata: Metadata = {
 /**
  * Root layout for the PassForge application.
  * Sets up global styles, fonts, and context providers.
+ * Fetches user data server-side to prevent authentication loading states.
  *
  * @param {object} props - The component's props.
  * @param {React.ReactNode} props.children - The child components to render.
  * @returns {JSX.Element} The root layout structure.
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): JSX.Element {
+}>): Promise<JSX.Element> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
@@ -41,7 +45,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthSessionProvider> {/* Auth provider wraps QueryClientProvider */}
+          <AuthSessionProvider preloadedUser={user}> {/* Auth provider wraps QueryClientProvider */}
             <QueryClientProvider>
               {children}
               <Toaster />

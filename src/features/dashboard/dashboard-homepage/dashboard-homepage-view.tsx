@@ -16,8 +16,9 @@ import {
 } from '@/components/ui/tabs';
 import { BarChart, CheckCircle, LineChart, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuth } from '@/features/auth/hooks'; 
-import { useEffect, useState } from 'react'; 
+import { useAuth } from '@/features/auth/hooks';
+import { useDashboardLoading } from '@/features/dashboard/context/dashboard-loading-context';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function LoadingCard() {
   return (
@@ -34,47 +35,54 @@ function LoadingCard() {
 }
 
 export function DashboardHomepageView() {
-  const { user, profile, isSessionLoading, sessionError } = useAuth(); // Using isSessionLoading
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { user, profile } = useAuth();
+  const { isLoading: showSkeletons } = useDashboardLoading();
 
   const getDisplayName = () => {
     if (profile?.firstName) return profile.firstName;
     const userMetaFirstName = user?.user_metadata?.first_name as string | undefined;
     if (userMetaFirstName) return userMetaFirstName;
     if (user?.email) return user.email.split('@')[0];
-    return 'User'; 
+    return 'User';
   };
-  
-  // Skeleton logic aligned with HeroHeader
-  const showSkeletons = !mounted || isSessionLoading;
-  
+
   const displayName = showSkeletons || !user ? "User" : getDisplayName();
 
 
   return (
     <div className="flex flex-col gap-6">
       <div className="mb-4">
-        {showSkeletons ? (
-          <>
-            <Skeleton className="h-10 w-3/4 sm:w-1/2 mb-2" /> 
-            <Skeleton className="h-6 w-1/2 sm:w-1/3" />      
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl sm:text-4xl font-bold">
-              <span className="bg-gradient-to-r from-[hsl(var(--chart-1))] to-[hsl(var(--destructive))] bg-clip-text text-transparent">
-                Hello, {displayName}! 
-              </span>
-            </h1>
-            <p className="text-lg text-muted-foreground mt-1">
-              Welcome back! Here&apos;s what&apos;s happening today.
-            </p>
-          </>
-        )}
+        <AnimatePresence mode="wait">
+          {showSkeletons ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Skeleton className="h-10 w-3/4 sm:w-1/2 mb-2" />
+              <Skeleton className="h-6 w-1/2 sm:w-1/3" />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <h1 className="text-3xl sm:text-4xl font-bold">
+                <span className="bg-gradient-to-r from-[hsl(var(--chart-1))] to-[hsl(var(--destructive))] bg-clip-text text-transparent">
+                  Hello, {displayName}!
+                </span>
+              </h1>
+              <p className="text-lg text-muted-foreground mt-1">
+                Welcome back! Here&apos;s what&apos;s happening today.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       
       <Tabs defaultValue="overview" className="space-y-4">

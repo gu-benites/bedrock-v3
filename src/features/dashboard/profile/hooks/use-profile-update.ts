@@ -4,16 +4,20 @@
 import { useFormReturn } from 'react-hook-form';
 import { useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
-import { User } from '@supabase/supabase-js'; 
+import { User } from '@supabase/supabase-js';
 import { UserProfileSchema, type UserProfile } from '@/features/user-auth-data/schemas';
 import {
     updateProfileTextDetails,
     updateProfileAvatar,
     updateProfileBanner,
+    type ProfileActionError
 } from '@/features/user-auth-data/actions';
+import { getProfileActionErrorMessage } from '@/features/user-auth-data/utils/error-messages.utils';
 import { useToast as useShadcnToast } from '@/hooks/use-toast'; // Renamed to avoid conflict with local toast
-import { UseCharacterLimitReturn } from '@/hooks'; 
+import { UseCharacterLimitReturn } from '@/hooks';
+import { type ImageProcessingError, getImageValidationErrorMessage } from '@/features/user-auth-data/utils/image-validation.utils';
 import * as Sentry from '@sentry/nextjs';
+import { useState, useCallback } from 'react';
 
 const clientLogger = {
     info: (message: string, context?: any) => console.log(`[ProfileUpdateHookINFO] ${message}`, context),
@@ -21,18 +25,27 @@ const clientLogger = {
     error: (message: string, context?: any) => console.error(`[ProfileUpdateHookERROR] ${message}`, context),
 };
 
+// Simplified language options with 4 core languages
 export const languageOptions = [
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Español' },
-    { value: 'fr', label: 'Français' },
-    { value: 'de', label: 'Deutsch' },
+    { value: 'pt', label: 'Português', flag: '🇵🇹' },
+    { value: 'en', label: 'English', flag: '🇺🇸' },
+    { value: 'es', label: 'Español', flag: '🇪🇸' },
+    { value: 'fr', label: 'Français', flag: '🇫🇷' },
 ];
 
+// Simplified age category options with 5 core categories
 export const ageCategoryOptions = [
-    { value: 'child', label: 'Child' },
-    { value: 'teen', label: 'Teen' },
-    { value: 'adult', label: 'Adult' },
-    { value: 'senior', label: 'Senior' },
+    { value: 'baby', label: 'Baby (0-23)', description: 'Ages 0 to 23 months' },
+    { value: 'child', label: 'Child (2-12)', description: 'Ages 2 to 12 years' },
+    { value: 'teen', label: 'Teen (13-17)', description: 'Ages 13 to 17 years' },
+    { value: 'adult', label: 'Adult (18-64)', description: 'Ages 18 to 64 years' },
+    { value: 'senior', label: 'Senior (65+)', description: 'Ages 65 and above' },
+];
+
+// Simplified gender options with 2 traditional options (no icons)
+export const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
 ];
 
 export type ProfileFormValues = UserProfile & {
@@ -45,12 +58,28 @@ export const ProfileFormSchema = UserProfileSchema.extend({
     bannerDataUri: z.string().optional().nullable(),
 });
 
+// Enhanced error tracking types
+export interface ProfileUpdateError {
+    type: 'text' | 'avatar' | 'banner' | 'validation' | 'network' | 'unknown';
+    message: string;
+    details?: ProfileActionError | ImageProcessingError;
+    field?: string;
+}
+
+// Progress tracking types
+export interface ProfileUpdateProgress {
+    step: 'validating' | 'updating-text' | 'updating-avatar' | 'updating-banner' | 'finalizing' | 'complete';
+    message: string;
+    progress: number; // 0-100
+}
 
 interface UseProfileUpdateOptions {
     user: User | null | undefined;
     profile: UserProfile | null | undefined; // Original profile data for comparison or context
     queryClient: QueryClient;
     toast: ReturnType<typeof useShadcnToast>['toast'];
+    onProgress?: (progress: ProfileUpdateProgress) => void; // Progress callback
+    onError?: (error: ProfileUpdateError) => void; // Enhanced error callback
     // Removed form and updateBioDisplayValue from direct hook options
     // They will be handled by the calling component in its onSuccess callback
 }
@@ -60,14 +89,59 @@ export function useProfileUpdate({
     profile: originalProfile, // Renamed for clarity within the hook
     queryClient,
     toast,
+    onProgress,
+    onError,
 }: UseProfileUpdateOptions) {
+    // Enhanced state tracking
+    const [imageErrors, setImageErrors] = useState<Record<string, ProfileUpdateError>>({});
+    const [currentProgress, setCurrentProgress] = useState<ProfileUpdateProgress | null>(null);
+
+    // Helper function to report progress
+    const reportProgress = useCallback((progress: ProfileUpdateProgress) => {
+        setCurrentProgress(progress);
+        onProgress?.(progress);
+        clientLogger.info(`Progress: ${progress.step} - ${progress.message} (${progress.progress}%)`);
+    }, [onProgress]);
+
+    // Helper function to handle errors
+    const handleError = useCallback((error: ProfileUpdateError) => {
+        setImageErrors(prev => ({
+            ...prev,
+            [error.type]: error
+        }));
+        onError?.(error);
+
+        // Defensive error logging to avoid empty object issues
+        const errorInfo = {
+            type: error.type,
+            message: error.message || 'Unknown error',
+            details: error.details || 'No details available',
+            field: error.field || 'No field specified'
+        };
+        clientLogger.error(`[ProfileUpdateHookERROR] Error in ${error.type}:`, errorInfo);
+    }, [onError]);
+
+    // Clear errors when starting new update
+    const clearErrors = useCallback(() => {
+        setImageErrors({});
+        setCurrentProgress(null);
+    }, []);
 
     const { mutate, isPending, error, ...rest } = useMutation<
-        UserProfile | undefined, 
-        Error,                   
-        ProfileFormValues        
+        UserProfile | undefined,
+        Error,
+        ProfileFormValues
     >({
         mutationFn: async (formData: ProfileFormValues) => {
+            // Clear previous errors and start progress tracking
+            clearErrors();
+
+            reportProgress({
+                step: 'validating',
+                message: 'Validating profile data...',
+                progress: 0
+            });
+
             clientLogger.info('mutationFn started. FormData (URIs snipped):', {
                 ...formData,
                 avatarDataUri: formData.avatarDataUri ? formData.avatarDataUri.substring(0, 50) + '...' : formData.avatarDataUri,
@@ -75,9 +149,30 @@ export function useProfileUpdate({
             });
 
             let latestProfileData: UserProfile | undefined = originalProfile || undefined;
-            const errors: string[] = [];
+            const errors: ProfileUpdateError[] = [];
+            let totalSteps = 0;
+            let completedSteps = 0;
 
             const { avatarDataUri, bannerDataUri, ...textDataFromForm } = formData;
+
+            // Calculate total steps for progress tracking
+            const hasTextChanges = Object.keys(textDataFromForm).some(key => {
+                if (['id', 'email', 'avatarUrl', 'bannerUrl', 'createdAt', 'updatedAt', 'role',
+                    'stripeCustomerId', 'subscriptionStatus', 'subscriptionTier', 'subscriptionPeriod',
+                    'subscriptionStartDate', 'subscriptionEndDate'].includes(key)) return false;
+
+                const formValue = (formData as any)[key];
+                const originalValue = (originalProfile as any)?.[key];
+                const formValueForCompare = formValue === "" ? null : formValue;
+                const originalValueForCompare = originalValue === "" ? null : originalValue;
+                return formValueForCompare !== originalValueForCompare;
+            });
+
+            if (hasTextChanges) totalSteps++;
+            if (formData.avatarDataUri !== undefined) totalSteps++;
+            if (formData.bannerDataUri !== undefined) totalSteps++;
+
+            if (totalSteps === 0) totalSteps = 1; // At least one step for validation
 
             const textDetailsPayload: Partial<UserProfile> = {};
             const originalProfileForComparison = originalProfile || {};
@@ -103,11 +198,42 @@ export function useProfileUpdate({
             });
 
             if (textFieldsChanged) {
+                reportProgress({
+                    step: 'updating-text',
+                    message: 'Updating profile information...',
+                    progress: Math.round((completedSteps / totalSteps) * 100)
+                });
+
                 clientLogger.info('Text fields changed. Calling updateProfileTextDetails with payload:', textDetailsPayload);
-                const textResult = await updateProfileTextDetails(textDetailsPayload as any); // Cast as any to satisfy Pick
-                clientLogger.info('updateProfileTextDetails result:', textResult);
-                if (textResult.error) errors.push(`Text update error: ${textResult.error}`);
-                if (textResult.data) latestProfileData = textResult.data;
+
+                try {
+                    const textResult = await updateProfileTextDetails(textDetailsPayload as any);
+                    clientLogger.info('updateProfileTextDetails result:', textResult);
+
+                    if (textResult.error) {
+                        const error: ProfileUpdateError = {
+                            type: 'text',
+                            message: textResult.error,
+                            details: textResult.errorDetails,
+                        };
+                        errors.push(error);
+                        handleError(error);
+                    }
+
+                    if (textResult.data) {
+                        latestProfileData = textResult.data;
+                    }
+                } catch (err) {
+                    const error: ProfileUpdateError = {
+                        type: 'text',
+                        message: 'Failed to update profile information',
+                        details: err instanceof Error ? { code: 'UNKNOWN_ERROR', message: err.message } as ProfileActionError : undefined
+                    };
+                    errors.push(error);
+                    handleError(error);
+                }
+
+                completedSteps++;
             } else {
                 clientLogger.info('No text fields changed.');
             }
@@ -115,41 +241,137 @@ export function useProfileUpdate({
             // Check if avatarDataUri is explicitly provided (not undefined)
             // A value of `null` means remove, `string` means update, `undefined` means no change intended by user action
             if (formData.avatarDataUri !== undefined) {
+                reportProgress({
+                    step: 'updating-avatar',
+                    message: 'Updating profile picture...',
+                    progress: Math.round((completedSteps / totalSteps) * 100)
+                });
+
                 clientLogger.info('Avatar data URI provided or explicitly null. Calling updateProfileAvatar.');
-                const avatarResult = await updateProfileAvatar(formData.avatarDataUri);
-                clientLogger.info('updateProfileAvatar result:', avatarResult);
-                if (avatarResult.error) errors.push(`Avatar update error: ${avatarResult.error}`);
-                if (avatarResult.updatedProfile) latestProfileData = avatarResult.updatedProfile;
+
+                try {
+                    const avatarResult = await updateProfileAvatar(formData.avatarDataUri);
+                    clientLogger.info('updateProfileAvatar result:', avatarResult);
+
+                    if (avatarResult.error) {
+                        const error: ProfileUpdateError = {
+                            type: 'avatar',
+                            message: avatarResult.error,
+                            details: avatarResult.errorDetails,
+                        };
+                        errors.push(error);
+                        handleError(error);
+                    }
+
+                    if (avatarResult.updatedProfile) {
+                        latestProfileData = avatarResult.updatedProfile;
+                    }
+                } catch (err) {
+                    const error: ProfileUpdateError = {
+                        type: 'avatar',
+                        message: 'Failed to update profile picture',
+                        details: err instanceof Error ? { code: 'UNKNOWN_ERROR', message: err.message } as ProfileActionError : undefined
+                    };
+                    errors.push(error);
+                    handleError(error);
+                }
+
+                completedSteps++;
             } else {
                 clientLogger.info('Avatar data URI is undefined. Skipping avatar update action.');
             }
 
             if (formData.bannerDataUri !== undefined) {
+                reportProgress({
+                    step: 'updating-banner',
+                    message: 'Updating banner image...',
+                    progress: Math.round((completedSteps / totalSteps) * 100)
+                });
+
                 clientLogger.info('Banner data URI provided or explicitly null. Calling updateProfileBanner.');
-                const bannerResult = await updateProfileBanner(formData.bannerDataUri);
-                clientLogger.info('updateProfileBanner result:', bannerResult);
-                if (bannerResult.error) errors.push(`Banner update error: ${bannerResult.error}`);
-                if (bannerResult.updatedProfile) latestProfileData = bannerResult.updatedProfile;
+
+                try {
+                    const bannerResult = await updateProfileBanner(formData.bannerDataUri);
+                    clientLogger.info('updateProfileBanner result:', {
+                        hasError: !!bannerResult.error,
+                        errorMessage: bannerResult.error,
+                        hasErrorDetails: !!bannerResult.errorDetails,
+                        errorDetails: bannerResult.errorDetails,
+                        hasUpdatedProfile: !!bannerResult.updatedProfile,
+                        resultKeys: Object.keys(bannerResult)
+                    });
+
+                    if (bannerResult.error) {
+                        const error: ProfileUpdateError = {
+                            type: 'banner',
+                            message: bannerResult.error || 'Unknown banner error',
+                            details: bannerResult.errorDetails,
+                        };
+                        errors.push(error);
+                        handleError(error);
+                    }
+
+                    if (bannerResult.updatedProfile) {
+                        latestProfileData = bannerResult.updatedProfile;
+                    }
+                } catch (err) {
+                    const error: ProfileUpdateError = {
+                        type: 'banner',
+                        message: 'Failed to update banner image',
+                        details: err instanceof Error ? { code: 'UNKNOWN_ERROR', message: err.message } as ProfileActionError : undefined
+                    };
+                    errors.push(error);
+                    handleError(error);
+                }
+
+                completedSteps++;
             } else {
                 clientLogger.info('Banner data URI is undefined. Skipping banner update action.');
             }
 
+            // Finalize progress
+            reportProgress({
+                step: 'finalizing',
+                message: 'Finalizing changes...',
+                progress: 95
+            });
+
             if (errors.length > 0) {
                 clientLogger.error('Errors during mutation:', errors);
-                const errorMessage = `Profile update failed: ${errors.join('; ')}`;
-                throw new Error(errorMessage); 
+
+                // Create a comprehensive error message
+                const errorMessages = errors.map(err => {
+                    if (err.details && 'code' in err.details) {
+                        return getProfileActionErrorMessage(err.details as ProfileActionError);
+                    } else if (err.details && 'code' in err.details) {
+                        return getImageValidationErrorMessage(err.details as ImageProcessingError);
+                    }
+                    return err.message;
+                });
+
+                const errorMessage = `Profile update failed: ${errorMessages.join('; ')}`;
+                throw new Error(errorMessage);
             }
 
             // If no specific updates were made (no text changes, no image changes signaled)
             // and no errors, it's possible latestProfileData is still the originalProfile or undefined.
-            // We should ensure we return something, preferably the most up-to-date profile if possible.
             if (!textFieldsChanged && formData.avatarDataUri === undefined && formData.bannerDataUri === undefined && errors.length === 0) {
-                 clientLogger.info('mutationFn finished. No changes were made. Returning original profile data if available.');
-                 // In this case, the onSuccess in ProfileView will reset the form to its original state,
-                 // which is correct as no changes were pushed.
-                 return originalProfile || undefined;
+                reportProgress({
+                    step: 'complete',
+                    message: 'No changes to save',
+                    progress: 100
+                });
+
+                clientLogger.info('mutationFn finished. No changes were made. Returning original profile data if available.');
+                return originalProfile || undefined;
             }
-            
+
+            reportProgress({
+                step: 'complete',
+                message: 'Profile updated successfully',
+                progress: 100
+            });
+
             clientLogger.info('mutationFn finished. Returning latestProfileData:', latestProfileData);
             return latestProfileData;
         },
@@ -176,6 +398,9 @@ export function useProfileUpdate({
         performUpdate: mutate, // Expose the mutate function
         isPending,
         error,
+        imageErrors, // Expose image-specific errors
+        currentProgress, // Expose current progress
+        clearErrors, // Expose error clearing function
         ...rest, // Includes isError, status, etc.
     };
 }

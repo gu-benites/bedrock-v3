@@ -23,24 +23,30 @@ const AuthSessionContext = createContext<AuthSessionContextType | undefined>(
   undefined,
 );
 
-const getTimestampLog = () => new Date().toISOString(); 
+const getTimestampLog = () => new Date().toISOString();
 
-export const AuthSessionProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); 
+export const AuthSessionProvider = ({
+  children,
+  preloadedUser = null
+}: {
+  children: ReactNode;
+  preloadedUser?: User | null;
+}) => {
+  const [user, setUser] = useState<User | null>(preloadedUser);
+  const [isLoading, setIsLoading] = useState(!preloadedUser);
   const [error, setError] = useState<Error | null>(null);
   const [supabaseClient] = useState(() => createClient());
 
   const isMountedRef = useRef(true);
-  const initialSessionProcessedRef = useRef(false); // Tracks if INITIAL_SESSION event logic has run
+  const initialSessionProcessedRef = useRef(!!preloadedUser); // Tracks if INITIAL_SESSION event logic has run
 
   useEffect(() => {
     isMountedRef.current = true;
-    initialSessionProcessedRef.current = false; 
-    
+    initialSessionProcessedRef.current = !!preloadedUser;
+
     // This log helps see the state when the effect that sets up subscription runs.
-    // On initial mount, isLoading is true from useState.
-    console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): Subscribing to onAuthStateChange. Initial isLoading: ${isLoading}, User: ${user?.id}`);
+    // On initial mount, isLoading is false if preloadedUser exists.
+    console.log(`[${getTimestampLog()}] AuthSessionProvider (Client): Subscribing to onAuthStateChange. Initial isLoading: ${isLoading}, User: ${user?.id}, PreloadedUser: ${!!preloadedUser}`);
 
     const { data: { subscription: authSubscription }, error: subscriptionErrorHook } = supabaseClient.auth.onAuthStateChange(
       (event, session) => {
@@ -102,12 +108,12 @@ export const AuthSessionProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const loadingFallbackTimeoutId = setTimeout(() => {
-      if (isMountedRef.current && isLoading) { 
-        console.warn(`[${getTimestampLog()}] AuthSessionProvider (Client): isLoading fallback timeout (3s). Forcing isLoading to false as initial session state not definitively resolved by an event with a user.`);
+      if (isMountedRef.current && isLoading) {
+        console.warn(`[${getTimestampLog()}] AuthSessionProvider (Client): isLoading fallback timeout (1.5s). Forcing isLoading to false as initial session state not definitively resolved by an event with a user.`);
         setIsLoading(false);
-        initialSessionProcessedRef.current = true; 
+        initialSessionProcessedRef.current = true;
       }
-    }, 3000); 
+    }, 1500);
 
     return () => {
       isMountedRef.current = false; 

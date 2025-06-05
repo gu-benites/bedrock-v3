@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useMotionValueEvent, type Variants } from 'framer-motion';
+import { motion, useScroll, useMotionValueEvent, AnimatePresence, type Variants } from 'framer-motion';
 import Link from 'next/link';
 import NavLink from './nav-link';
 import DropdownMenu from './dropdown-menu';
@@ -12,6 +12,7 @@ import { MenuIcon, CloseIcon } from './icons';
 import { NAV_ITEMS_DESKTOP, NAV_ITEMS_MOBILE, LOGO_TEXT } from '../../constants';
 import type { NavItem as NavItemType } from '../../types';
 import { useAuth } from '@/features/auth/hooks';
+import { useLoading } from '@/features/auth/context/loading-context';
 import { signOutUserAction } from '@/features/auth/actions';
 import { Button } from '@/components/ui/button';
 import { PassForgeLogo } from '@/components/icons';
@@ -38,26 +39,8 @@ const HeroHeader: React.FC = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const {
-    user, 
-    profile, 
-    isSessionLoading, // This is true until AuthSessionProvider's initial check is done
-    sessionError,
-    // isLoadingAuth is not used here directly, as isSessionLoading is more relevant for initial skeleton display
-  } = useAuth();
-
-  // Corrected condition for showing skeletons:
-  // Show skeletons if not mounted (initial client render) OR if the session is actively being loaded.
-  const showSkeletons = !mounted || isSessionLoading;
-
-  // Determine authentication status once loading is complete and component is mounted.
-  const currentIsAuthenticated = mounted && !!user && !sessionError;
+  const { user, profile } = useAuth();
+  const { isLoading: showSkeletons, isAuthenticated } = useLoading();
 
   const handleDropdownEnter = (label: string) => {
     if (dropdownTimeoutRef.current) {
@@ -168,40 +151,63 @@ const HeroHeader: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center flex-shrink-0 space-x-2 sm:space-x-4 lg:space-x-6">
-            {showSkeletons ? (
-              <>
-                <Skeleton className="h-8 w-20" /> 
-                <Skeleton className="h-8 w-24" />
-                <Skeleton className="h-8 w-8 rounded-full" />
-              </>
-            ) : currentIsAuthenticated ? (
-              <>
-                <span className="text-sm text-foreground hidden sm:inline">
-                  Hi, {getDisplayName()}
-                </span>
-                <Avatar className="h-8 w-8 text-sm">
-                  {avatarUrl && <AvatarImage src={avatarUrl} alt={getDisplayName()} />}
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {getInitials()}
-                  </AvatarFallback>
-                </Avatar>
-                <form action={signOutUserAction}>
-                  <Button variant="ghost" type="submit" size="sm">Sign Out</Button>
-                </form>
-                <Button variant="secondary" asChild size="sm">
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" asChild size="sm">
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button variant="default" asChild size="sm">
-                  <Link href="/register">Register</Link>
-                </Button>
-              </>
-            )}
+            <AnimatePresence mode="wait">
+              {showSkeletons ? (
+                <motion.div
+                  key="skeleton"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6"
+                >
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </motion.div>
+              ) : isAuthenticated ? (
+                <motion.div
+                  key="authenticated"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6"
+                >
+                  <span className="text-sm text-foreground hidden sm:inline">
+                    Hi, {getDisplayName()}
+                  </span>
+                  <Avatar className="h-8 w-8 text-sm">
+                    {avatarUrl && <AvatarImage src={avatarUrl} alt={getDisplayName()} />}
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <form action={signOutUserAction}>
+                    <Button variant="ghost" type="submit" size="sm">Sign Out</Button>
+                  </form>
+                  <Button variant="secondary" asChild size="sm">
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="unauthenticated"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6"
+                >
+                  <Button variant="ghost" asChild size="sm">
+                    <Link href="/login">Login</Link>
+                  </Button>
+                  <Button variant="default" asChild size="sm">
+                    <Link href="/register">Register</Link>
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="md:hidden flex items-center">
@@ -221,7 +227,7 @@ const HeroHeader: React.FC = () => {
         items={NAV_ITEMS_MOBILE}
         onClose={toggleMobileMenu}
         isSessionLoading={showSkeletons} // Pass the comprehensive loading state
-        isAuthenticated={currentIsAuthenticated} // Pass the derived authenticated state
+        isAuthenticated={isAuthenticated} // Pass the derived authenticated state
       />
     </motion.header>
   );

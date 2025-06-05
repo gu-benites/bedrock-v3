@@ -38,17 +38,24 @@ export default async function DashboardLayout({
     try {
       logger.info(`DashboardLayout (Server): PREFETCHING user profile for user ID: ${user.id}.`);
       console.log(`[${getTimestampLog()}] DashboardLayout (Server): PREFETCHING user profile for user ID: ${user.id}.`);
-      await queryClient.prefetchQuery({
+
+      // Race prefetch against timeout to prevent blocking rendering
+      const profilePromise = queryClient.prefetchQuery({
         queryKey: ['userProfile', user.id],
         queryFn: getCurrentUserProfile,
+        staleTime: 10 * 1000, // 10 seconds
       });
-      logger.info(`DashboardLayout (Server): SUCCESSFULLY PREFETCHED user profile for user ID: ${user.id}.`);
-      console.log(`[${getTimestampLog()}] DashboardLayout (Server): SUCCESSFULLY PREFETCHED user profile for user ID: ${user.id}.`);
+
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 500));
+      await Promise.race([profilePromise, timeoutPromise]);
+
+      logger.info(`DashboardLayout (Server): PREFETCH completed (or timed out) for user ID: ${user.id}.`);
+      console.log(`[${getTimestampLog()}] DashboardLayout (Server): PREFETCH completed (or timed out) for user ID: ${user.id}.`);
     } catch (error) {
       const castError = error instanceof Error ? error : new Error(String(error));
       logger.error('DashboardLayout (Server): FAILED to prefetch user profile.', { userId: user.id, error: castError.message, stack: castError.stack });
       console.error(`[${getTimestampLog()}] DashboardLayout (Server): FAILED to prefetch user profile for user ID: ${user.id}. Error: ${castError.message}`);
-      // Do not redirect on prefetch failure. Client-side will attempt to fetch.
+      // Continue even if prefetch fails - client-side will attempt to fetch
     }
   } else {
     logger.warn('DashboardLayout (Server): No authenticated user found. Skipping user profile prefetch.');

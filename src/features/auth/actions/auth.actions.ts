@@ -22,11 +22,15 @@ const logger = getServerLogger('AuthActions');
  * @property {boolean} success - Indicates if the action was successful.
  * @property {string | null} message - A message describing the result of the action.
  * @property {Record<string, string> | null} [errorFields] - Optional. A record of field-specific error messages.
+ * @property {string} [redirectTo] - Optional. The URL to redirect to on successful authentication.
+ * @property {any} [user] - Optional. The user object returned on successful authentication.
  */
 interface AuthActionState {
   success: boolean;
   message: string | null;
   errorFields?: Record<string, string> | null;
+  redirectTo?: string;
+  user?: any;
 }
 
 /**
@@ -189,6 +193,67 @@ export async function signInWithPassword(prevState: AuthActionState, formData: F
   
   logger.info(`Sign-in successful, redirecting user: ${data.user.id} to /dashboard`);
   redirect('/dashboard');
+}
+
+/**
+ * Server Action to sign in a user with their email and password.
+ * Returns result object instead of redirecting, allowing client-side navigation.
+ *
+ * @param {FormData} formData - The form data, expected to contain 'email' and 'password'.
+ * @returns {Promise<AuthActionState>} The result state with user data and redirect URL on success.
+ */
+export async function signInWithPasswordAction(formData: FormData): Promise<AuthActionState> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  logger.info(`Sign-in attempt for email: ${email?.substring(0,3)}...`);
+
+  const emailValidation = commonEmailSchema.safeParse(email);
+  if (!emailValidation.success) {
+    const errorMessage = emailValidation.error.errors.map((e) => e.message).join(", ");
+    logger.warn('Sign-in validation failed for email.', { emailProvided: !!email, error: errorMessage });
+    return {
+      success: false,
+      message: "Invalid email address.",
+      errorFields: { email: errorMessage }
+    };
+  }
+
+  const passwordValidation = loginPasswordSchema.safeParse(password);
+   if (!passwordValidation.success) {
+    const errorMessage = passwordValidation.error.errors.map((e) => e.message).join(", ");
+    logger.warn('Sign-in validation failed for password.', { error: errorMessage });
+    return {
+      success: false,
+      message: "Password is required.",
+      errorFields: { password: errorMessage }
+    };
+  }
+
+  const { data, error } = await authService.signInWithPasswordWithSupabase({ email, password });
+
+  if (error) {
+    logger.error('Service error during sign-in.', { email: email?.substring(0,3), serviceError: error.message });
+    return {
+      success: false,
+      message: error.message || "Invalid login credentials.",
+    };
+  }
+
+  if (!data.user) {
+     logger.warn('Sign-in failed: No user data returned despite no service error.', { email: email?.substring(0,3) });
+     return {
+      success: false,
+      message: "Login failed. Please check your credentials.",
+    };
+  }
+
+  logger.info(`Sign-in successful for user: ${data.user.id}`);
+  return {
+    success: true,
+    message: "Login successful",
+    user: data.user,
+    redirectTo: '/dashboard'
+  };
 }
 
 /**

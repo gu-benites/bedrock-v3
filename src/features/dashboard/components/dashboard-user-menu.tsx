@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks";
+import { useDashboardLoading } from "@/features/dashboard/context/dashboard-loading-context";
 import { signOutUserAction } from "@/features/auth/actions";
 import {
   AlertDialog,
@@ -76,22 +77,13 @@ export function DashboardUserMenu({
   notificationCount = 0,
   onRequestSidebarExpand,
 }: DashboardUserMenuProps) {
-  const [mounted, setMounted] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const {
-    user, 
-    profile, 
-    isSessionLoading,
-    sessionError, 
-  } = useAuth();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { user, profile } = useAuth();
+  const { isLoading: showSkeletons, isAuthenticated, isSigningOut, setIsSigningOut } = useDashboardLoading();
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -142,11 +134,15 @@ export function DashboardUserMenu({
 
   // Compute timestamped avatar URL directly in render logic if profile and avatarUrl exist
   const currentBaseAvatarUrl = profile?.avatarUrl || (user?.user_metadata?.avatar_url as string | undefined);
-  const timestampedAvatarUrl = currentBaseAvatarUrl 
-    ? `${currentBaseAvatarUrl.split('?')[0]}?t=${new Date().getTime()}` 
+  const timestampedAvatarUrl = currentBaseAvatarUrl
+    ? `${currentBaseAvatarUrl.split('?')[0]}?t=${new Date().getTime()}`
     : null;
-  
-  const showSkeletons = !mounted || isSessionLoading;
+
+  const handleSignOut = async (formData: FormData) => {
+    setIsSigningOut(true);
+    setShowLogoutConfirm(false);
+    await signOutUserAction();
+  };
 
 
   return (
@@ -277,15 +273,20 @@ export function DashboardUserMenu({
             <AlertDialogCancel onClick={() => setShowLogoutConfirm(false)}>
               Cancel
             </AlertDialogCancel>
-            <form action={signOutUserAction}>
+            <form action={handleSignOut}>
               <Button
                 type="submit"
                 variant="destructive"
-                onClick={() => {
-                  setShowLogoutConfirm(false); 
-                }}
+                disabled={isSigningOut}
               >
-                Log Out
+                {isSigningOut ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing out...
+                  </>
+                ) : (
+                  'Log Out'
+                )}
               </Button>
             </form>
           </AlertDialogFooter>

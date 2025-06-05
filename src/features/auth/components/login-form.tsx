@@ -2,27 +2,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useActionState } from "react";
+
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Separator } from "@/components/ui";
-import { signInWithPassword, signInWithGoogleRedirectAction, signInWithAzureRedirectAction } from "@/features/auth/actions";
+import { signInWithPasswordAction, signInWithGoogleRedirectAction, signInWithAzureRedirectAction } from "@/features/auth/actions";
 import { useToast } from "@/hooks";
 import { PassForgeLogo, GoogleLogo, MicrosoftLogo } from "@/components/icons";
 import { LogIn, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import * as Sentry from '@sentry/nextjs';
 import { useSearchParams } from "next/navigation";
-import OneTapComponent from './one-tap-component'; 
+import OneTapComponent from './one-tap-component';
+
 
 /**
  * A button component that displays a loading spinner while the form action is pending.
  * @returns {JSX.Element} The submit button.
  */
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ isPending }: { isPending: boolean }) {
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+    <Button type="submit" className="w-full" disabled={isPending}>
+      {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
       Log In
     </Button>
   );
@@ -89,15 +90,19 @@ const USER_FACING_ERROR_SUBSTRINGS = [
  */
 export default function LoginForm(): JSX.Element {
   const { toast } = useToast();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const initialStatePassword = { message: null, success: false, errorFields: null };
-  const [statePassword, formActionPassword] = useActionState(signInWithPassword, initialStatePassword);
+  // Remove unused useActionState for now - we'll handle form submission manually
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const [showPassword, setShowPassword] = useState(false);
   const [googleClientIdExists, setGoogleClientIdExists] = useState(false);
 
+
+
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+    if (process.env['NEXT_PUBLIC_GOOGLE_CLIENT_ID']) {
       setGoogleClientIdExists(true);
     }
   }, []);
@@ -122,39 +127,101 @@ export default function LoginForm(): JSX.Element {
     }
   }, [searchParams, toast]);
 
-  useEffect(() => {
-    if (statePassword?.message) {
-      if (statePassword.success) {
+  // Handle form submission manually
+  const handlePasswordSubmit = async (formData: FormData) => {
+    setIsPending(true);
+    setError(null);
+
+    try {
+      const result = await signInWithPasswordAction(formData);
+
+      if (result?.success) {
         toast({
           title: "Success!",
-          description: statePassword.message,
+          description: result.message || "Successfully signed in",
         });
-      } else {
+        router.push('/dashboard');
+      } else if (result?.message) {
+        setError(result.message);
         toast({
           title: "Login Failed",
-          description: statePassword.message,
+          description: result.message,
           variant: "destructive",
         });
-        const isUserFacingError = USER_FACING_ERROR_SUBSTRINGS.some(sub => 
-          statePassword.message!.toLowerCase().includes(sub)
+
+        const isUserFacingError = USER_FACING_ERROR_SUBSTRINGS.some(sub =>
+          result.message!.toLowerCase().includes(sub)
         );
-        if (!isUserFacingError && !statePassword.errorFields) {
+        if (!isUserFacingError && !result.errorFields) {
           Sentry.captureMessage('Login action failed with unexpected server message', {
             level: 'error',
-            extra: { 
-              action: 'signInWithPassword', 
-              formStateMessage: statePassword.message,
+            extra: {
+              action: 'signInWithPassword',
+              formStateMessage: result.message,
               emailUsed: (document.getElementById('email') as HTMLInputElement)?.value?.substring(0,3) + '...'
             }
           });
         }
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      setError(errorMessage);
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsPending(false);
     }
-  }, [statePassword, toast]);
+  };
+
+  // Wrapper functions for social login actions
+  const handleGoogleRedirect = async () => {
+    try {
+      await signInWithGoogleRedirectAction();
+    } catch (error) {
+      console.error('Google redirect error:', error);
+    }
+  };
+
+  const handleAzureRedirect = async () => {
+    try {
+      await signInWithAzureRedirectAction();
+    } catch (error) {
+      console.error('Azure redirect error:', error);
+    }
+  };
+
+  // Handle Google One Tap success
+  const handleGoogleOneTapSuccess = () => {
+    toast({
+      title: "Welcome!",
+      description: "Successfully signed in with Google.",
+    });
+  };
+
+  // Handle Google One Tap error
+  const handleGoogleOneTapError = (error: string) => {
+    setError(error);
+    toast({
+      title: "Sign-in Failed",
+      description: error,
+      variant: "destructive",
+    });
+  };
 
   return (
     <>
-      {googleClientIdExists && <OneTapComponent />}
+      {/* Google One Tap - only render once at the top level */}
+      {googleClientIdExists && (
+        <OneTapComponent
+          onSuccess={handleGoogleOneTapSuccess}
+          onError={handleGoogleOneTapError}
+          disabled={isPending}
+          showButton={false} // Don't show button here, we have it in the form
+        />
+      )}
       <div className="w-full animate-fade-in">
         <Card className="w-full shadow-xl">
           <CardHeader className="text-center">
@@ -168,28 +235,35 @@ export default function LoginForm(): JSX.Element {
             {/* Social Logins First */}
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
-                <form action={signInWithGoogleRedirectAction} className="w-full sm:flex-1">
+                <form action={handleGoogleRedirect} className="w-full sm:flex-1">
                   <GoogleSignInButton />
                 </form>
-                <form action={signInWithAzureRedirectAction} className="w-full sm:flex-1">
+                <form action={handleAzureRedirect} className="w-full sm:flex-1">
                   <MicrosoftSignInButton />
                 </form>
               </div>
             </div>
 
+
+
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
+                  Or continue with email
                 </span>
               </div>
             </div>
 
             {/* Email/Password Form */}
-            <form action={formActionPassword} className="space-y-6">
+            <form action={handlePasswordSubmit} className="space-y-6">
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <label
                   htmlFor="email"
@@ -206,10 +280,9 @@ export default function LoginForm(): JSX.Element {
                     placeholder="you@example.com"
                     required
                     className="pl-10 focus:ring-accent focus:placeholder-transparent"
-                    aria-describedby={statePassword?.errorFields?.email ? "email-error" : undefined}
+                    disabled={isPending}
                   />
                 </div>
-                 {statePassword?.errorFields?.email && <p id="email-error" className="text-sm text-destructive">{statePassword.errorFields.email}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -232,7 +305,7 @@ export default function LoginForm(): JSX.Element {
                     placeholder="••••••••"
                     required
                     className="pl-10 pr-10 focus:ring-accent focus:placeholder-transparent"
-                    aria-describedby={statePassword?.errorFields?.password ? "password-error" : undefined}
+                    disabled={isPending}
                   />
                   <Button
                     type="button"
@@ -241,13 +314,13 @@ export default function LoginForm(): JSX.Element {
                     className="absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
+                    disabled={isPending}
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </Button>
                 </div>
-                {statePassword?.errorFields?.password && <p id="password-error" className="text-sm text-destructive">{statePassword.errorFields.password}</p>}
               </div>
-              <SubmitButton />
+              <SubmitButton isPending={isPending} />
             </form>
           </CardContent>
            <CardFooter className="flex-col items-center text-sm pt-4">

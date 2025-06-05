@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardLoading } from "../context/dashboard-loading-context";
 import { DashboardUserMenu } from "./dashboard-user-menu"; // Updated import
 
 type SubMenuItem = {
@@ -203,12 +204,7 @@ function MenuItem({
 
 export function DashboardSidebar({ onClose, collapsed = false, onUserMenuClick }: DashboardSidebarProps) {
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const { isLoading: loading } = useDashboardLoading();
 
   useEffect(() => {
     if (collapsed) {

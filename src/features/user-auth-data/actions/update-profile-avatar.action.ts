@@ -4,13 +4,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { UserProfileSchema, type UserProfile } from "../schemas/profile.schema";
 import { getServerLogger } from '@/lib/logger'; // Re-added import
-import { getStoragePathFromUrl, handleImageProcessing } from "../utils/profile-image.utils"; 
+import { getStoragePathFromUrl, handleImageProcessing, type ImageProcessingError } from "../utils/profile-image.utils";
+import { type ProfileActionError } from "./profile.actions";
 
 const logger = getServerLogger('UpdateProfileAvatarAction'); // Re-added instantiation
 
 interface UpdateProfileImageResult {
   updatedProfile?: UserProfile;
   error?: string;
+  errorDetails?: ProfileActionError | ImageProcessingError;
 }
 
 export async function updateProfileAvatar(
@@ -22,12 +24,22 @@ export async function updateProfileAvatar(
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError) {
-    logger.error("[UpdateProfileAvatarAction] Authentication error.", { error: authError.message }); // Uncommented logger call
-    return { error: `Authentication error: ${authError.message}` };
+    const errorDetails: ProfileActionError = {
+      code: 'AUTH_ERROR',
+      message: 'Authentication failed. Please log in again.',
+      details: { originalError: authError.message }
+    };
+    logger.error("[UpdateProfileAvatarAction] Authentication error.", errorDetails);
+    return { error: errorDetails.message, errorDetails };
   }
   if (!user) {
-    logger.warn("[UpdateProfileAvatarAction] No authenticated user found."); // Uncommented logger call
-    return { error: "User not authenticated." };
+    const errorDetails: ProfileActionError = {
+      code: 'AUTH_ERROR',
+      message: 'User not authenticated. Please log in.',
+      details: { context: 'updateProfileAvatar' }
+    };
+    logger.warn("[UpdateProfileAvatarAction] No authenticated user found.", errorDetails);
+    return { error: errorDetails.message, errorDetails };
   }
   logger.info(`[UpdateProfileAvatarAction] Authenticated user: ${user.id}`); // Uncommented logger call
 
@@ -67,7 +79,10 @@ export async function updateProfileAvatar(
 
 
   if (avatarResult.error) {
-    return { error: avatarResult.error };
+    return {
+      error: avatarResult.error,
+      errorDetails: avatarResult.errorDetails
+    };
   }
 
   if (avatarResult.newImageUrl !== undefined) {
@@ -85,12 +100,22 @@ export async function updateProfileAvatar(
       .single();
 
     if (updateError) {
-      logger.error(`[UpdateProfileAvatarAction] Failed to update avatar_url in DB for user ID: ${user.id}`, { error: updateError.message }); // Uncommented logger call
-      return { error: `Failed to update profile: ${updateError.message}` };
+      const errorDetails: ProfileActionError = {
+        code: 'DATABASE_ERROR',
+        message: 'Failed to update avatar image in database.',
+        details: { originalError: updateError.message, userId: user.id }
+      };
+      logger.error(`[UpdateProfileAvatarAction] Failed to update avatar_url in DB for user ID: ${user.id}`, errorDetails);
+      return { error: errorDetails.message, errorDetails };
     }
     if (!updatedProfileData) {
-      logger.error(`[UpdateProfileAvatarAction] Profile DB update for avatar for user ID: ${user.id} did not return data.`); // Uncommented logger call
-      return { error: "Profile update for avatar failed to return data." };
+      const errorDetails: ProfileActionError = {
+        code: 'DATABASE_ERROR',
+        message: 'Avatar update completed but no data was returned.',
+        details: { userId: user.id }
+      };
+      logger.error(`[UpdateProfileAvatarAction] Profile DB update for avatar for user ID: ${user.id} did not return data.`, errorDetails);
+      return { error: errorDetails.message, errorDetails };
     }
     logger.info(`[UpdateProfileAvatarAction] DB update for avatar_url successful for user ID: ${user.id}. Updated data:`, updatedProfileData); // Uncommented logger call
     
@@ -119,8 +144,13 @@ export async function updateProfileAvatar(
 
     const validationResult = UserProfileSchema.safeParse(mappedProfile);
     if (!validationResult.success) {
-        logger.error('[UpdateProfileAvatarAction] Updated profile data (avatar) failed validation.', { errors: validationResult.error.flatten() }); // Uncommented logger call
-        return { error: 'Updated profile data (avatar) is invalid.' };
+      const errorDetails: ProfileActionError = {
+        code: 'VALIDATION_ERROR',
+        message: 'Updated avatar profile data failed validation.',
+        details: { validationErrors: validationResult.error.flatten(), userId: user.id }
+      };
+      logger.error('[UpdateProfileAvatarAction] Updated profile data (avatar) failed validation.', errorDetails);
+      return { error: errorDetails.message, errorDetails };
     }
     logger.info(`[UpdateProfileAvatarAction] Avatar updated and profile validated successfully for user ID: ${user.id}`); // Uncommented logger call
     return { updatedProfile: validationResult.data };

@@ -2,130 +2,254 @@
 'use client'
 
 import Script from 'next/script'
-import { createClient } from '@/lib/supabase/client' // Ensure this is your browser client
-import type { CredentialResponse } from 'google-one-tap'
+import { createClient } from '@/lib/supabase/client'
+import type { CredentialResponse } from '@/types/google-one-tap'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { getServerLogger } from '@/lib/logger'; // Using server logger for client-side is not ideal, but for consistency if no client logger exists
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useToast } from '@/hooks/use-toast'
 
-// Using a simple console log for client-side, or you'd integrate a client-side logging solution
+// Client-side logger for Google One Tap
 const clientLogger = {
   info: (message: string, ...args: any[]) => console.log(`[OneTap INFO] ${message}`, ...args),
   error: (message: string, ...args: any[]) => console.error(`[OneTap ERROR] ${message}`, ...args),
   warn: (message: string, ...args: any[]) => console.warn(`[OneTap WARN] ${message}`, ...args),
 };
 
-const OneTapComponent = () => {
-  const [supabase] = useState(() => createClient()); // Stable Supabase client instance
-  const router = useRouter();
-  const [isGsiScriptReady, setIsGsiScriptReady] = useState(false);
-  const [googleClientId, setGoogleClientId] = useState<string | undefined>(undefined);
+// Global singleton to prevent multiple initializations
+let isGoogleOneTapInitialized = false;
+let initializationPromise: Promise<void> | null = null;
 
-  useEffect(() => {
-    setGoogleClientId(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+interface OneTapComponentProps {
+  onSuccess?: () => void;
+  onError?: (error: string) => void;
+  disabled?: boolean;
+  showButton?: boolean;
+}
+
+const OneTapComponent = ({
+  onSuccess,
+  onError,
+  disabled = false,
+  showButton = false
+}: OneTapComponentProps) => {
+  const supabase = createClient();
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [currentNonce, setCurrentNonce] = useState<string | null>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const initializationRef = useRef(false);
+
+  // Get Google Client ID
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  // Generate nonce to use for Google ID token sign-in
+  const generateNonce = useCallback(async (): Promise<[string, string]> => {
+    try {
+      const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+      const encoder = new TextEncoder();
+      const encodedNonce = encoder.encode(nonce);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+
+      clientLogger.info('Generated nonce for Google One Tap');
+      return [nonce, hashedNonce];
+    } catch (error) {
+      clientLogger.error('Failed to generate nonce', error);
+      throw new Error('Failed to generate security nonce');
+    }
   }, []);
 
-  const generateNonce = async (): Promise<string[]> => {
-    const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
-    const encoder = new TextEncoder();
-    const encodedNonce = encoder.encode(nonce);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return [nonce, hashedNonce];
-  };
+  // Handle Google Sign-In callback
+  const handleGoogleSignIn = useCallback(async (response: CredentialResponse) => {
+    if (!currentNonce) {
+      clientLogger.error('No nonce available for Google sign-in');
+      onError?.('Authentication error occurred');
+      return;
+    }
 
-  useEffect(() => {
-    if (!isGsiScriptReady || !googleClientId) {
-      if (googleClientId === undefined && !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
-        // Only log warning once if client ID is definitively missing
-        clientLogger.warn('Google Client ID not found. Google One-Tap will not initialize.');
+    try {
+      clientLogger.info('Processing Google One Tap sign-in...');
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: response.credential,
+        nonce: currentNonce, // Use the raw (non-hashed) nonce
+      });
+
+      if (error) {
+        clientLogger.error('Supabase authentication error:', error);
+        onError?.(error.message || 'Failed to sign in with Google');
+        toast({
+          title: "Sign-in Failed",
+          description: error.message || 'Failed to sign in with Google. Please try again.',
+          variant: "destructive"
+        });
+        return;
       }
+
+      clientLogger.info('Successfully signed in with Google One Tap');
+      onSuccess?.();
+      toast({
+        title: "Welcome!",
+        description: "Successfully signed in with Google.",
+        variant: "default"
+      });
+
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      clientLogger.error('Error during Google sign-in:', error);
+      onError?.(errorMessage);
+      toast({
+        title: "Sign-in Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, [currentNonce, supabase, router, onSuccess, onError, toast]);
+
+  // Initialize Google One Tap
+  useEffect(() => {
+    if (!isScriptLoaded || !googleClientId || disabled || initializationRef.current || isGoogleOneTapInitialized) {
       return;
     }
 
     const initializeGoogleOneTap = async () => {
-      clientLogger.info('Attempting to initialize Google One Tap...');
-
-      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-        clientLogger.error('Google GSI library not fully loaded on window object.');
+      // Prevent multiple simultaneous initializations
+      if (initializationPromise) {
+        await initializationPromise;
         return;
       }
 
-      const [nonce, hashedNonce] = await generateNonce();
-      clientLogger.info('Generated Nonce (raw, hashed):', nonce.substring(0,5)+'...', hashedNonce.substring(0,5)+'...');
+      initializationPromise = (async () => {
+        try {
+          clientLogger.info('Initializing Google One Tap...');
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        clientLogger.error('Error getting session before One-Tap init:', sessionError);
-      }
-      if (sessionData.session) {
-        clientLogger.info('User already has a session. Skipping One-Tap display, redirecting to dashboard.');
-        router.push('/dashboard');
-        return;
-      }
-
-      try {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: async (response: CredentialResponse) => {
-            clientLogger.info('Google One-Tap callback received.');
-            try {
-              const { data, error } = await supabase.auth.signInWithIdToken({
-                provider: 'google',
-                token: response.credential,
-                nonce, // Use the raw (non-hashed) nonce here
-              });
-
-              if (error) {
-                clientLogger.error('Error logging in with Google One Tap (Supabase signInWithIdToken):', error);
-                // Optionally, provide user feedback here, e.g., via a toast
-                throw error;
-              }
-              clientLogger.info('Successfully logged in with Google One Tap. Session data:', data);
-              router.push('/dashboard'); // Redirect to dashboard on success
-            } catch (error) {
-              clientLogger.error('Caught error during One-Tap Supabase auth:', error);
-            }
-          },
-          nonce: hashedNonce, // Use the hashed nonce for Google's initialization
-          use_fedcm_for_prompt: true,
-          auto_select: true, // Attempt to sign in automatically if conditions are met
-          // context: 'signin', // Optional: can be 'signin', 'signup', or 'use'
-          // ux_mode: 'popup', // Default is popup, can be 'redirect'
-        });
-
-        clientLogger.info('Google One-Tap initialized. Prompting...');
-        window.google.accounts.id.prompt((notification: any) => {
-          // This notification callback provides insights into the prompt's display status.
-          // Useful for debugging why a prompt might not be showing.
-          if (notification.isNotDisplayed()) {
-            clientLogger.warn('Google One-Tap prompt was not displayed.', { reason: notification.getNotDisplayedReason() });
-          } else if (notification.isSkippedMoment()) {
-            clientLogger.info('Google One-Tap prompt was skipped.', { reason: notification.getSkippedReason() });
-          } else if (notification.isDismissedMoment()) {
-            clientLogger.info('Google One-Tap prompt was dismissed by user.', { reason: notification.getDismissedReason() });
-          } else {
-            clientLogger.info('Google One-Tap prompt displayed or other moment.', { moment_type: notification.getMomentType() });
+          if (!window.google?.accounts?.id) {
+            clientLogger.error('Google GSI library not available');
+            return;
           }
-        });
 
-      } catch (initError) {
-        clientLogger.error('Error during google.accounts.id.initialize:', initError);
-      }
+          // Cancel any existing prompts first
+          try {
+            window.google.accounts.id.cancel();
+          } catch (error) {
+            // Ignore errors from canceling non-existent prompts
+          }
+
+        // Check if user is already signed in
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          clientLogger.error('Error checking session:', sessionError);
+        }
+
+        if (sessionData.session) {
+          clientLogger.info('User already signed in, skipping One Tap');
+          return;
+        }
+
+        // Generate nonce
+        const [nonce, hashedNonce] = await generateNonce();
+        setCurrentNonce(nonce);
+
+        // Initialize Google One Tap with a small delay to ensure clean state
+        setTimeout(() => {
+          try {
+            window.google.accounts.id.initialize({
+              client_id: googleClientId,
+              callback: handleGoogleSignIn,
+              nonce: hashedNonce, // Use the hashed nonce for Google's initialization
+              use_fedcm_for_prompt: true,
+              auto_select: false, // Don't auto-select to give user control
+              context: 'signin',
+              ux_mode: 'popup',
+              cancel_on_tap_outside: false,
+              itp_support: true,
+            });
+
+            // Render button if requested
+            if (showButton && buttonRef.current) {
+              window.google.accounts.id.renderButton(buttonRef.current, {
+                type: 'standard',
+                theme: 'outline',
+                size: 'large',
+                text: 'signin_with',
+                shape: 'pill',
+                logo_alignment: 'left',
+              });
+            }
+
+            // Show One Tap prompt with a small delay
+            setTimeout(() => {
+              window.google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed()) {
+                  const reason = notification.getNotDisplayedReason();
+                  clientLogger.warn('One Tap not displayed:', reason);
+
+                  // Handle specific reasons
+                  if (reason === 'browser_not_supported') {
+                    onError?.('Your browser does not support Google One Tap');
+                  } else if (reason === 'invalid_client') {
+                    onError?.('Google authentication configuration error');
+                  }
+                } else if (notification.isSkippedMoment()) {
+                  clientLogger.info('One Tap skipped:', notification.getSkippedReason());
+                } else if (notification.isDismissedMoment()) {
+                  clientLogger.info('One Tap dismissed:', notification.getDismissedReason());
+                }
+              });
+            }, 100);
+
+            setIsInitialized(true);
+            initializationRef.current = true;
+            isGoogleOneTapInitialized = true;
+            clientLogger.info('Google One Tap initialized successfully');
+          } catch (initError) {
+            clientLogger.error('Error during Google One Tap initialization:', initError);
+            onError?.('Failed to initialize Google authentication');
+          }
+        }, 100);
+
+        } catch (error) {
+          clientLogger.error('Failed to initialize Google One Tap:', error);
+          onError?.('Failed to initialize Google authentication');
+        } finally {
+          initializationPromise = null;
+        }
+      })();
+
+      await initializationPromise;
     };
 
-    initializeGoogleOneTap();
+    // Only initialize once
+    if (!initializationRef.current) {
+      initializeGoogleOneTap();
+    }
+  }, [isScriptLoaded, googleClientId, disabled, handleGoogleSignIn, generateNonce, supabase, showButton, onError]);
 
-    // No specific cleanup for google.accounts.id.initialize or prompt is standard,
-    // as it's meant to manage its lifecycle.
-  }, [isGsiScriptReady, supabase, router, googleClientId]);
+  // Cleanup on unmount and prevent multiple initializations
+  useEffect(() => {
+    return () => {
+      if (window.google?.accounts?.id) {
+        try {
+          window.google.accounts.id.cancel();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      }
+      initializationRef.current = false;
+      isGoogleOneTapInitialized = false;
+      initializationPromise = null;
+    };
+  }, []);
 
-
+  // Don't render if Google Client ID is not configured
   if (!googleClientId) {
-    // Don't render the script if the client ID is not configured.
-    // This check happens after initial render due to how process.env works on client.
-    // A console warning is logged in the useEffect.
+    clientLogger.warn('Google Client ID not configured. Set NEXT_PUBLIC_GOOGLE_CLIENT_ID environment variable.');
     return null;
   }
 
@@ -134,21 +258,28 @@ const OneTapComponent = () => {
       <Script
         src="https://accounts.google.com/gsi/client"
         strategy="afterInteractive"
-        onReady={() => {
-          clientLogger.info('Google GSI script ready.');
-          setIsGsiScriptReady(true);
+        onLoad={() => {
+          clientLogger.info('Google GSI script loaded successfully');
+          setIsScriptLoaded(true);
         }}
-        onError={(e) => {
-          clientLogger.error('Failed to load Google GSI script:', e);
+        onError={(error) => {
+          clientLogger.error('Failed to load Google GSI script:', error);
+          onError?.('Failed to load Google authentication');
         }}
       />
-      {/* Google One-Tap does not require a specific div to render its default prompt UI.
-          If using the Sign In With Google button, you would place its div here.
-          <div id="g_id_onload" ...></div>
-          <div class="g_id_signin" ...></div>
-      */}
+
+      {/* Optional Sign In With Google button */}
+      {showButton && (
+        <div
+          ref={buttonRef}
+          className="flex justify-center mt-4"
+          style={{ minHeight: '44px' }}
+        />
+      )}
+
+      {/* One Tap will automatically show its prompt when initialized */}
     </>
   );
-}
+};
 
 export default OneTapComponent;
