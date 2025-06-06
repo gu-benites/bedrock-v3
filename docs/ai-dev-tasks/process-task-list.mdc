@@ -7,6 +7,19 @@ alwaysApply: false
 
 Guidelines for managing task lists in markdown files to track progress on completing a PRD
 
+## Test Implementation First
+
+- **First of all** you need to implement and get a passed on all test files to only later continue to follow the sequence of core features implementation
+- **Constraints**: before you implement any feature you need to make sure that all tests are passing
+
+### **Update the tests task list as you work:**
+   - Mark test tasks and subtasks as completed (`[x]`) as they pass, and only if they pass..
+   - Add to the list new tests necessary as they emerge.
+
+### **Maintain the “Relevant Files” section:**
+   - List every file created or modified.
+   - Give each file a one‑line description of its purpose.
+
 ## Task Implementation
 - **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say “yes” or "y"
 - **Completion protocol:**  

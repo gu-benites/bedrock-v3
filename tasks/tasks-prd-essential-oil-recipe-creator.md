@@ -1,0 +1,108 @@
+# Tasks: Essential Oil Recipe Creator
+
+## Relevant Files
+
+- `package.json` - Verify existing dependencies and add required packages (Zustand, React Hook Form, etc.)
+- `src/app/(dashboard)/dashboard/create-recipe/[step]/page.tsx` - Dynamic route page for wizard steps ✅ CREATED
+- `src/app/(dashboard)/dashboard/create-recipe/layout.tsx` - Layout wrapper for create-recipe pages ✅ CREATED
+- `src/app/api/create-recipe/route.ts` - API proxy route for external AromaRx API integration ✅ CREATED
+- `src/features/create-recipe/store/recipe-store.ts` - Zustand store for recipe wizard state management ✅ CREATED
+- `src/features/create-recipe/store/recipe-store.test.ts` - Unit tests for recipe store ✅ PASSING
+- `src/features/create-recipe/schemas/recipe-schemas.ts` - Zod validation schemas for all wizard steps ✅ CREATED
+- `src/features/create-recipe/schemas/recipe-schemas.test.ts` - Unit tests for validation schemas ✅ PASSING
+- `src/features/create-recipe/services/recipe-api.service.ts` - Service functions for API calls ✅ CREATED
+- `src/features/create-recipe/services/recipe-api.service.test.ts` - Unit tests for API service ✅ PASSING
+- `src/features/create-recipe/hooks/use-recipe-navigation.ts` - Custom hook for wizard navigation logic ✅ CREATED
+- `src/features/create-recipe/hooks/use-recipe-navigation.test.ts` - Unit tests for navigation hook ✅ PASSING
+- `src/features/create-recipe/components/wizard-container.test.tsx` - Unit tests for wizard container ✅ PASSING
+- `src/features/create-recipe/components/wizard-layout.tsx` - Main wizard layout with progress indicator ✅ CREATED
+- `src/features/create-recipe/components/wizard-layout.test.tsx` - Unit tests for wizard layout
+- `src/features/create-recipe/components/steps/health-concern-step.tsx` - Step 1: Health concern input component
+- `src/features/create-recipe/components/steps/health-concern-step.test.tsx` - Unit tests for health concern step
+- `src/features/create-recipe/components/steps/demographics-step.tsx` - Step 2: Demographics form component
+- `src/features/create-recipe/components/steps/demographics-step.test.tsx` - Unit tests for demographics step
+- `src/features/create-recipe/components/steps/causes-step.tsx` - Step 3: Potential causes selection component
+- `src/features/create-recipe/components/steps/causes-step.test.tsx` - Unit tests for causes step
+- `src/features/create-recipe/components/steps/symptoms-step.tsx` - Step 4: Symptoms selection component
+- `src/features/create-recipe/components/steps/symptoms-step.test.tsx` - Unit tests for symptoms step
+- `src/features/create-recipe/components/steps/properties-step.tsx` - Step 5: Therapeutic properties display component
+- `src/features/create-recipe/components/steps/properties-step.test.tsx` - Unit tests for properties step
+- `src/features/create-recipe/components/steps/oils-step.tsx` - Step 6: Essential oils suggestions component
+- `src/features/create-recipe/components/steps/oils-step.test.tsx` - Unit tests for oils step
+- `src/features/create-recipe/components/ui/progress-indicator.tsx` - Progress bar component for wizard
+- `src/features/create-recipe/components/ui/progress-indicator.test.tsx` - Unit tests for progress indicator
+- `src/features/create-recipe/components/ui/loading-skeleton.tsx` - Loading skeleton components
+- `src/features/create-recipe/components/ui/loading-skeleton.test.tsx` - Unit tests for loading skeleton
+- `src/features/create-recipe/components/ui/error-boundary.tsx` - Error boundary for recipe wizard
+- `src/features/create-recipe/components/ui/error-boundary.test.tsx` - Unit tests for error boundary
+- `src/features/create-recipe/utils/local-storage.ts` - Utility functions for local storage persistence
+- `src/features/create-recipe/utils/api-data-transform.ts` - Utility functions for API data transformation ✅ CREATED
+- `src/features/create-recipe/components/auth-guard.tsx` - Authentication guard component ✅ CREATED
+- `src/features/create-recipe/providers/recipe-wizard-provider.tsx` - Wizard provider with auth guard ✅ CREATED
+- `src/features/create-recipe/components/wizard-container.tsx` - Main wizard container component ✅ CREATED
+- `src/features/create-recipe/components/breadcrumb-navigation.tsx` - Breadcrumb navigation with completion tracking ✅ CREATED
+- `src/features/create-recipe/components/health-concern-form.tsx` - Health concern input form with validation ✅ CREATED
+- `src/features/create-recipe/components/demographics-form.tsx` - Demographics form with validation ✅ CREATED
+- `src/features/create-recipe/components/causes-selection.tsx` - Causes selection with API integration ✅ CREATED
+- `src/features/create-recipe/components/symptoms-selection.tsx` - Symptoms selection with API integration ✅ CREATED
+- `src/features/create-recipe/components/properties-display.tsx` - Therapeutic properties display ✅ CREATED
+- `src/features/create-recipe/components/oils-display.tsx` - Essential oils recommendations display ✅ CREATED
+- `src/features/create-recipe/components/error-boundary.tsx` - Error boundary with fallback UI ✅ CREATED
+- `src/features/create-recipe/components/loading-skeletons.tsx` - Loading skeleton components ✅ CREATED
+- `src/features/create-recipe/components/mobile-layout.tsx` - Mobile-optimized responsive layout ✅ CREATED
+- `src/features/create-recipe/utils/local-storage.ts` - Local storage utilities with 7-day retention ✅ CREATED
+- `src/features/create-recipe/utils/local-storage.test.ts` - Unit tests for local storage utils
+- `src/features/create-recipe/types/recipe.types.ts` - TypeScript type definitions for recipe data ✅ CREATED
+- `src/features/create-recipe/constants/recipe.constants.ts` - Constants for age categories, gender options, etc. ✅ CREATED
+
+### Notes
+
+- Unit tests should typically be placed alongside the code files they are testing (e.g., `MyComponent.tsx` and `MyComponent.test.tsx` in the same directory).
+- Use `npx jest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the Jest configuration.
+- Follow existing project patterns for authentication guards and error handling
+- Ensure mobile-first responsive design for all components
+- Use existing ShadCN UI components and maintain consistency with current design system
+
+## Tasks
+
+- [x] 1.0 Verify Existing Stack and Set up Required Dependencies
+  - [x] 1.1 Review package.json to identify existing dependencies (Zustand, React Hook Form, Zod validation)
+  - [x] 1.2 Check if Zustand persist middleware is already installed
+  - [x] 1.3 Verify React Hook Form and Zod integration is available
+  - [x] 1.4 Install missing dependencies only if not present: `zustand`, `@hookform/resolvers`, `react-hook-form`
+  - [x] 1.5 Create TypeScript type definitions file for recipe data structures
+  - [x] 1.6 Set up constants file for age categories, gender options, and step configurations
+- [x] 2.0 Create API Integration Layer and External Service Proxy
+  - [x] 2.1 Create API route handler at `/api/create-recipe` for proxying external API calls
+  - [x] 2.2 Implement server-side API key management and security headers
+  - [x] 2.3 Create service functions for each API step (PotentialCauses, PotentialSymptoms, MedicalProperties, SuggestedOils)
+  - [x] 2.4 Implement retry logic and error handling for API calls
+  - [x] 2.5 Add request/response validation using Zod schemas
+  - [x] 2.6 Create utility functions for API data transformation
+- [x] 3.0 Implement Multi-Step Wizard Navigation and Routing
+  - [x] 3.1 Create dynamic route structure `/dashboard/create-recipe/[step]`
+  - [x] 3.2 Implement Zustand store for wizard state management with persistence
+  - [x] 3.3 Create custom hook for wizard navigation logic and step validation
+  - [x] 3.4 Implement authentication guards for recipe creation routes
+  - [x] 3.5 Create wizard layout component with progress indicator
+  - [x] 3.6 Add breadcrumb navigation and step completion tracking
+- [x] 4.0 Build Individual Step Components with Forms and Validation
+  - [x] 4.1 Create Step 1: Health Concern Input component with Zod validation (minimum 3 characters)
+  - [x] 4.2 Create Step 2: Demographics form with gender selection and age input
+  - [x] 4.3 Create Step 3: Potential Causes selection component with checkbox list
+  - [x] 4.4 Create Step 4: Symptoms selection component with multiple selection
+  - [x] 4.5 Create Step 5: Therapeutic Properties display component with relevancy scores
+  - [x] 4.6 Create Step 6: Essential Oils suggestions component grouped by properties
+  - [x] 4.7 Implement React Hook Form integration for all form steps
+  - [x] 4.8 Add local storage auto-save functionality for form data
+  - [x] 4.9 Create reusable UI components (selection cards, loading states, error displays)
+- [x] 5.0 Implement Error Handling, Loading States, and Mobile Optimization
+  - [x] 5.1 Create error boundary component for wizard steps
+  - [x] 5.2 Implement loading skeleton components for API data fetching
+  - [x] 5.3 Add retry mechanisms for failed API calls with user feedback
+  - [x] 5.4 Create mobile-optimized touch-friendly UI components
+  - [x] 5.5 Implement responsive design for all wizard steps
+  - [x] 5.6 Add accessibility features (keyboard navigation, ARIA labels)
+  - [x] 5.7 Create local storage utility functions with 7-day data retention
+  - [x] 5.8 Implement comprehensive error logging for debugging
+  - [x] 5.9 Add unit tests for all components, hooks, and utility functions
