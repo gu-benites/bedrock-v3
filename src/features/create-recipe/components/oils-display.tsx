@@ -6,8 +6,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { fetchSuggestedOilsForAllProperties } from '../services/recipe-api.service';
 import type { PropertyOilSuggestions, EssentialOil } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils';
  * Oils Display component
  */
 export function OilsDisplay() {
+  const router = useRouter();
   const {
     healthConcern,
     demographics,
@@ -32,7 +34,7 @@ export function OilsDisplay() {
     resetWizard
   } = useRecipeStore();
 
-  const { goToPrevious, canGoPrevious, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToPrevious, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isLoadingOils, setIsLoadingOils] = useState(false);
   const [expandedProperties, setExpandedProperties] = useState<Set<string>>(new Set());
 
@@ -40,9 +42,9 @@ export function OilsDisplay() {
    * Fetch suggested oils on component mount
    */
   const loadSuggestedOils = useCallback(async () => {
+    // If data is missing, let navigation handle redirects
     if (!healthConcern || !demographics || selectedCauses.length === 0 ||
         selectedSymptoms.length === 0 || therapeuticProperties.length === 0) {
-      setError('Missing required information. Please complete previous steps.');
       return;
     }
 
@@ -86,9 +88,24 @@ export function OilsDisplay() {
     markCurrentStepCompleted
   ]);
 
+  /**
+   * Check if we have required data and show appropriate state
+   */
+  const checkRequiredData = useCallback(() => {
+    if (!healthConcern || !demographics || selectedCauses.length === 0 ||
+        selectedSymptoms.length === 0 || therapeuticProperties.length === 0) {
+      // Don't set errors during reset/navigation - let the navigation system handle redirects
+      return;
+    } else {
+      clearError();
+      loadSuggestedOils();
+    }
+  }, [healthConcern, demographics, selectedCauses, selectedSymptoms, therapeuticProperties, loadSuggestedOils, clearError]);
+
   useEffect(() => {
-    loadSuggestedOils();
-  }, [loadSuggestedOils]);
+    const cleanup = checkRequiredData();
+    return cleanup;
+  }, [checkRequiredData]);
 
   /**
    * Handle go back
@@ -112,6 +129,7 @@ export function OilsDisplay() {
    */
   const handleStartNew = () => {
     resetWizard();
+    router.push('/dashboard/create-recipe/health-concern');
   };
 
   /**

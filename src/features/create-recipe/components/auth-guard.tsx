@@ -8,7 +8,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/use-auth';
-import { useLoading } from '@/features/auth/context/loading-context';
+import { useLoading } from '@/features/ui/providers/loading-provider';
 import { getServerLogger } from '@/lib/logger';
 
 /**

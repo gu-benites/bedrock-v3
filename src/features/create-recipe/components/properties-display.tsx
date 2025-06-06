@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { fetchTherapeuticProperties } from '../services/recipe-api.service';
 import type { TherapeuticProperty } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
@@ -30,15 +30,15 @@ export function PropertiesDisplay() {
     clearError
   } = useRecipeStore();
 
-  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isLoadingProperties, setIsLoadingProperties] = useState(false);
 
   /**
    * Fetch therapeutic properties on component mount
    */
   const loadTherapeuticProperties = useCallback(async () => {
+    // If data is missing, let navigation handle redirects
     if (!healthConcern || !demographics || selectedCauses.length === 0 || selectedSymptoms.length === 0) {
-      setError('Missing required information. Please complete previous steps.');
       return;
     }
 
@@ -80,9 +80,23 @@ export function PropertiesDisplay() {
     markCurrentStepCompleted
   ]);
 
+  /**
+   * Check if we have required data and show appropriate state
+   */
+  const checkRequiredData = useCallback(() => {
+    if (!healthConcern || !demographics || selectedCauses.length === 0 || selectedSymptoms.length === 0) {
+      // Don't set errors during reset/navigation - let the navigation system handle redirects
+      return;
+    } else {
+      clearError();
+      loadTherapeuticProperties();
+    }
+  }, [healthConcern, demographics, selectedCauses, selectedSymptoms, loadTherapeuticProperties, clearError]);
+
   useEffect(() => {
-    loadTherapeuticProperties();
-  }, [loadTherapeuticProperties]);
+    const cleanup = checkRequiredData();
+    return cleanup;
+  }, [checkRequiredData]);
 
   /**
    * Handle continue to next step

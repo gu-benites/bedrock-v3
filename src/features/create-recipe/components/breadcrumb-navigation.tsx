@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useRecipeStore } from '../store/recipe-store';
 import { WIZARD_STEPS } from '../constants/recipe.constants';
 import { RecipeStep } from '../types/recipe.types';
@@ -144,7 +144,7 @@ export function BreadcrumbNavigation({
   allowNavigation = true,
   className
 }: BreadcrumbNavigationProps) {
-  const { goToStep, canNavigateToStep, isStepCompleted } = useRecipeNavigation();
+  const { goToStep, canNavigateToStep, isStepCompleted } = useRecipeWizardNavigation();
   const { completedSteps } = useRecipeStore();
 
   const handleStepClick = async (step: RecipeStep) => {
@@ -193,7 +193,7 @@ export function CompactBreadcrumbNavigation({
   currentStep: RecipeStep;
   className?: string;
 }) {
-  const { stepInfo, goToPrevious, goToNext, canGoPrevious, canGoNext } = useRecipeNavigation();
+  const { stepInfo, goToPrevious, goToNext, canGoPrevious, canGoNext } = useRecipeWizardNavigation();
 
   return (
     <nav
@@ -248,7 +248,7 @@ export function CompactBreadcrumbNavigation({
  * Step completion summary component
  */
 export function StepCompletionSummary({ className }: { className?: string }) {
-  const { getCompletionPercentage } = useRecipeNavigation();
+  const { getCompletionPercentage } = useRecipeWizardNavigation();
   const { completedSteps } = useRecipeStore();
   
   const completionPercentage = getCompletionPercentage();
@@ -285,7 +285,7 @@ export function StepCompletionSummary({ className }: { className?: string }) {
  */
 export function useStepCompletionTracking() {
   const { completedSteps, currentStep } = useRecipeStore();
-  const { stepInfo, getCompletionPercentage } = useRecipeNavigation();
+  const { stepInfo, getCompletionPercentage } = useRecipeWizardNavigation();
 
   const getStepAnalytics = () => {
     return {

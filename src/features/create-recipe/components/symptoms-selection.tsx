@@ -9,7 +9,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { fetchPotentialSymptoms } from '../services/recipe-api.service';
 import { symptomsSelectionSchema } from '../schemas/recipe-schemas';
 import type { PotentialSymptom } from '../types/recipe.types';
@@ -41,7 +41,7 @@ export function SymptomsSelection() {
     clearError
   } = useRecipeStore();
 
-  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isLoadingSymptoms, setIsLoadingSymptoms] = useState(false);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<Set<string>>(new Set());
 
@@ -67,8 +67,8 @@ export function SymptomsSelection() {
    * Fetch potential symptoms on component mount
    */
   const loadPotentialSymptoms = useCallback(async () => {
+    // If data is missing, let navigation handle redirects
     if (!healthConcern || !demographics || selectedCauses.length === 0) {
-      setError('Missing required information. Please complete previous steps.');
       return;
     }
 
@@ -90,9 +90,23 @@ export function SymptomsSelection() {
     }
   }, [healthConcern, demographics, selectedCauses, potentialSymptoms.length, setPotentialSymptoms, setError, clearError]);
 
+  /**
+   * Check if we have required data and show appropriate state
+   */
+  const checkRequiredData = useCallback(() => {
+    if (!healthConcern || !demographics || selectedCauses.length === 0) {
+      // Don't set errors during reset/navigation - let the navigation system handle redirects
+      return;
+    } else {
+      clearError();
+      loadPotentialSymptoms();
+    }
+  }, [healthConcern, demographics, selectedCauses, loadPotentialSymptoms, clearError]);
+
   useEffect(() => {
-    loadPotentialSymptoms();
-  }, [loadPotentialSymptoms]);
+    const cleanup = checkRequiredData();
+    return cleanup;
+  }, [checkRequiredData]);
 
   /**
    * Handle symptom selection toggle

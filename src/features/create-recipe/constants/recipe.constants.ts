@@ -125,8 +125,10 @@ export const DEFAULT_STEP = RecipeStep.HEALTH_CONCERN;
 
 /**
  * External API endpoint for recipe generation
+ * Configurable via CREATE_RECIPE_BASE_URL environment variable
+ * Falls back to default URL for backward compatibility
  */
-export const EXTERNAL_API_URL = 'https://webhook.daianefreitas.com/webhook/10p_build_recipe_protocols';
+export const EXTERNAL_API_URL = process.env['CREATE_RECIPE_BASE_URL'] || 'https://webhook.daianefreitas.com/webhook/10p_build_recipe_protocols';
 
 /**
  * Internal API proxy endpoint

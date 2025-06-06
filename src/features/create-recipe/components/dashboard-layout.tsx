@@ -6,7 +6,8 @@
 'use client';
 
 import React from 'react';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRouter } from 'next/navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useRecipeStore } from '../store/recipe-store';
 import { BreadcrumbNavigation } from './breadcrumb-navigation';
 import { cn } from '@/lib/utils';
@@ -25,10 +26,19 @@ interface DashboardLayoutProps {
  * Dashboard progress sidebar component
  */
 function DashboardProgressSidebar() {
-  const { stepInfo, getCompletionPercentage } = useRecipeNavigation();
-  const { currentStep, completedSteps } = useRecipeStore();
+  const router = useRouter();
+  const { stepInfo, getCompletionPercentage } = useRecipeWizardNavigation();
+  const { currentStep, completedSteps, resetWizard, sessionId } = useRecipeStore();
 
   const completionPercentage = getCompletionPercentage();
+
+  /**
+   * Handle starting a new recipe
+   */
+  const handleStartNewRecipe = () => {
+    resetWizard();
+    router.push('/dashboard/create-recipe/health-concern');
+  };
 
   return (
     <div className="bg-card rounded-lg border p-4 space-y-4">
@@ -103,7 +113,10 @@ function DashboardProgressSidebar() {
         <button className="w-full text-left text-sm text-muted-foreground hover:text-foreground transition-colors">
           📋 View Previous Recipes
         </button>
-        <button className="w-full text-left text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <button
+          onClick={handleStartNewRecipe}
+          className="w-full text-left text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
           🔄 Start New Recipe
         </button>
       </div>
@@ -115,7 +128,7 @@ function DashboardProgressSidebar() {
  * Dashboard header component
  */
 function DashboardHeader() {
-  const { stepInfo } = useRecipeNavigation();
+  const { stepInfo } = useRecipeWizardNavigation();
 
   return (
     <div className="space-y-4">
@@ -189,7 +202,7 @@ export function DashboardLayout({
  */
 export function useDashboardIntegration() {
   const { currentStep, completedSteps } = useRecipeStore();
-  const { getCompletionPercentage } = useRecipeNavigation();
+  const { getCompletionPercentage } = useRecipeWizardNavigation();
 
   // Dashboard-specific functionality
   const saveToFavorites = () => {

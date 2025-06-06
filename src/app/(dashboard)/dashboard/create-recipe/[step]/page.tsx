@@ -16,9 +16,9 @@ const logger = getServerLogger();
  * Props for the dynamic recipe step page
  */
 interface RecipeStepPageProps {
-  params: {
+  params: Promise<{
     step: string;
-  };
+  }>;
 }
 
 /**
@@ -39,7 +39,7 @@ function getStepConfig(step: RecipeStep) {
  * Generates metadata for the page based on the current step
  */
 export async function generateMetadata({ params }: RecipeStepPageProps) {
-  const { step } = params;
+  const { step } = await params;
   
   if (!isValidStep(step)) {
     return {
@@ -106,7 +106,7 @@ function RecipeStepLoading() {
  * Main page component for recipe wizard steps
  */
 export default async function RecipeStepPage({ params }: RecipeStepPageProps) {
-  const { step } = params;
+  const { step } = await params;
   
   try {
     // Validate step parameter
@@ -146,13 +146,12 @@ export default async function RecipeStepPage({ params }: RecipeStepPageProps) {
     });
     
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Suspense fallback={<RecipeStepLoading />}>
-            <RecipeWizardContainer currentStep={step} />
-          </Suspense>
-        </div>
-      </div>
+      <Suspense fallback={<RecipeStepLoading />}>
+        <RecipeWizardContainer
+          currentStep={step}
+          layout="dashboard"
+        />
+      </Suspense>
     );
     
   } catch (error) {

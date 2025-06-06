@@ -5,7 +5,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useRecipeStore, useRecipeNavigation } from '../store/recipe-store';
+import { useRecipeStore } from '../store/recipe-store';
 import { WIZARD_STEPS, TOTAL_STEPS } from '../constants/recipe.constants';
 import { RecipeStep } from '../types/recipe.types';
 
@@ -64,7 +64,7 @@ interface UseRecipeNavigationReturn {
 /**
  * Custom hook for recipe wizard navigation
  */
-export function useRecipeNavigation(): UseRecipeNavigationReturn {
+export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
   const router = useRouter();
   const {
     currentStep,

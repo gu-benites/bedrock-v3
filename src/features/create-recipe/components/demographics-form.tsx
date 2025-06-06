@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { demographicsSchema } from '../schemas/recipe-schemas';
 import type { DemographicsData } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ const GENDER_OPTIONS = [
  */
 export function DemographicsForm() {
   const { demographics, updateDemographics, isLoading, error } = useRecipeStore();
-  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 

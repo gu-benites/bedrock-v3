@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useRecipeStore } from '../store/recipe-store';
 import { BreadcrumbNavigation, CompactBreadcrumbNavigation } from './breadcrumb-navigation';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,7 @@ interface MobileLayoutProps {
  * Mobile-optimized header component
  */
 function MobileHeader() {
-  const { stepInfo, getCompletionPercentage } = useRecipeNavigation();
+  const { stepInfo, getCompletionPercentage } = useRecipeWizardNavigation();
   const { currentStep } = useRecipeStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -99,7 +99,7 @@ function MobileHeader() {
  * Mobile-optimized footer component
  */
 function MobileFooter() {
-  const { goToNext, goToPrevious, canGoNext, canGoPrevious, stepInfo } = useRecipeNavigation();
+  const { goToNext, goToPrevious, canGoNext, canGoPrevious, stepInfo } = useRecipeWizardNavigation();
   const { isLoading } = useRecipeStore();
 
   return (

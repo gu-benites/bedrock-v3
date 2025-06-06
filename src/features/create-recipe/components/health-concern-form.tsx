@@ -9,7 +9,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { healthConcernSchema } from '../schemas/recipe-schemas';
 import type { HealthConcernData } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
  */
 export function HealthConcernForm() {
   const { healthConcern, updateHealthConcern, isLoading, error } = useRecipeStore();
-  const { goToNext, canGoNext, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToNext, canGoNext, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 

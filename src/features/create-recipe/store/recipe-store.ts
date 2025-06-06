@@ -284,11 +284,46 @@ export const useRecipeStore = create<RecipeStore>()(
       },
       
       resetWizard: () => {
+        console.log('🔄 Starting recipe wizard reset...');
+
+        // Clear all localStorage data first
+        try {
+          localStorage.removeItem(STORAGE_KEYS.WIZARD_STATE);
+          localStorage.removeItem(STORAGE_KEYS.SESSION_BACKUP);
+
+          // Clear any other recipe-related localStorage items
+          const keysToRemove = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.includes('recipe') || key.includes('wizard') || key.includes('create-recipe'))) {
+              keysToRemove.push(key);
+            }
+          }
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+
+        } catch (error) {
+          console.error('Error clearing localStorage during reset:', error);
+        }
+
+        // Reset to initial state with new session ID and explicitly clear error
         set(() => ({
           ...initialState,
+          error: null, // Explicitly clear any error state
+          isLoading: false, // Explicitly clear loading state
           sessionId: generateUUID(), // Generate new session ID
           lastUpdated: new Date()
         }));
+
+        // Force a small delay to ensure all components re-render and clear any pending errors
+        setTimeout(() => {
+          // Double-check that error is cleared
+          const currentState = get();
+          if (currentState.error) {
+            console.log('Clearing residual error after reset:', currentState.error);
+            set((state) => ({ ...state, error: null }));
+          }
+          console.log('Recipe wizard reset completed - all data and errors cleared');
+        }, 150); // Slightly longer delay to ensure all effects have run
       }
     }),
     {
@@ -332,7 +367,7 @@ export const useRecipeStore = create<RecipeStore>()(
 /**
  * Selector hooks for specific parts of the state
  */
-export const useRecipeNavigation = () => useRecipeStore((state) => ({
+export const useRecipeNavigationStore = () => useRecipeStore((state) => ({
   currentStep: state.currentStep,
   completedSteps: state.completedSteps,
   setCurrentStep: state.setCurrentStep,

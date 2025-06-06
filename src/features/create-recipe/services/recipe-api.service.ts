@@ -166,11 +166,11 @@ export async function fetchPotentialCauses(
   };
 
   try {
-    const response = await makeApiRequest<ApiResponse<PotentialCausesResponse>[]>(requestBody);
-    
-    // Extract the potential causes from the API response structure
-    if (response && response.length > 0 && response[0].message?.content?.potential_causes) {
-      return response[0].message.content.potential_causes;
+    const response = await makeApiRequest<PotentialCausesResponse>(requestBody);
+
+    // Handle the simplified format returned by the backend (content extracted from n8n response)
+    if (response?.potential_causes && Array.isArray(response.potential_causes)) {
+      return response.potential_causes;
     }
 
     throw new RecipeApiError(
@@ -216,10 +216,11 @@ export async function fetchPotentialSymptoms(
   };
 
   try {
-    const response = await makeApiRequest<ApiResponse<PotentialSymptomsResponse>[]>(requestBody);
-    
-    if (response && response.length > 0 && response[0].message?.content?.potential_symptoms) {
-      return response[0].message.content.potential_symptoms;
+    const response = await makeApiRequest<PotentialSymptomsResponse>(requestBody);
+
+    // Handle the simplified format returned by the backend (content extracted from n8n response)
+    if (response?.potential_symptoms && Array.isArray(response.potential_symptoms)) {
+      return response.potential_symptoms;
     }
 
     throw new RecipeApiError(
@@ -275,10 +276,11 @@ export async function fetchTherapeuticProperties(
   };
 
   try {
-    const response = await makeApiRequest<ApiResponse<MedicalPropertiesResponse>[]>(requestBody);
-    
-    if (response && response.length > 0 && response[0].message?.content?.therapeutic_properties) {
-      return response[0].message.content.therapeutic_properties;
+    const response = await makeApiRequest<MedicalPropertiesResponse>(requestBody);
+
+    // Handle the simplified format returned by the backend (content extracted from n8n response)
+    if (response?.therapeutic_properties && Array.isArray(response.therapeutic_properties)) {
+      return response.therapeutic_properties;
     }
 
     throw new RecipeApiError(
@@ -320,16 +322,16 @@ export async function fetchSuggestedOilsForProperty(
   };
 
   try {
-    const response = await makeApiRequest<ApiResponse<SuggestedOilsResponse>[]>(requestBody);
-    
-    if (response && response.length > 0 && response[0].message?.content) {
-      const content = response[0].message.content;
+    const response = await makeApiRequest<SuggestedOilsResponse>(requestBody);
+
+    // Handle the simplified format returned by the backend (content extracted from n8n response)
+    if (response?.property_id && response?.suggested_oils) {
       return {
-        property_id: content.property_id,
-        property_name: content.property_name,
-        property_name_in_english: content.property_name_in_english,
-        description: content.description,
-        suggested_oils: content.suggested_oils
+        property_id: response.property_id,
+        property_name: response.property_name,
+        property_name_in_english: response.property_name_in_english,
+        description: response.description,
+        suggested_oils: response.suggested_oils
       };
     }
 

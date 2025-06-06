@@ -1,15 +1,25 @@
 # API Calls and Responses Documentation
 
-- **API Integration**: Interacts with an external API (https://webhook.daianefreitas.com/webhook/10p_build_recipe_protocols) to:
+- **API Integration**: Interacts with an external API (configurable via environment variables) to:
   - Fetch potential causes and symptoms.
   - Retrieve associated therapeutic properties.
   - Obtain suggestions for essential oils.
 
 This document outlines the expected request bodies and response payloads for each step of the AromaRx API interaction.
 
-Example:
-curl --location '.env BASE_URL' \
---header 'apikey: .env EXTERNAL_APIKEY' \
+## Environment Variables
+
+The following environment variables must be configured:
+
+- `CREATE_RECIPE_BASE_URL`: The base URL for the external recipe API
+  - Example: `https://webhook.daianefreitas.com/webhook/10p_build_recipe_protocols`
+- `CREATE_RECIPE_APIKEY`: The API key for authenticating with the external recipe API
+
+## Example API Call
+
+```bash
+curl --location '$CREATE_RECIPE_BASE_URL' \
+--header 'apikey: $CREATE_RECIPE_APIKEY' \
 --header 'Content-Type: application/json' \
 --data '{
   "health_concern": "dermatite atopica",

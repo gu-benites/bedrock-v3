@@ -6,21 +6,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
-import { useRecipeNavigation } from '../hooks/use-recipe-navigation';
+import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { fetchPotentialCauses } from '../services/recipe-api.service';
-import { causesSelectionSchema } from '../schemas/recipe-schemas';
 import type { PotentialCause } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
-
-/**
- * Form data interface
- */
-interface CausesSelectionData {
-  selectedCauses: PotentialCause[];
-}
 
 /**
  * Causes Selection component
@@ -40,17 +30,9 @@ export function CausesSelection() {
     clearError
   } = useRecipeStore();
 
-  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeNavigation();
+  const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isLoadingCauses, setIsLoadingCauses] = useState(false);
   const [selectedCauseIds, setSelectedCauseIds] = useState<Set<string>>(new Set());
-
-  const {
-    handleSubmit,
-    formState: { isValid }
-  } = useForm<CausesSelectionData>({
-    resolver: zodResolver(causesSelectionSchema),
-    mode: 'onChange'
-  });
 
   /**
    * Initialize selected causes from store
@@ -66,8 +48,10 @@ export function CausesSelection() {
    * Fetch potential causes on component mount
    */
   const loadPotentialCauses = useCallback(async () => {
+    // If data is missing, check if we should redirect to earlier steps
     if (!healthConcern || !demographics) {
-      setError('Missing required information. Please complete previous steps.');
+      // Don't show error immediately - let navigation handle redirects
+      // Only show error if user tries to stay on this step
       return;
     }
 
@@ -89,9 +73,23 @@ export function CausesSelection() {
     }
   }, [healthConcern, demographics, potentialCauses.length, setPotentialCauses, setError, clearError]);
 
+  /**
+   * Check if we have required data and show appropriate state
+   */
+  const checkRequiredData = useCallback(() => {
+    if (!healthConcern || !demographics) {
+      // Don't set errors during reset/navigation - let the navigation system handle redirects
+      return;
+    } else {
+      clearError();
+      loadPotentialCauses();
+    }
+  }, [healthConcern, demographics, loadPotentialCauses, clearError]);
+
   useEffect(() => {
-    loadPotentialCauses();
-  }, [loadPotentialCauses]);
+    const cleanup = checkRequiredData();
+    return cleanup;
+  }, [checkRequiredData]);
 
   /**
    * Handle cause selection toggle
@@ -128,7 +126,9 @@ export function CausesSelection() {
   /**
    * Handle form submission
    */
-  const onSubmit = async () => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (selectedCauseIds.size === 0) {
       setError('Please select at least one potential cause.');
       return;
@@ -216,7 +216,7 @@ export function CausesSelection() {
 
       {/* Causes Selection */}
       {!isLoadingCauses && potentialCauses.length > 0 && (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">

@@ -17,7 +17,8 @@ import {
   Search,
   Target,
   PanelLeftClose,
-  User
+  User,
+  Leaf
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -51,9 +52,14 @@ const navItems: NavItem[] = [
     icon: <Home className="h-5 w-5" />,
   },
   {
-    title: "Profile", 
+    title: "Profile",
     href: "/dashboard/profile",
     icon: <User className="h-5 w-5" />,
+  },
+  {
+    title: "Create Recipe",
+    href: "/dashboard/create-recipe/health-concern",
+    icon: <Leaf className="h-5 w-5" />,
   },
   {
     title: "Search",

@@ -41,17 +41,7 @@ interface RecipeCreatorLayoutProps {
 function RecipeCreatorLoading() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header skeleton */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="h-8 w-48 bg-muted rounded animate-pulse" />
-            <div className="h-8 w-24 bg-muted rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-      
-      {/* Main content skeleton */}
+      {/* Main content skeleton - no header skeleton needed */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-6">
@@ -81,33 +71,7 @@ export default function RecipeCreatorLayout({ children }: RecipeCreatorLayoutPro
     
     return (
       <div className="min-h-screen bg-background">
-        {/* Recipe Creator Header */}
-        <div className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <h1 className="text-xl font-semibold text-foreground">
-                  Essential Oil Recipe Creator
-                </h1>
-                <div className="hidden sm:block text-sm text-muted-foreground">
-                  Create personalized aromatherapy recipes
-                </div>
-              </div>
-              
-              {/* Quick actions */}
-              <div className="flex items-center space-x-2">
-                <a
-                  href="/dashboard"
-                  className="inline-flex items-center px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
-                >
-                  ← Dashboard
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Main content area */}
+        {/* Main content area - no header needed as dashboard layout provides its own */}
         <main className="flex-1">
           <Suspense fallback={<RecipeCreatorLoading />}>
             <RecipeWizardProvider>
