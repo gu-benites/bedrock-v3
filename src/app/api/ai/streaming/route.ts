@@ -6,13 +6,10 @@ import {
   Agent,
   run,
   setDefaultOpenAIKey,
-  setOpenAIAPI,
-  withTrace
+  setOpenAIAPI
 } from '@openai/agents';
 import { parse } from 'best-effort-json-parser';
-// Note: zod would be imported here in real implementation
-// For testing, we'll use simple validation
-import { getPromptManager, PromptManagerError } from '@/features/recipe-wizard/services/prompt-manager';
+import { getPromptManager, PromptManagerError } from '@/features/recipe-wizard/services';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -23,17 +20,10 @@ if (process.env['OPENAI_API_KEY']) {
   setOpenAIAPI('responses'); // Use Responses API for structured outputs
 }
 
-// Logger will be imported dynamically to support mocking
-
 // API timeout for AI requests (30 seconds)
 const API_TIMEOUT = 30000;
 
-// Tracing configuration
-const TRACE_CONFIG = {
-  workflowName: 'AI Streaming API',
-  traceIncludeSensitiveData: false,
-  tracingDisabled: process.env['OPENAI_AGENTS_DISABLE_TRACING'] === '1'
-};
+// API configuration
 
 /**
  * Simple request validation for testing
@@ -62,7 +52,7 @@ function validateStreamingRequest(data: any): { isValid: boolean; errors?: strin
 /**
  * Prepare template variables based on feature and step
  */
-function prepareTemplateVariables(feature: string, step: string, data: any): Record<string, any> {
+function prepareTemplateVariables(feature: string, data: any): Record<string, any> {
   // For recipe-wizard feature
   if (feature === 'recipe-wizard') {
     const demographics = data.demographics || {};
@@ -85,6 +75,10 @@ function prepareTemplateVariables(feature: string, step: string, data: any): Rec
  * Handle structured-only streaming (no text chunks, only structured data)
  * Uses best-effort-json-parser for bulletproof progressive parsing
  */
+/**
+ * Handle structured-only streaming (no text chunks, only structured data)
+ * Uses best-effort-json-parser for bulletproof progressive parsing
+ */
 async function handleStructuredOnlyStreaming(
   result: any,
   controller: ReadableStreamDefaultController,
@@ -96,70 +90,139 @@ async function handleStructuredOnlyStreaming(
   let lastSentDataLength = 0;
   let totalChunksProcessed = 0;
   let totalItemsSent = 0;
+  let buffer = '';
+  let lastCompleteItemIndex = -1;
+  let finalData: any = null;
 
-  // Use toTextStream() to get character-by-character updates
-  const textStream = result.toTextStream();
+  // Track the most complete version of each item we've seen
+  const itemBuffers: Record<number, any> = {};
 
-  for await (const textChunk of textStream) {
-    accumulatedText += textChunk;
-    totalChunksProcessed++;
+  // Helper to send an item update
+  const sendItemUpdate = (index: number, data: any) => {
+    // Only send if this is a new or updated item
+    if (index > lastCompleteItemIndex || 
+        (itemBuffers[index] && 
+         JSON.stringify(itemBuffers[index]) !== JSON.stringify(data))) {
+      
+      const sseEvent = `data: ${JSON.stringify({
+        type: 'structured_data',
+        field: 'potential_causes',
+        index,
+        data,
+        timestamp: new Date().toISOString()
+      })}\n\n`;
 
-    // Log progress every 50 chunks to avoid spam
-    if (totalChunksProcessed % 50 === 0) {
-      console.log('[Structured-Only Streaming] Progress:', {
-        accumulatedLength: accumulatedText.length,
-        chunksProcessed: totalChunksProcessed,
-        itemsSent: totalItemsSent
+      controller.enqueue(encoder.encode(sseEvent));
+      totalItemsSent++;
+      itemBuffers[index] = { ...data }; // Store a copy
+      lastCompleteItemIndex = Math.max(lastCompleteItemIndex, index);
+
+      console.log('[Structured-Only Streaming] ✅ Sent item:', {
+        index,
+        name: data.name_localized,
+        suggestionLength: data.suggestion_localized?.length || 0,
+        explanationLength: data.explanation_localized?.length || 0,
+        totalSent: totalItemsSent
       });
     }
+  };
 
-    // Use bulletproof progressive parsing
-    const progressiveData = extractProgressiveData(accumulatedText, lastSentDataLength);
+  // Process the accumulated text and extract any complete items
+  const processAccumulatedText = () => {
+    try {
+      // Use best-effort-json-parser to parse the accumulated text
+      const parsed = parse(accumulatedText);
+      if (!parsed || typeof parsed !== 'object') return;
 
-    if (progressiveData.newItems.length > 0) {
-      // Send new items as they become available
-      for (const item of progressiveData.newItems) {
-        try {
-          const sseEvent = `data: ${JSON.stringify({
-            type: 'structured_data',
-            field: 'potential_causes',
-            index: item.index,
-            data: item.data,
-            timestamp: new Date().toISOString()
-          })}\n\n`;
+      // Check if we have a valid structure with potential_causes
+      if (parsed.data?.potential_causes && Array.isArray(parsed.data.potential_causes)) {
+        const causes = parsed.data.potential_causes;
+        
+        // Process each cause we find
+        for (let i = 0; i < causes.length; i++) {
+          const cause = causes[i];
+          if (!cause || typeof cause !== 'object' || !cause.cause_id) continue;
 
-          controller.enqueue(encoder.encode(sseEvent));
-          totalItemsSent++;
+          // Check if this cause has all required fields
+          const hasName = cause.name_localized?.length > 0;
+          const hasSuggestion = cause.suggestion_localized?.length > 0;
+          const hasExplanation = cause.explanation_localized?.length > 0;
 
-          console.log('[Structured-Only Streaming] ✅ Sent item:', {
-            index: item.index,
-            name: item.data.name_localized,
-            totalSent: totalItemsSent
-          });
+          // Only process if we have all required fields
+          if (hasName && hasSuggestion && hasExplanation) {
+            const cleanData = {
+              cause_id: cause.cause_id,
+              name_localized: cause.name_localized,
+              suggestion_localized: cause.suggestion_localized,
+              explanation_localized: cause.explanation_localized,
+              // Include any additional fields
+              ...(cause.confidence && { confidence: cause.confidence }),
+              ...(cause.tags && { tags: cause.tags })
+            };
 
-        } catch (sseError) {
-          console.error('[Structured-Only Streaming] ❌ Error sending SSE event:', sseError);
+            sendItemUpdate(i, cleanData);
+          }
         }
       }
-      lastSentDataLength = progressiveData.totalSent;
+    } catch (error) {
+      // Ignore parse errors - we'll try again with more data
     }
-  }
+  };
 
-  console.log('[Structured-Only Streaming] Text streaming completed, waiting for final result');
-
-  // Wait for completion and send final structured data
   try {
-    await result.completed;
-    const finalOutput = result.finalOutput;
+    // Use toTextStream() to get character-by-character updates
+    const textStream = result.toTextStream();
 
-    if (finalOutput && typeof finalOutput === 'object') {
+    for await (const textChunk of textStream) {
+      accumulatedText += textChunk;
+      totalChunksProcessed++;
+
+      // Process the accumulated text to extract complete items
+      processAccumulatedText();
+
+      // Log progress every 50 chunks to avoid spam
+      if (totalChunksProcessed % 50 === 0) {
+        console.log('[Structured-Only Streaming] Progress:', {
+          accumulatedLength: accumulatedText.length,
+          chunksProcessed: totalChunksProcessed,
+          itemsSent: totalItemsSent,
+          lastCompleteItemIndex
+        });
+      }
+    }
+
+    console.log('[Structured-Only Streaming] Text streaming completed, waiting for final result');
+
+    // Wait for completion and send final structured data
+    await result.completed;
+    finalData = result.finalOutput;
+
+    if (finalData && typeof finalData === 'object') {
+      // Process final data to ensure we have all complete items
+      if (finalData.data?.potential_causes && Array.isArray(finalData.data.potential_causes)) {
+        finalData.data.potential_causes.forEach((cause: any, index: number) => {
+          if (cause && typeof cause === 'object' && cause.cause_id) {
+            const cleanData = {
+              cause_id: cause.cause_id,
+              name_localized: cause.name_localized || '',
+              suggestion_localized: cause.suggestion_localized || '',
+              explanation_localized: cause.explanation_localized || '',
+              ...(cause.confidence && { confidence: cause.confidence }),
+              ...(cause.tags && { tags: cause.tags })
+            };
+            sendItemUpdate(index, cleanData);
+          }
+        });
+      }
+
       const completionEvent = `data: ${JSON.stringify({
         type: 'structured_complete',
-        data: finalOutput,
+        data: finalData,
         stats: {
           totalChunksProcessed,
           totalItemsSent,
-          finalTextLength: accumulatedText.length
+          finalTextLength: accumulatedText.length,
+          itemsProcessed: Object.keys(itemBuffers).length
         },
         timestamp: new Date().toISOString()
       })}\n\n`;
@@ -168,7 +231,8 @@ async function handleStructuredOnlyStreaming(
       console.log('[Structured-Only Streaming] ✅ Final completion sent:', {
         totalChunksProcessed,
         totalItemsSent,
-        finalOutputKeys: Object.keys(finalOutput)
+        itemsProcessed: Object.keys(itemBuffers).length,
+        finalOutputKeys: finalData ? Object.keys(finalData) : []
       });
     }
   } catch (error) {
@@ -178,115 +242,15 @@ async function handleStructuredOnlyStreaming(
     const errorEvent = `data: ${JSON.stringify({
       type: 'error',
       error: error instanceof Error ? error.message : 'Unknown completion error',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      recovery: 'Streaming completed with errors. Some data may be incomplete.'
     })}\n\n`;
-    controller.enqueue(encoder.encode(errorEvent));
-  }
-}
-
-/**
- * Handle hybrid structured JSON streaming (text + structured data)
- * Uses best-effort-json-parser for bulletproof progressive parsing
- */
-async function handleStructuredStreaming(
-  result: any,
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder
-): Promise<void> {
-  console.log('[Hybrid Streaming] Starting bulletproof hybrid processing (text + structured)');
-
-  let accumulatedText = '';
-  let lastSentDataLength = 0;
-  let totalChunksProcessed = 0;
-  let totalItemsSent = 0;
-
-  // Use toTextStream() to get character-by-character updates
-  const textStream = result.toTextStream();
-
-  for await (const textChunk of textStream) {
-    accumulatedText += textChunk;
-    totalChunksProcessed++;
-
-    // Always send text chunks for real-time feedback
+    
     try {
-      const textSseEvent = `data: ${JSON.stringify({
-        type: 'text_chunk',
-        content: textChunk,
-        timestamp: new Date().toISOString()
-      })}\n\n`;
-      controller.enqueue(encoder.encode(textSseEvent));
-    } catch (textError) {
-      console.error('[Hybrid Streaming] ❌ Error sending text chunk:', textError);
+      controller.enqueue(encoder.encode(errorEvent));
+    } catch (e) {
+      console.error('Failed to send error event:', e);
     }
-
-    // Use bulletproof progressive parsing for structured data
-    const progressiveData = extractProgressiveData(accumulatedText, lastSentDataLength);
-
-    if (progressiveData.newItems.length > 0) {
-      // Send new structured items as they become available
-      for (const item of progressiveData.newItems) {
-        try {
-          const structuredSseEvent = `data: ${JSON.stringify({
-            type: 'structured_data',
-            field: 'potential_causes',
-            index: item.index,
-            data: item.data,
-            timestamp: new Date().toISOString()
-          })}\n\n`;
-
-          controller.enqueue(encoder.encode(structuredSseEvent));
-          totalItemsSent++;
-
-          console.log('[Hybrid Streaming] ✅ Sent structured item:', {
-            index: item.index,
-            name: item.data.name_localized,
-            totalSent: totalItemsSent
-          });
-
-        } catch (structuredError) {
-          console.error('[Hybrid Streaming] ❌ Error sending structured event:', structuredError);
-        }
-      }
-      lastSentDataLength = progressiveData.totalSent;
-    }
-  }
-
-  console.log('[Hybrid Streaming] Text streaming completed, waiting for final result');
-
-  // Wait for completion and send final structured data
-  try {
-    await result.completed;
-    const finalOutput = result.finalOutput;
-
-    if (finalOutput && typeof finalOutput === 'object') {
-      const completionEvent = `data: ${JSON.stringify({
-        type: 'structured_complete',
-        data: finalOutput,
-        stats: {
-          totalChunksProcessed,
-          totalItemsSent,
-          finalTextLength: accumulatedText.length
-        },
-        timestamp: new Date().toISOString()
-      })}\n\n`;
-
-      controller.enqueue(encoder.encode(completionEvent));
-      console.log('[Hybrid Streaming] ✅ Final completion sent:', {
-        totalChunksProcessed,
-        totalItemsSent,
-        finalOutputKeys: Object.keys(finalOutput)
-      });
-    }
-  } catch (error) {
-    console.error('[Hybrid Streaming] ❌ Error processing final output:', error);
-
-    // Send error event
-    const errorEvent = `data: ${JSON.stringify({
-      type: 'error',
-      error: error instanceof Error ? error.message : 'Unknown completion error',
-      timestamp: new Date().toISOString()
-    })}\n\n`;
-    controller.enqueue(encoder.encode(errorEvent));
   }
 }
 
@@ -330,81 +294,107 @@ async function handleTextStreaming(
  * Extract progressive data from accumulated JSON text using best-effort-json-parser
  * This is bulletproof and works with any JSON structure
  */
+/**
+ * Extract progressive data from accumulated JSON text using best-effort-json-parser
+ * This ensures we only send complete items with all required fields
+ */
 function extractProgressiveData(accumulatedText: string, lastSentLength: number): {
   newItems: Array<{ index: number; data: any }>;
   totalSent: number;
 } {
   const newItems: Array<{ index: number; data: any }> = [];
-
+  
   try {
-    // Use best-effort-json-parser to parse incomplete JSON
+    // Use best-effort-json-parser to parse the accumulated text
     const parsed = parse(accumulatedText);
+    if (!parsed || typeof parsed !== 'object') {
+      return { newItems, totalSent: lastSentLength };
+    }
 
     // Check if we have a valid structure with potential_causes
-    if (parsed &&
-        typeof parsed === 'object' &&
-        parsed.data &&
-        parsed.data.potential_causes &&
-        Array.isArray(parsed.data.potential_causes)) {
-
+    if (parsed.data?.potential_causes && Array.isArray(parsed.data.potential_causes)) {
       const causes = parsed.data.potential_causes;
+      let highestCompleteIndex = -1;
+      let hasIncompleteCauses = false;
 
-      // Send any new complete causes that we haven't sent yet
-      for (let i = lastSentLength; i < causes.length; i++) {
+      // Process all causes, but only return new ones
+      for (let i = 0; i < causes.length; i++) {
         const cause = causes[i];
 
-        // Check if this cause is COMPLETE with all required fields
-        if (cause &&
-            typeof cause === 'object' &&
-            cause.cause_id &&
-            cause.name_localized &&
-            cause.suggestion_localized &&
-            cause.explanation_localized &&
-            // Ensure fields have meaningful content (not just empty strings)
-            cause.name_localized.length > 3 &&
-            cause.suggestion_localized.length > 10 &&
-            cause.explanation_localized.length > 10) {
+        // Check if this cause has all required fields and meaningful content
+        if (cause && typeof cause === 'object' && cause.cause_id) {
+          const hasName = cause.name_localized?.length > 0;
+          const hasSuggestion = cause.suggestion_localized?.length > 0;
+          const hasExplanation = cause.explanation_localized?.length > 0;
+          
+          // We need all three fields to be present to consider it complete
+          const isComplete = hasName && hasSuggestion && hasExplanation;
+          
+          if (isComplete) {
+            // Only process new causes we haven't sent yet
+            if (i >= lastSentLength) {
+              // Create a clean data object with all required fields
+              const cleanData = {
+                cause_id: cause.cause_id,
+                name_localized: cause.name_localized,
+                suggestion_localized: cause.suggestion_localized,
+                explanation_localized: cause.explanation_localized,
+                // Include any additional fields
+                ...(cause.confidence && { confidence: cause.confidence }),
+                ...(cause.tags && { tags: cause.tags })
+              };
 
-          // Log complete object for debugging
-          console.log('[Progressive Data] ✅ Complete cause found:', {
-            index: i,
-            name: cause.name_localized,
-            suggestion_length: cause.suggestion_localized.length,
-            explanation_length: cause.explanation_localized.length
-          });
+              console.log('[Progressive Data] ✅ Complete cause found:', {
+                index: i,
+                name: cleanData.name_localized,
+                suggestionLength: cleanData.suggestion_localized.length,
+                explanationLength: cleanData.explanation_localized.length
+              });
 
-          newItems.push({
-            index: i,
-            data: cause
-          });
-        } else if (cause && typeof cause === 'object' && cause.cause_id) {
-          // Log incomplete objects for debugging
-          console.log('[Progressive Data] ⏳ Incomplete cause (waiting for more data):', {
-            index: i,
-            name: cause.name_localized || 'missing',
-            has_suggestion: !!cause.suggestion_localized,
-            has_explanation: !!cause.explanation_localized
-          });
+              newItems.push({
+                index: i,
+                data: cleanData
+              });
+            }
+            highestCompleteIndex = i;
+          } else {
+            hasIncompleteCauses = true;
+            if (i >= lastSentLength) {
+              console.log('[Progressive Data] ⏳ Incomplete cause:', {
+                index: i,
+                hasName,
+                hasSuggestion,
+                hasExplanation,
+                name: cause.name_localized || 'Unnamed',
+                suggestionLength: cause.suggestion_localized?.length || 0,
+                explanationLength: cause.explanation_localized?.length || 0
+              });
+            }
+          }
         }
       }
 
-      // Return the new items and update the count
+
+      // If we found any complete items, return them
       if (newItems.length > 0) {
-        return { newItems, totalSent: lastSentLength + newItems.length };
+        return { 
+          newItems, 
+          totalSent: Math.max(lastSentLength, highestCompleteIndex + 1)
+        };
       }
-
-      // Even if no new complete items, update the count if we have more partial items
-      return { newItems, totalSent: Math.max(lastSentLength, causes.length) };
+      
+      // If we have incomplete causes but no new complete ones, update the count
+      // This helps with cases where we're still streaming in the data
+      if (hasIncompleteCauses && causes.length > lastSentLength) {
+        return { newItems, totalSent: causes.length };
+      }
     }
-
-    // If we don't have the expected structure yet, return current state
-    return { newItems, totalSent: lastSentLength };
-
   } catch (error) {
-    // best-effort-json-parser should rarely throw, but handle gracefully
-    console.log('[Progressive Data] Parse error (rare with best-effort-json-parser):', error instanceof Error ? error.message : 'Unknown error');
-    return { newItems, totalSent: lastSentLength };
+    console.log('[Progressive Data] Parse attempt failed, waiting for more data');
   }
+  
+  // If we get here, no new complete items were found
+  return { newItems, totalSent: lastSentLength };
 }
 
 /**
@@ -456,7 +446,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Get prompt manager and load configuration
     console.log('[Streaming API] Getting prompt manager');
     const promptManager = getPromptManager();
-    const templateVariables = prepareTemplateVariables(feature, step, data);
+    const templateVariables = prepareTemplateVariables(feature, data);
     console.log('[Streaming API] Template variables prepared', templateVariables);
 
     // Load prompt configuration
@@ -496,8 +486,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       throw error;
     }
 
-    // Create SSE response with hybrid streaming (structured + text)
-    console.log('[Streaming API] Creating hybrid SSE stream');
+    // Create SSE response with structured or text streaming
+    console.log('[Streaming API] Creating SSE stream');
     const encoder = new TextEncoder();
 
     // Detect if we have structured output (JSON schema)
@@ -505,10 +495,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     console.log('[Streaming API] Structured output detected:', hasStructuredOutput);
     console.log('[Streaming API] Config schema keys:', config.schema ? Object.keys(config.schema) : 'no schema');
 
-    // Determine final streaming mode
-    let finalStreamingMode = streamingMode;
-    if (streamingMode === 'auto') {
-      finalStreamingMode = hasStructuredOutput ? 'hybrid' : 'text';
+    // Determine streaming mode (default to 'structured' if not specified)
+    let finalStreamingMode = 'structured';
+    if (['structured', 'text'].includes(streamingMode)) {
+      finalStreamingMode = streamingMode;
     }
     console.log('[Streaming API] Final streaming mode:', finalStreamingMode);
 
@@ -520,16 +510,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         try {
           // Determine and execute the appropriate streaming mode
           if (finalStreamingMode === 'structured' && hasStructuredOutput) {
-            streamingMode = 'structured-only';
-            console.log('[Streaming API] 🚀 Starting bulletproof structured-only streaming');
+            streamingMode = 'structured';
+            console.log('[Streaming API] 🚀 Starting structured streaming');
             await handleStructuredOnlyStreaming(result, controller, encoder);
-          } else if (finalStreamingMode === 'hybrid' && hasStructuredOutput) {
-            streamingMode = 'hybrid';
-            console.log('[Streaming API] 🚀 Starting bulletproof hybrid streaming');
-            await handleStructuredStreaming(result, controller, encoder);
           } else {
-            streamingMode = 'text-only';
-            console.log('[Streaming API] 🚀 Starting text-only streaming');
+            // Fall back to text mode if structured output is not available or text mode is explicitly requested
+            streamingMode = 'text';
+            console.log('[Streaming API] 🚀 Starting text streaming');
             await handleTextStreaming(result, controller, encoder);
           }
 
@@ -606,7 +593,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (error instanceof Error && error.message.includes('timeout')) {
       return NextResponse.json(
         {
-          error: 'Request timeout',
+          error: 'timeout',
           message: 'AI analysis took too long. Please try again.',
           traceId,
           duration_ms: totalDuration
@@ -615,15 +602,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Generic error response
-    return NextResponse.json(
-      {
-        error: 'Streaming failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        traceId,
-        duration_ms: totalDuration
-      },
-      { status: 500 }
+    console.error('Error in streaming API:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return new NextResponse(
+      JSON.stringify({
+        error: 'An error occurred while processing your request.',
+        details: errorMessage,
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }

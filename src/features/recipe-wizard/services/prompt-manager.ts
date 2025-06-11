@@ -146,7 +146,7 @@ export class PromptManager {
       // Handle conditional blocks {{#unless @last}}
       processedTemplate = processedTemplate.replace(
         /\{\{#unless\s+@last\}\}([\s\S]*?)\{\{\/unless\}\}/g,
-        (match, content) => {
+        (_match, content) => {
           // This is a simplified implementation - in a real scenario,
           // you'd need to track the context of the @last variable
           return content;

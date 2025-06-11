@@ -8,6 +8,7 @@ This directory contains comprehensive test scripts for demonstrating and validat
 |--------|---------|---------|
 | `test-streaming.js` | Single scenario testing with detailed output | `npm run test:streaming` |
 | `demo-streaming.js` | Multi-scenario demo with all test cases | `npm run demo:streaming` |
+| `test-structured-typing.js` | Interactive typing effect demo | `npm run demo:typing` |
 | `validate-streaming.js` | Environment and configuration validation | `npm run validate:streaming` |
 | `test-streaming.sh` | Unix/Linux wrapper script | `./scripts/test-streaming.sh` |
 | `test-streaming.bat` | Windows wrapper script | `scripts\test-streaming.bat` |

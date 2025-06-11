@@ -2,28 +2,41 @@
 // Core reusable hook for OpenAI Agents JS SDK streaming with generic type support
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { parse } from 'best-effort-json-parser';
 
 /**
- * Configuration options for the streaming hook
+ * Configuration options for the streaming hook.
  */
 export interface StreamConfig {
+  /** Maximum number of retry attempts for failed requests. */
   maxRetries?: number;
+  /** Delay between retry attempts in milliseconds. */
   retryDelay?: number;
+  /** Request timeout in milliseconds. */
   timeout?: number;
+  /**
+   * Callback for handling errors during streaming.
+   * @param error The error that occurred.
+   * @param retryCount Current retry attempt number (0-based).
+   * @returns boolean Whether to continue retrying (true) or stop (false).
+   */
+  onError?: (error: Error, retryCount: number) => boolean | Promise<boolean>;
+  /** Path to the array of items in a JSON text stream, e.g., 'data.potential_causes'. */
+  jsonArrayPath?: string;
 }
 
 /**
- * Stream event types from SSE
+ * Stream event types from SSE.
  */
 export interface StreamEvent {
-  type: 'text_chunk' | 'completion' | 'error';
+  type: 'text_chunk' | 'structured_data' | 'completion' | 'error';
   content?: string;
   data?: any;
   message?: string;
 }
 
 /**
- * Request data structure for streaming API
+ * Request data structure for streaming API.
  */
 export interface StreamRequest {
   feature: string;
@@ -32,10 +45,11 @@ export interface StreamRequest {
 }
 
 /**
- * Hook state interface
+ * Hook state interface.
  */
 export interface StreamState<T> {
   streamingText: string;
+  partialData: T | null;
   isStreaming: boolean;
   isComplete: boolean;
   error: string | null;
@@ -45,12 +59,14 @@ export interface StreamState<T> {
 }
 
 /**
- * Default configuration
+ * Default configuration.
  */
 const DEFAULT_CONFIG: Required<StreamConfig> = {
   maxRetries: 3,
   retryDelay: 1000,
-  timeout: 30000
+  timeout: 30000,
+  onError: () => true, // Default: always retry on error
+  jsonArrayPath: '',
 };
 
 /**
@@ -59,13 +75,14 @@ const DEFAULT_CONFIG: Required<StreamConfig> = {
  */
 export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<T> {
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
-  
+
   // State management
   const [streamingText, setStreamingText] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [finalData, setFinalData] = useState<T | null>(null);
+  const [partialData, setPartialData] = useState<T | null>(null);
 
   // Refs for cleanup and retry logic
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -96,6 +113,7 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
     setIsComplete(false);
     setError(null);
     setFinalData(null);
+    setPartialData(null);
     retryCountRef.current = 0;
   }, [cleanup]);
 
@@ -109,7 +127,34 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
       switch (streamEvent.type) {
         case 'text_chunk':
           if (streamEvent.content) {
-            setStreamingText(prev => prev + streamEvent.content);
+            setStreamingText(prev => {
+              const newText = prev + streamEvent.content;
+              if (mergedConfig.jsonArrayPath) {
+                try {
+                  const parsed = parse(newText);
+                  const get = (p: string, o: any) =>
+                    p.split('.').reduce((xs, x) => (xs && xs[x] ? xs[x] : null), o);
+                  const partialArray = get(mergedConfig.jsonArrayPath, parsed);
+
+                  if (Array.isArray(partialArray)) {
+                    setPartialData(partialArray as T);
+                  }
+                } catch (e) {
+                  // Best-effort parser can fail on intermediate chunks, ignore
+                }
+              }
+              return newText;
+            });
+          }
+          break;
+
+        case 'structured_data':
+          if (streamEvent.data) {
+            setPartialData(prev => {
+              const prevArray = Array.isArray(prev) ? prev : [];
+              // Assumes the incoming data is an item to be added to an array
+              return [...prevArray, streamEvent.data] as T;
+            });
           }
           break;
 
@@ -199,6 +244,7 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
     setIsComplete(false);
     setError(null);
     setFinalData(null);
+    setPartialData(null);
     setIsStreaming(true);
 
     // Clean up any existing connections
@@ -238,7 +284,8 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
     isComplete,
     error,
     finalData,
+    partialData,
     startStream,
-    resetStream
+    resetStream,
   };
 }

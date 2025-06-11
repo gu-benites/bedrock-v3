@@ -7,7 +7,7 @@ const PUBLIC_PATHS = ['/login', '/register', '/reset-password', '/'];
 
 // Add development-only public paths for testing
 const DEVELOPMENT_PUBLIC_PATHS = process.env.NODE_ENV === 'development'
-  ? ['/api/ai/streaming']
+  ? ['/api/ai/streaming', '/api/recipe-wizard']
   : [];
 
 const ALL_PUBLIC_PATHS = [...PUBLIC_PATHS, ...DEVELOPMENT_PUBLIC_PATHS];
