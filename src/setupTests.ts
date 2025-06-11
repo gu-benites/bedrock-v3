@@ -3,6 +3,50 @@
 
 import '@testing-library/jest-dom';
 
+// Mock Web APIs for Next.js API route testing
+import { TextEncoder, TextDecoder } from 'util';
+import { URL, URLSearchParams } from 'url';
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder as any;
+
+// Mock URL for Next.js
+global.URL = URL as any;
+global.URLSearchParams = URLSearchParams as any;
+
+// Mock Request and Response for Next.js API routes
+if (!global.Request) {
+  global.Request = class MockRequest {
+    constructor(public url: string, public init?: any) {}
+    async json() {
+      return this.init?.body ? JSON.parse(this.init.body) : {};
+    }
+    async text() {
+      return this.init?.body || '';
+    }
+  } as any;
+}
+
+if (!global.Response) {
+  global.Response = class MockResponse {
+    constructor(public body: any, public init?: any) {
+      this.status = init?.status || 200;
+    }
+    status: number;
+    async json() {
+      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body;
+    }
+    static json(data: any, init?: any) {
+      return new MockResponse(data, init);
+    }
+  } as any;
+}
+
+// Mock fetch for API calls
+if (!global.fetch) {
+  global.fetch = jest.fn();
+}
+
 // Mock window.URL for file upload tests
 global.URL = {
   createObjectURL: jest.fn(() => 'blob:mock-url'),

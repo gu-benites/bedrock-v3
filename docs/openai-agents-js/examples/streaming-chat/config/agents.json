@@ -1,0 +1,72 @@
+{
+  "agents": {
+    "customer_service": {
+      "name": "Customer Service Agent",
+      "model": "gpt-4o",
+      "modelSettings": {
+        "temperature": 0.3,
+        "maxTokens": 1000
+      },
+      "description": "Handles customer inquiries and support issues",
+      "tools": ["lookup_customer", "create_ticket"],
+      "promptFile": "customer-service",
+      "context": {
+        "department": "support",
+        "priority": "high"
+      }
+    },
+    "weather": {
+      "name": "Weather Specialist",
+      "model": "gpt-4o-mini",
+      "modelSettings": {
+        "temperature": 0.2,
+        "maxTokens": 800
+      },
+      "description": "Provides weather information and forecasts",
+      "tools": ["get_weather", "get_forecast"],
+      "promptFile": "weather",
+      "context": {
+        "defaultUnits": "celsius",
+        "includeHumidity": true
+      }
+    },
+    "research": {
+      "name": "Research Specialist",
+      "model": "gpt-4o",
+      "modelSettings": {
+        "temperature": 0.4,
+        "maxTokens": 2000
+      },
+      "description": "Conducts research and provides detailed analysis",
+      "tools": ["web_search", "analyze_data"],
+      "promptFile": "research",
+      "context": {
+        "maxSources": 10,
+        "citationStyle": "APA"
+      }
+    },
+    "triage": {
+      "name": "Triage Agent",
+      "model": "gpt-4o",
+      "modelSettings": {
+        "temperature": 0.1,
+        "maxTokens": 500
+      },
+      "description": "Routes requests to appropriate specialists",
+      "handoffs": ["customer_service", "weather", "research"],
+      "promptFile": "triage"
+    }
+  },
+  "settings": {
+    "defaultModel": "gpt-4o",
+    "defaultTemperature": 0.3,
+    "defaultMaxTokens": 1000,
+    "tracingEnabled": true,
+    "apiType": "responses"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2024-01-15",
+    "author": "Your Team"
+  }
+}

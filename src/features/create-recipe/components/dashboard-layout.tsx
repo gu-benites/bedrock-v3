@@ -127,7 +127,7 @@ function DashboardProgressSidebar() {
 /**
  * Dashboard header component
  */
-function DashboardHeader() {
+function DashboardHeader({ showBreadcrumbs = true }: { showBreadcrumbs?: boolean }) {
   const { stepInfo } = useRecipeWizardNavigation();
 
   return (
@@ -142,7 +142,7 @@ function DashboardHeader() {
             Get personalized essential oil recommendations for your health concerns
           </p>
         </div>
-        
+
         {/* Current Step Badge */}
         <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
           {stepInfo.current.title}
@@ -150,13 +150,15 @@ function DashboardHeader() {
       </div>
 
       {/* Breadcrumb Navigation */}
-      <BreadcrumbNavigation
-        currentStep={stepInfo.current.key}
-        showStepNumbers={true}
-        showCompletionStatus={true}
-        allowNavigation={true}
-        className="bg-muted/30 rounded-lg p-3"
-      />
+      {showBreadcrumbs && (
+        <BreadcrumbNavigation
+          currentStep={stepInfo.current.key}
+          showStepNumbers={true}
+          showCompletionStatus={true}
+          allowNavigation={true}
+          className="bg-muted/30 rounded-lg p-3"
+        />
+      )}
     </div>
   );
 }
@@ -173,7 +175,7 @@ export function DashboardLayout({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Dashboard Header */}
-      <DashboardHeader />
+      <DashboardHeader showBreadcrumbs={showBreadcrumbs} />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

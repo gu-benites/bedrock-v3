@@ -10,6 +10,7 @@ import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useRecipeStore } from '../store/recipe-store';
 import { RecipeStep } from '../types/recipe.types';
 import { HealthConcernForm } from './health-concern-form';
+import { HealthConcernChatInput } from './health-concern-chat-input';
 import { DemographicsForm } from './demographics-form';
 import { CausesSelection } from './causes-selection';
 import { SymptomsSelection } from './symptoms-selection';
@@ -33,10 +34,13 @@ interface WizardContainerProps {
 /**
  * Renders the appropriate step component based on current step
  */
-function StepRenderer({ step, sessionId }: { step: RecipeStep; sessionId: string }) {
+function StepRenderer({ step, sessionId, layout }: { step: RecipeStep; sessionId: string; layout?: string }) {
   switch (step) {
     case RecipeStep.HEALTH_CONCERN:
-      return <HealthConcernForm key={`health-concern-${sessionId}`} />;
+      // Use chat-style input for dashboard layout, regular form for others
+      return layout === 'dashboard'
+        ? <HealthConcernChatInput key={`health-concern-chat-${sessionId}`} />
+        : <HealthConcernForm key={`health-concern-${sessionId}`} />;
     case RecipeStep.DEMOGRAPHICS:
       return <DemographicsForm key={`demographics-${sessionId}`} />;
     case RecipeStep.CAUSES:
@@ -78,6 +82,10 @@ export function WizardContainer({
   // Progress indicator
   const progressPercentage = getCompletionPercentage();
 
+  // Determine if we should show simplified layout for health concern step
+  const isHealthConcernStep = activeStep === RecipeStep.HEALTH_CONCERN;
+  const shouldShowSimplifiedLayout = isHealthConcernStep && layout === 'dashboard';
+
   // Wizard content (same for all layouts)
   const wizardContent = (
     <div className="space-y-6" aria-label="Recipe creation wizard">
@@ -111,7 +119,7 @@ export function WizardContainer({
 
       {/* Step Content */}
       <div className="min-h-[400px]">
-        <StepRenderer step={activeStep} sessionId={sessionId} />
+        <StepRenderer step={activeStep} sessionId={sessionId} layout={layout} />
       </div>
     </div>
   );
@@ -120,13 +128,21 @@ export function WizardContainer({
   return (
     <RecipeErrorBoundary>
       {layout === 'dashboard' ? (
-        <DashboardLayout
-          showBreadcrumbs={showBreadcrumbs}
-          showProgress={showProgress}
-          className={className}
-        >
-          {wizardContent}
-        </DashboardLayout>
+        shouldShowSimplifiedLayout ? (
+          // Simplified layout for health concern step - no breadcrumbs or sidebar
+          <div className="h-full">
+            <StepRenderer step={activeStep} sessionId={sessionId} layout={layout} />
+          </div>
+        ) : (
+          // Regular dashboard layout for other steps
+          <DashboardLayout
+            showBreadcrumbs={showBreadcrumbs}
+            showProgress={showProgress}
+            className={className}
+          >
+            {wizardContent}
+          </DashboardLayout>
+        )
       ) : layout === 'standalone' ? (
         <div className={className}>
           {wizardContent}

@@ -5,14 +5,21 @@ import * as Sentry from '@sentry/nextjs';
 // Define public paths that don't require authentication
 const PUBLIC_PATHS = ['/login', '/register', '/reset-password', '/'];
 
+// Add development-only public paths for testing
+const DEVELOPMENT_PUBLIC_PATHS = process.env.NODE_ENV === 'development'
+  ? ['/api/ai/streaming']
+  : [];
+
+const ALL_PUBLIC_PATHS = [...PUBLIC_PATHS, ...DEVELOPMENT_PUBLIC_PATHS];
+
 export async function middleware(request: NextRequest) {
   try {
     // Create supabase middleware client
     const { supabase, response } = createClient(request);
     
     // Check if path is public
-    const isPublicPath = PUBLIC_PATHS.some(path => 
-      request.nextUrl.pathname === path || 
+    const isPublicPath = ALL_PUBLIC_PATHS.some(path =>
+      request.nextUrl.pathname === path ||
       request.nextUrl.pathname.startsWith(`${path}/`)
     );
     

@@ -1,0 +1,56 @@
+# Agent Configuration File
+# This file defines agent configurations that can be loaded dynamically
+
+agents:
+  customer_service:
+    name: "Customer Service Agent"
+    model: "gpt-4o"
+    temperature: 0.3
+    max_tokens: 1000
+    description: "Handles customer inquiries and support issues"
+    tools:
+      - "lookup_customer"
+      - "create_ticket"
+    prompt_file: "customer-service"
+    
+  weather:
+    name: "Weather Specialist"
+    model: "gpt-4o-mini"
+    temperature: 0.2
+    max_tokens: 800
+    description: "Provides weather information and forecasts"
+    tools:
+      - "get_weather"
+      - "get_forecast"
+    prompt_file: "weather"
+    
+  research:
+    name: "Research Specialist"
+    model: "gpt-4o"
+    temperature: 0.4
+    max_tokens: 2000
+    description: "Conducts research and provides detailed analysis"
+    tools:
+      - "web_search"
+      - "analyze_data"
+    prompt_file: "research"
+    
+  triage:
+    name: "Triage Agent"
+    model: "gpt-4o"
+    temperature: 0.1
+    max_tokens: 500
+    description: "Routes requests to appropriate specialists"
+    handoffs:
+      - "customer_service"
+      - "weather"
+      - "research"
+    prompt_file: "triage"
+
+# Global settings
+settings:
+  default_model: "gpt-4o"
+  default_temperature: 0.3
+  default_max_tokens: 1000
+  tracing_enabled: true
+  api_type: "responses"

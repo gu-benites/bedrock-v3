@@ -23,4 +23,7 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'], // Setup file for testing
+  transformIgnorePatterns: [
+    'node_modules/(?!(lucide-react)/)', // Transform lucide-react ESM imports
+  ],
 };

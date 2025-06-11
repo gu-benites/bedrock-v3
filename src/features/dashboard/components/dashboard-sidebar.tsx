@@ -18,7 +18,8 @@ import {
   Target,
   PanelLeftClose,
   User,
-  Leaf
+  Leaf,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,11 @@ const navItems: NavItem[] = [
     title: "Create Recipe",
     href: "/dashboard/create-recipe/health-concern",
     icon: <Leaf className="h-5 w-5" />,
+  },
+  {
+    title: "Recipe Wizard",
+    href: "/dashboard/recipe-wizard/health-concern",
+    icon: <Sparkles className="h-5 w-5" />,
   },
   {
     title: "Search",

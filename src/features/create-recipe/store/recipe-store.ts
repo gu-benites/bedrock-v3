@@ -283,6 +283,134 @@ export const useRecipeStore = create<RecipeStore>()(
         }));
       },
       
+      /**
+       * Clears data for all steps after the specified step
+       * Used when navigating backwards to ensure data consistency
+       */
+      clearStepsAfter: (currentStep: RecipeStep) => {
+        console.log(`🧹 Clearing steps after: ${currentStep}`);
+
+        set((state) => {
+          const updates: Partial<RecipeWizardState> = {
+            lastUpdated: new Date()
+          };
+
+          // Clear completed steps that come after the current step
+          const stepOrder = [
+            RecipeStep.HEALTH_CONCERN,
+            RecipeStep.DEMOGRAPHICS,
+            RecipeStep.CAUSES,
+            RecipeStep.SYMPTOMS,
+            RecipeStep.PROPERTIES,
+            RecipeStep.OILS
+          ];
+
+          const currentStepIndex = stepOrder.indexOf(currentStep);
+          const stepsToRemove = stepOrder.slice(currentStepIndex + 1);
+
+          updates.completedSteps = state.completedSteps.filter(
+            step => !stepsToRemove.includes(step)
+          );
+
+          // Clear data based on which step we're going back to
+          switch (currentStep) {
+            case RecipeStep.HEALTH_CONCERN:
+              // Clear everything except health concern
+              updates.demographics = null;
+              updates.selectedCauses = [];
+              updates.selectedSymptoms = [];
+              updates.therapeuticProperties = [];
+              updates.suggestedOils = [];
+              updates.potentialCauses = [];
+              updates.potentialSymptoms = [];
+              break;
+
+            case RecipeStep.DEMOGRAPHICS:
+              // Clear causes and everything after
+              updates.selectedCauses = [];
+              updates.selectedSymptoms = [];
+              updates.therapeuticProperties = [];
+              updates.suggestedOils = [];
+              updates.potentialCauses = [];
+              updates.potentialSymptoms = [];
+              break;
+
+            case RecipeStep.CAUSES:
+              // Clear symptoms and everything after
+              updates.selectedSymptoms = [];
+              updates.therapeuticProperties = [];
+              updates.suggestedOils = [];
+              updates.potentialSymptoms = [];
+              break;
+
+            case RecipeStep.SYMPTOMS:
+              // Clear properties and oils
+              updates.therapeuticProperties = [];
+              updates.suggestedOils = [];
+              break;
+
+            case RecipeStep.PROPERTIES:
+              // Clear only oils
+              updates.suggestedOils = [];
+              break;
+
+            case RecipeStep.OILS:
+              // Nothing to clear - this is the last step
+              break;
+          }
+
+          console.log(`✅ Cleared data for steps after ${currentStep}:`, {
+            clearedSteps: stepsToRemove,
+            remainingCompletedSteps: updates.completedSteps
+          });
+
+          return { ...state, ...updates };
+        });
+      },
+
+      /**
+       * Clears specific step data
+       * Used for targeted data clearing
+       */
+      clearStepData: (step: RecipeStep) => {
+        console.log(`🧹 Clearing data for step: ${step}`);
+
+        set((state) => {
+          const updates: Partial<RecipeWizardState> = {
+            lastUpdated: new Date()
+          };
+
+          // Remove step from completed steps
+          updates.completedSteps = state.completedSteps.filter(s => s !== step);
+
+          // Clear specific step data
+          switch (step) {
+            case RecipeStep.HEALTH_CONCERN:
+              updates.healthConcern = null;
+              break;
+            case RecipeStep.DEMOGRAPHICS:
+              updates.demographics = null;
+              break;
+            case RecipeStep.CAUSES:
+              updates.selectedCauses = [];
+              updates.potentialCauses = [];
+              break;
+            case RecipeStep.SYMPTOMS:
+              updates.selectedSymptoms = [];
+              updates.potentialSymptoms = [];
+              break;
+            case RecipeStep.PROPERTIES:
+              updates.therapeuticProperties = [];
+              break;
+            case RecipeStep.OILS:
+              updates.suggestedOils = [];
+              break;
+          }
+
+          return { ...state, ...updates };
+        });
+      },
+
       resetWizard: () => {
         console.log('🔄 Starting recipe wizard reset...');
 

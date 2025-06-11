@@ -42,6 +42,7 @@ interface UseRecipeNavigationReturn {
   goToNext: () => Promise<NavigationResult>;
   goToPrevious: () => Promise<NavigationResult>;
   goToFirst: () => Promise<NavigationResult>;
+  startNewRecipe: () => Promise<NavigationResult>;
   
   // Validation functions
   canNavigateToStep: (step: RecipeStep) => boolean;
@@ -71,7 +72,9 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
     completedSteps,
     setCurrentStep,
     markStepCompleted,
-    canNavigateToStep: storeCanNavigateToStep
+    canNavigateToStep: storeCanNavigateToStep,
+    clearStepsAfter,
+    resetWizard
   } = useRecipeStore();
   
   const { isLoading } = useRecipeStore();
@@ -156,7 +159,7 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
   }, [stepInfo.isFirst]);
 
   /**
-   * Navigates to a specific step
+   * Navigates to a specific step with state clearing for backwards navigation
    */
   const goToStep = useCallback(async (step: RecipeStep): Promise<NavigationResult> => {
     try {
@@ -166,6 +169,26 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
           success: false,
           error: 'Cannot navigate to this step. Please complete previous steps first.'
         };
+      }
+
+      // Determine if we're navigating backwards and clear future steps if needed
+      const stepOrder = [
+        RecipeStep.HEALTH_CONCERN,
+        RecipeStep.DEMOGRAPHICS,
+        RecipeStep.CAUSES,
+        RecipeStep.SYMPTOMS,
+        RecipeStep.PROPERTIES,
+        RecipeStep.OILS
+      ];
+
+      const currentStepIndex = stepOrder.indexOf(currentStep);
+      const targetStepIndex = stepOrder.indexOf(step);
+      const isNavigatingBackwards = targetStepIndex < currentStepIndex;
+
+      // If navigating backwards, clear data for steps after the target step
+      if (isNavigatingBackwards) {
+        console.log(`🔄 Navigating backwards from ${currentStep} to ${step}`);
+        clearStepsAfter(step);
       }
 
       // Update store state
@@ -187,7 +210,7 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
         error: 'Failed to navigate to step'
       };
     }
-  }, [storeCanNavigateToStep, setCurrentStep, getStepUrl, router]);
+  }, [storeCanNavigateToStep, setCurrentStep, getStepUrl, router, currentStep, clearStepsAfter]);
 
   /**
    * Navigates to the next step
@@ -227,6 +250,33 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
     return goToStep(WIZARD_STEPS[0].key);
   }, [goToStep]);
 
+  /**
+   * Starts a new recipe by resetting all data and navigating to first step
+   */
+  const startNewRecipe = useCallback(async (): Promise<NavigationResult> => {
+    try {
+      console.log('🔄 Starting new recipe...');
+
+      // Reset all wizard data
+      resetWizard();
+
+      // Navigate to the first step
+      const url = getStepUrl(WIZARD_STEPS[0].key);
+      router.push(url);
+
+      return {
+        success: true,
+        redirected: true
+      };
+    } catch (error) {
+      console.error('Error starting new recipe:', error);
+      return {
+        success: false,
+        error: 'Failed to start new recipe'
+      };
+    }
+  }, [resetWizard, getStepUrl, router]);
+
   return {
     // Current step information
     stepInfo,
@@ -236,6 +286,7 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
     goToNext,
     goToPrevious,
     goToFirst,
+    startNewRecipe,
     
     // Validation functions
     canNavigateToStep: storeCanNavigateToStep,

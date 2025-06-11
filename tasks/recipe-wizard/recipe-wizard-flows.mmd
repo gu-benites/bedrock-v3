@@ -1,0 +1,345 @@
+%% Essential Oil Recipe Wizard MVP - Comprehensive Flow Diagrams
+%% Three interconnected flows: User Flow, Data Flow, and AI Agent Flow
+
+graph TB
+    %% ===========================================
+    %% 1. USER FLOW DIAGRAM - 6-Step Wizard Progression
+    %% ===========================================
+    
+    subgraph UserFlow ["🧭 User Flow - 6-Step Wizard Progression"]
+        direction TB
+        
+        %% Step 1: Health Concern Input
+        U1[👤 User enters health concern]
+        U1_Component["📄 health-concern-input.tsx<br/>Chat-style interface"]
+        U1_Validation{Minimum 3 characters?}
+        U1_Error["❌ Show validation error"]
+        
+        %% Step 2: Demographics
+        U2[👤 User provides demographics]
+        U2_Component["📄 demographics-form.tsx<br/>Gender, Age Category, Specific Age"]
+        U2_Validation{All fields complete?}
+        U2_Error["❌ Show form errors"]
+        
+        %% Step 3: Potential Causes (AI-Powered)
+        U3[🤖 AI generates potential causes]
+        U3_Component["📄 causes-selection.tsx<br/>Multi-select interface"]
+        U3_Selection{User selects causes?}
+        U3_Error["❌ Agent failure fallback"]
+
+        %% Step 4: Symptoms (AI-Powered)
+        U4[🤖 AI generates symptoms]
+        U4_Component["📄 symptoms-selection.tsx<br/>Multi-select interface"]
+        U4_Selection{User selects symptoms?}
+        U4_Error["❌ Agent failure fallback"]
+
+        %% Step 5: Therapeutic Properties (AI-Powered)
+        U5[🤖 AI analyzes properties]
+        U5_Component["📄 properties-display.tsx<br/>Display properties information"]
+        U5_Continue{Continue to oils?}
+        U5_Error["❌ Agent failure fallback"]
+
+        %% Step 6: Suggested Oils (AI-Powered)
+        U6[🤖 AI suggests oils]
+        U6_Component["📄 oils-display.tsx<br/>Display oil recommendations"]
+        U6_Complete[✅ Wizard Complete]
+        U6_Error["❌ Agent failure fallback"]
+        
+        %% Navigation Controls
+        Nav_Back["⬅️ navigation-controls.tsx<br/>Previous Step"]
+        Nav_Next["➡️ navigation-controls.tsx<br/>Next Step"]
+        Progress["📊 progress-indicator.tsx<br/>Step tracking with agent status"]
+        
+        %% User Flow Connections
+        U1 --> U1_Component --> U1_Validation
+        U1_Validation -->|No| U1_Error --> U1
+        U1_Validation -->|Yes| U2
+        
+        U2 --> U2_Component --> U2_Validation
+        U2_Validation -->|No| U2_Error --> U2
+        U2_Validation -->|Yes| U3
+        
+        U3 --> U3_Component --> U3_Selection
+        U3_Selection -->|No selection| U3_Error --> U3
+        U3_Selection -->|Selected| U4
+        
+        U4 --> U4_Component --> U4_Selection
+        U4_Selection -->|No selection| U4_Error --> U4
+        U4_Selection -->|Selected| U5
+        
+        U5 --> U5_Component --> U5_Continue
+        U5_Continue -->|Error| U5_Error --> U5
+        U5_Continue -->|Continue| U6
+        
+        U6 --> U6_Component --> U6_Complete
+        U6 -->|Error| U6_Error --> U6
+        
+        %% Navigation Integration
+        Nav_Back -.->|Available Steps 2-6| U1
+        Nav_Next -.->|Validation passed| U2
+        Progress -.->|Track all steps| U6_Complete
+    end
+    
+    %% ===========================================
+    %% 2. DATA FLOW DIAGRAM - System Data Movement
+    %% ===========================================
+    
+    subgraph DataFlow ["💾 Data Flow - System Data Movement"]
+        direction TB
+        
+        %% Frontend State Management
+        subgraph Frontend ["🖥️ Frontend Layer"]
+            WizardStore["📦 wizard-store.ts<br/>Zustand State Management"]
+            SessionStorage["💾 Session Storage<br/>Persistence & Recovery"]
+            UserContext["👤 User Context<br/>Health concern + Demographics"]
+        end
+        
+        %% API Layer
+        subgraph APILayer ["🔌 API Layer"]
+            APIRoute["📡 /api/recipe-wizard/analyze<br/>route.ts - Enhanced handler"]
+            RequestValidation{Request Validation<br/>Zod schemas}
+            ResponseValidation{Response Validation<br/>Safety + Research data}
+        end
+        
+        %% Service Layer
+        subgraph ServiceLayer ["⚙️ Service Layer"]
+            AgentOrchestrator["🎯 agent-orchestrator.ts<br/>Specialized agent coordination"]
+            PromptManager["📝 prompt-manager.ts<br/>YAML configuration loader"]
+        end
+
+        %% Data Flow Connections
+        WizardStore <--> SessionStorage
+        WizardStore --> UserContext
+        UserContext --> APIRoute
+        APIRoute --> RequestValidation
+        RequestValidation -->|Valid| AgentOrchestrator
+        RequestValidation -->|Invalid| ResponseValidation
+
+        AgentOrchestrator --> PromptManager
+        AgentOrchestrator --> ResponseValidation
+        ResponseValidation --> APIRoute
+        APIRoute --> WizardStore
+    end
+
+    %% ===========================================
+    %% 3. AI AGENT FLOW DIAGRAM - Specialized Agent Orchestration
+    %% ===========================================
+
+    subgraph AgentFlow ["🤖 AI Agent Flow - Specialized Agent Orchestration"]
+        direction TB
+
+        %% Agent Selection Logic
+        AgentSelector{🎯 Agent Selection<br/>Based on wizard step}
+
+        %% Specialized Agents (Feature-specific)
+        subgraph SpecializedAgents ["🧠 Specialized Agents (src/features/recipe-wizard/services/agents/)"]
+
+            subgraph MedicalAgent ["🏥 Medical Analysis Agent"]
+                MA_Agent["medical-analysis-agent.ts<br/>Temperature: 0.3 (Conservative)"]
+                MA_Prompt["📄 potential-causes.yaml<br/>Medical analysis prompt"]
+                MA_Response["📋 Potential Causes Response"]
+            end
+
+            subgraph SymptomAgent ["🔍 Symptom Correlation Agent"]
+                SC_Agent["symptom-correlation-agent.ts<br/>Temperature: 0.4 (Moderate)"]
+                SC_Prompt["📄 potential-symptoms.yaml<br/>Symptom correlation prompt"]
+                SC_Response["📋 Symptoms Response"]
+            end
+
+            subgraph PropertiesAgent ["⚗️ Therapeutic Properties Agent"]
+                TP_Agent["therapeutic-properties-agent.ts<br/>Temperature: 0.2 (Accurate)"]
+                TP_Prompt["📄 therapeutic-properties.yaml<br/>Properties analysis prompt"]
+                TP_Response["📋 Properties Response"]
+            end
+
+            subgraph OilAgent ["🌿 Oil Recommendation Agent"]
+                OR_Agent["oil-recommendation-agent.ts<br/>Temperature: 0.5 (Balanced)"]
+                OR_Prompt["📄 suggested-oils.yaml<br/>Oil recommendation prompt"]
+                OR_Response["📋 Oil Suggestions Response"]
+            end
+        end
+
+        %% YAML Prompt Processing
+        subgraph PromptProcessing ["📝 YAML Prompt Processing"]
+            YAMLLoader["📂 YAML File Loader<br/>js-yaml parser"]
+            TemplateProcessor["🔄 Template Processor<br/>Variable substitution"]
+            ConfigExtractor["⚙️ Config Extractor<br/>Temperature, tools, schema"]
+        end
+
+        %% OpenAI Agents JS SDK Integration
+        subgraph OpenAISDK ["🔌 OpenAI Agents JS SDK Integration"]
+            AgentExecution["🚀 Agent Execution<br/>OpenAI Agents JS SDK"]
+            StructuredOutput["📊 Structured Output<br/>JSON schema validation"]
+            ErrorHandling["❌ Error Handling<br/>Retry with temperature adjustment"]
+        end
+
+        %% Agent Flow Connections
+        AgentSelector -->|Step 3: Causes| MedicalAgent
+        AgentSelector -->|Step 4: Symptoms| SymptomAgent
+        AgentSelector -->|Step 5: Properties| PropertiesAgent
+        AgentSelector -->|Step 6: Oils| OilAgent
+
+        %% Medical Agent Flow
+        MA_Agent --> MA_Prompt --> YAMLLoader
+        YAMLLoader --> TemplateProcessor --> ConfigExtractor
+        ConfigExtractor --> AgentExecution --> MA_Response
+
+        %% Symptom Agent Flow
+        SC_Agent --> SC_Prompt --> YAMLLoader
+        AgentExecution --> SC_Response
+
+        %% Properties Agent Flow
+        TP_Agent --> TP_Prompt --> YAMLLoader
+        AgentExecution --> TP_Response
+
+        %% Oil Agent Flow
+        OR_Agent --> OR_Prompt --> YAMLLoader
+        AgentExecution --> OR_Response
+
+        %% Error Handling
+        AgentExecution -->|Failure| ErrorHandling
+        ErrorHandling -->|Retry| AgentExecution
+        ErrorHandling -->|Fallback| StructuredOutput
+
+        %% Structured Output Processing
+        MA_Response --> StructuredOutput
+        SC_Response --> StructuredOutput
+        TP_Response --> StructuredOutput
+        OR_Response --> StructuredOutput
+    end
+
+    %% ===========================================
+    %% INTERCONNECTIONS BETWEEN FLOWS
+    %% ===========================================
+
+    %% User Flow to Data Flow Connections
+    U3 -.->|Triggers API call| APIRoute
+    U4 -.->|Triggers API call| APIRoute
+    U5 -.->|Triggers API call| APIRoute
+    U6 -.->|Triggers API call| APIRoute
+
+    %% Data Flow to Agent Flow Connections
+    AgentOrchestrator -.->|Selects agent| AgentSelector
+    StructuredOutput -.->|Returns response| ResponseValidation
+
+    %% Agent Flow to User Flow Connections
+    MA_Response -.->|Displays causes| U3_Component
+    SC_Response -.->|Displays symptoms| U4_Component
+    TP_Response -.->|Displays properties| U5_Component
+    OR_Response -.->|Displays oils| U6_Component
+
+    %% ===========================================
+    %% ERROR HANDLING & FALLBACK MECHANISMS
+    %% ===========================================
+
+    subgraph ErrorHandlingFlow ["❌ Error Handling & Fallback Mechanisms"]
+        direction TB
+
+        %% Error Boundary Components
+        ErrorBoundary["🛡️ error-boundary.tsx<br/>Agent-specific error handling"]
+
+        %% Fallback Strategies
+        subgraph FallbackStrategies ["🔄 Fallback Strategies"]
+            AgentFallback["🤖 Agent Fallback<br/>General agent if specialized fails"]
+            CachedResponse["💾 Cached Response<br/>Previous successful responses"]
+            GracefulDegradation["⬇️ Graceful Degradation<br/>Basic functionality maintained"]
+        end
+
+        %% Error Types
+        subgraph ErrorTypes ["⚠️ Error Types"]
+            NetworkError["🌐 Network Error<br/>API unavailable"]
+            AgentError["🤖 Agent Error<br/>OpenAI SDK failure"]
+            ValidationError["📋 Validation Error<br/>Invalid response format"]
+            ToolError["🔧 Tool Error<br/>External API failure"]
+        end
+
+        %% Error Handling Connections
+        NetworkError --> CachedResponse
+        AgentError --> AgentFallback
+        ValidationError --> ErrorBoundary
+        ToolError --> GracefulDegradation
+
+        ErrorBoundary --> FallbackStrategies
+        FallbackStrategies -.->|Recovery| UserFlow
+    end
+
+    %% ===========================================
+    %% BARREL FILE IMPORT RELATIONSHIPS
+    %% ===========================================
+
+    subgraph ImportRelationships ["📦 Barrel File Import Relationships"]
+        direction LR
+
+        %% Agents Barrel
+        AgentsBarrel["📄 src/features/recipe-wizard/services/agents/index.ts<br/>export { MedicalAnalysisAgent, SymptomCorrelationAgent, ... }"]
+
+        %% Import Usage
+        OrchestratorImports["🔗 Orchestrator Imports<br/>import { MedicalAnalysisAgent } from './agents'"]
+
+        %% Import Relationships
+        AgentsBarrel --> OrchestratorImports
+        OrchestratorImports -.->|Used by| AgentOrchestrator
+    end
+
+    %% ===========================================
+    %% STATE TRANSITIONS & DATA PERSISTENCE
+    %% ===========================================
+
+    subgraph StateTransitions ["🔄 State Transitions & Data Persistence"]
+        direction TB
+
+        %% State Management
+        StateManager["📊 State Manager<br/>wizard-store.ts (Zustand)"]
+
+        %% State Transitions
+        subgraph Transitions ["🔄 State Transitions"]
+            StepTransition["➡️ Step Transition<br/>Forward navigation with validation"]
+            BackwardNav["⬅️ Backward Navigation<br/>Data preservation + clearing subsequent steps"]
+            SessionRecovery["🔄 Session Recovery<br/>Automatic state restoration"]
+        end
+
+        %% Data Persistence
+        subgraph Persistence ["💾 Data Persistence"]
+            LocalStorage["💾 Local Storage<br/>Session data persistence"]
+            ContextPreservation["👤 Context Preservation<br/>User data + agent results"]
+            CacheManagement["🗄️ Cache Management<br/>Agent responses + external tool data"]
+        end
+
+        %% State Flow Connections
+        StateManager --> Transitions
+        StateManager --> Persistence
+        StepTransition -.->|Updates| WizardStore
+        BackwardNav -.->|Clears data| WizardStore
+        SessionRecovery -.->|Restores| UserContext
+
+        LocalStorage <--> WizardStore
+        ContextPreservation <--> UserContext
+        CacheManagement <--> AgentOrchestrator
+    end
+
+    %% ===========================================
+    %% PERFORMANCE & MONITORING
+    %% ===========================================
+
+    subgraph PerformanceMonitoring ["📈 Performance & Monitoring"]
+        direction TB
+
+        %% Performance Metrics
+        subgraph Metrics ["📊 Performance Metrics"]
+            AgentResponseTime["⏱️ Agent Response Time<br/>< 2 seconds per agent"]
+            UserCompletion["👤 User Completion<br/>Funnel analysis by step"]
+        end
+
+        %% Monitoring Integration
+        subgraph Monitoring ["📡 Monitoring Integration"]
+            ErrorTracking["❌ Error Tracking<br/>Agent-specific error rates"]
+            PerformanceTracking["📈 Performance Tracking<br/>Response time optimization"]
+        end
+
+        %% Monitoring Connections
+        SpecializedAgents -.->|Metrics| AgentResponseTime
+        UserFlow -.->|Metrics| UserCompletion
+
+        ErrorHandlingFlow -.->|Data| ErrorTracking
+        AgentFlow -.->|Data| PerformanceTracking
+    end

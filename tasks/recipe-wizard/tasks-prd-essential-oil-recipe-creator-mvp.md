@@ -1,0 +1,178 @@
+# Tasks: Essential Oil Recipe Wizard MVP
+
+Based on the enhanced PRD for Essential Oil Recipe Creator MVP, this document outlines the development tasks required to implement the complete 6-step recipe wizard with specialized OpenAI Agents JS SDK integration and multi-agent architecture.
+
+## Relevant Files
+
+- `src/features/recipe-wizard/services/agent-orchestrator.ts` - Main orchestration service for managing specialized AI agents
+- `src/features/recipe-wizard/services/agent-orchestrator.test.ts` - Unit tests for agent orchestrator
+- `src/features/recipe-wizard/services/agents/medical-analysis-agent.ts` - Specialized agent for conservative medical analysis (temp: 0.3)
+- `src/features/recipe-wizard/services/agents/medical-analysis-agent.test.ts` - Unit tests for medical analysis agent
+- `src/features/recipe-wizard/services/agents/symptom-correlation-agent.ts` - Specialized agent for symptom identification (temp: 0.4)
+- `src/features/recipe-wizard/services/agents/symptom-correlation-agent.test.ts` - Unit tests for symptom correlation agent
+- `src/features/recipe-wizard/services/agents/therapeutic-properties-agent.ts` - Specialized agent for properties analysis (temp: 0.2)
+- `src/features/recipe-wizard/services/agents/therapeutic-properties-agent.test.ts` - Unit tests for therapeutic properties agent
+- `src/features/recipe-wizard/services/agents/oil-recommendation-agent.ts` - Specialized agent for oil suggestions (temp: 0.5)
+- `src/features/recipe-wizard/services/agents/oil-recommendation-agent.test.ts` - Unit tests for oil recommendation agent
+- `src/features/recipe-wizard/services/agents/index.ts` - Barrel file for agents exports
+
+- `src/features/recipe-wizard/services/prompt-manager.ts` - Enhanced prompt configuration and YAML file management with agent-specific settings
+- `src/features/recipe-wizard/services/prompt-manager.test.ts` - Unit tests for enhanced prompt manager
+- `src/features/recipe-wizard/prompts/potential-causes.yaml` - Enhanced prompt configuration with conservative medical analysis settings and external tool integration
+- `src/features/recipe-wizard/prompts/potential-symptoms.yaml` - Enhanced prompt configuration with symptom correlation settings and research validation
+- `src/features/recipe-wizard/prompts/therapeutic-properties.yaml` - Enhanced prompt configuration with low-temperature settings for accurate properties assessment
+- `src/features/recipe-wizard/prompts/suggested-oils.yaml` - Enhanced prompt configuration with balanced creativity and safety tool integration
+- `src/features/recipe-wizard/store/wizard-store.ts` - Enhanced Zustand store for wizard state management with agent context and external tool data
+- `src/features/recipe-wizard/store/wizard-store.test.ts` - Unit tests for enhanced wizard store
+- `src/features/recipe-wizard/hooks/use-wizard-navigation.ts` - Custom hook for wizard navigation and step management
+- `src/features/recipe-wizard/hooks/use-wizard-navigation.test.ts` - Unit tests for navigation hook
+- `src/features/recipe-wizard/components/wizard-container.tsx` - Enhanced wizard orchestration component with agent selection and safety displays
+- `src/features/recipe-wizard/components/wizard-container.test.tsx` - Unit tests for enhanced wizard container
+- `src/features/recipe-wizard/components/steps/health-concern-input.tsx` - Health concern input step component
+- `src/features/recipe-wizard/components/steps/health-concern-input.test.tsx` - Unit tests for health concern step
+- `src/features/recipe-wizard/components/steps/demographics-form.tsx` - Demographics collection step component
+- `src/features/recipe-wizard/components/steps/demographics-form.test.tsx` - Unit tests for demographics step
+- `src/features/recipe-wizard/components/steps/causes-selection.tsx` - Potential causes selection step component
+- `src/features/recipe-wizard/components/steps/causes-selection.test.tsx` - Unit tests for causes step
+- `src/features/recipe-wizard/components/steps/symptoms-selection.tsx` - Symptoms identification step component
+- `src/features/recipe-wizard/components/steps/symptoms-selection.test.tsx` - Unit tests for symptoms step
+- `src/features/recipe-wizard/components/steps/properties-display.tsx` - Therapeutic properties display step component
+- `src/features/recipe-wizard/components/steps/properties-display.test.tsx` - Unit tests for properties step
+- `src/features/recipe-wizard/components/steps/oils-display.tsx` - Essential oils suggestions display step component
+- `src/features/recipe-wizard/components/steps/oils-display.test.tsx` - Unit tests for oils step
+- `src/features/recipe-wizard/components/ui/progress-indicator.tsx` - Enhanced progress indicator with agent status and safety validation tracking
+- `src/features/recipe-wizard/components/ui/progress-indicator.test.tsx` - Unit tests for enhanced progress indicator
+- `src/features/recipe-wizard/components/ui/navigation-controls.tsx` - Enhanced navigation buttons with agent validation and safety checks
+- `src/features/recipe-wizard/components/ui/navigation-controls.test.tsx` - Unit tests for enhanced navigation controls
+- `src/features/recipe-wizard/components/ui/error-boundary.tsx` - Enhanced error boundary with agent-specific error handling
+- `src/features/recipe-wizard/components/ui/error-boundary.test.tsx` - Unit tests for enhanced error boundary
+
+- `src/features/recipe-wizard/types/wizard.types.ts` - Enhanced TypeScript type definitions including agent types and external tool data
+- `src/features/recipe-wizard/types/agent.types.ts` - TypeScript type definitions for specialized agents and tool integrations
+- `src/features/recipe-wizard/schemas/wizard-schemas.ts` - Enhanced Zod schemas for data validation including safety and research data
+- `src/features/recipe-wizard/schemas/wizard-schemas.test.ts` - Unit tests for enhanced schemas
+- `src/features/recipe-wizard/constants/wizard.constants.ts` - Enhanced constants including agent configurations and external tool settings
+- `src/features/recipe-wizard/constants/agent.constants.ts` - Constants for agent-specific configurations and temperature settings
+- `src/app/api/recipe-wizard/analyze/route.ts` - Enhanced API route handler with agent orchestration and external tool integration
+- `src/app/api/recipe-wizard/analyze/route.test.ts` - Unit tests for enhanced API route
+- `src/app/(dashboard)/dashboard/recipe-wizard/page.tsx` - Main recipe wizard page component
+- `src/app/(dashboard)/dashboard/recipe-wizard/[step]/page.tsx` - Dynamic step page component
+- `src/app/(dashboard)/dashboard/recipe-wizard/layout.tsx` - Layout component for recipe wizard pages
+
+### Notes
+
+- Unit tests should be placed alongside the code files they are testing (e.g., `MyComponent.tsx` and `MyComponent.test.tsx` in the same directory).
+- Use `npx jest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the Jest configuration.
+- **Multi-Agent Architecture:** Uses specialized agents with domain-specific expertise and optimized temperature settings for each analysis type.
+- **Agent Configuration:** Medical Analysis (0.3), Symptom Correlation (0.4), Therapeutic Properties (0.2), Oil Recommendation (0.5).
+- **Feature-Specific Agents:** Recipe wizard agents remain in `src/features/recipe-wizard/services/agents/` as they are feature-specific.
+- **Prompt Directory Structure:** Uses `src/features/recipe-wizard/prompts/` with agent-specific YAML configurations.
+- **YAML Configuration:** Each prompt includes template, agent-specific config, external tool settings, and JSON schema.
+
+- All components should be built with mobile-first responsive design and WCAG AA accessibility compliance.
+
+## Tasks
+
+- [ ] 1.0 Setup Specialized Multi-Agent System and OpenAI Agents JS SDK Integration
+  - [ ] 1.1 Install and configure OpenAI Agents JS SDK package with specialized agent support
+  - [ ] 1.2 Create environment variables for OpenAI API key configuration
+  - [ ] 1.3 Implement AgentOrchestrator service for managing recipe wizard specialized agents
+  - [ ] 1.4 Create MedicalAnalysisAgent with conservative temperature (0.3) for evidence-based analysis
+  - [ ] 1.5 Create SymptomCorrelationAgent with moderate temperature (0.4) for symptom identification
+  - [ ] 1.6 Create TherapeuticPropertiesAgent with low temperature (0.2) for accurate properties assessment
+  - [ ] 1.7 Create OilRecommendationAgent with balanced temperature (0.5) for creative oil suggestions
+  - [ ] 1.8 Create barrel file (index.ts) in src/features/recipe-wizard/services/agents/ for agent exports
+  - [ ] 1.9 Create enhanced PromptManager with agent-specific YAML configurations
+  - [ ] 1.10 Install and configure YAML parser (js-yaml) for enhanced prompt processing
+  - [ ] 1.11 Create agent-specific YAML prompts with optimized temperature settings
+  - [ ] 1.12 Implement comprehensive response validation with structured JSON schemas
+  - [ ] 1.13 Add agent performance monitoring and response time tracking
+  - [ ] 1.14 Write comprehensive unit tests for all agents and orchestration logic
+- [ ] 2.0 Implement Enhanced Wizard Infrastructure with Agent Context Management
+  - [ ] 2.1 Create enhanced Zustand store with agent context and external tool data management
+  - [ ] 2.2 Define comprehensive TypeScript types for agents, tools, and enhanced data structures
+  - [ ] 2.3 Create agent-specific type definitions for specialized agent responses
+  - [ ] 2.4 Implement enhanced Zod schemas for validation including safety and research data
+  - [ ] 2.5 Create agent configuration constants with temperature settings and tool mappings
+  - [ ] 2.6 Implement enhanced useWizardNavigation hook with agent selection logic
+  - [ ] 2.7 Add enhanced session persistence with agent context and safety data
+  - [ ] 2.8 Implement backward navigation with agent state preservation
+  - [ ] 2.9 Create enhanced data clearing logic for agent-specific subsequent steps
+  - [ ] 2.10 Implement enhanced WizardContainer with agent orchestration and safety displays
+  - [ ] 2.11 Create enhanced ProgressIndicator with agent status and safety validation tracking
+  - [ ] 2.12 Implement enhanced NavigationControls with agent validation and safety checks
+  - [ ] 2.13 Create enhanced ErrorBoundary with agent-specific error handling
+  - [ ] 2.14 Add SafetyWarning component for displaying contraindications and age restrictions
+  - [ ] 2.15 Add ResearchCitation component for displaying evidence backing
+  - [ ] 2.16 Write comprehensive unit tests for enhanced store, hooks, and components
+- [ ] 3.0 Develop User Input Steps (Health Concern and Demographics)
+  - [ ] 3.1 Create HealthConcernInput component with chat-style interface
+  - [ ] 3.2 Implement input validation with minimum 3-character requirement
+  - [ ] 3.3 Add multi-language support for Portuguese and English
+  - [ ] 3.4 Create DemographicsForm component with gender and age collection
+  - [ ] 3.5 Implement form validation for all demographic fields
+  - [ ] 3.6 Add age category selection (Child, Teen, Adult, Senior)
+  - [ ] 3.7 Implement specific age input with validation
+  - [ ] 3.8 Create mobile-first responsive design for both input steps
+  - [ ] 3.9 Add accessibility features including keyboard navigation and screen reader support
+  - [ ] 3.10 Implement form state management and session storage integration
+  - [ ] 3.11 Create loading states and user feedback during form submission
+  - [ ] 3.12 Write comprehensive unit tests for both input step components
+- [ ] 4.0 Build Enhanced AI-Powered Analysis Steps with Specialized Agents and Shared Tools
+  - [ ] 4.1 Create enhanced CausesSelection component with safety warnings and research backing
+  - [ ] 4.2 Implement MedicalAnalysisAgent integration for conservative potential causes analysis
+  - [ ] 4.3 Add shared safety database tool integration for contraindication checking in causes step
+  - [ ] 4.4 Add shared research API tool integration for evidence-based cause validation
+  - [ ] 4.5 Create enhanced SymptomsSelection component with correlation validation
+  - [ ] 4.6 Implement SymptomCorrelationAgent integration for accurate symptom identification
+  - [ ] 4.7 Add symptom-to-cause correlation validation with shared external research backing
+  - [ ] 4.8 Create enhanced PropertiesDisplay component with research citations
+  - [ ] 4.9 Implement TherapeuticPropertiesAgent integration for accurate properties assessment
+  - [ ] 4.10 Add shared research citation display for therapeutic property claims
+  - [ ] 4.11 Create enhanced OilsDisplay component with safety information and quality ratings
+  - [ ] 4.12 Implement OilRecommendationAgent integration for balanced oil suggestions
+  - [ ] 4.13 Add shared oil quality tool integration for sourcing and quality information
+  - [ ] 4.14 Add comprehensive safety warnings using shared safety tools for age restrictions and contraindications
+  - [ ] 4.15 Display ALL suggested oils with enhanced safety and quality information from shared tools
+  - [ ] 4.16 Implement enhanced loading states with agent-specific progress indicators
+  - [ ] 4.17 Create enhanced API route handler with agent orchestration and shared tool integration
+  - [ ] 4.18 Add comprehensive request/response validation with safety and research data from shared tools
+  - [ ] 4.19 Implement intelligent caching strategy for agent responses and shared external tool data
+  - [ ] 4.20 Add agent performance monitoring and shared external tool reliability tracking
+  - [ ] 4.21 Write comprehensive unit tests for all enhanced AI-powered components with shared tool integration
+  - [ ] 4.22 Write integration tests for agent orchestration and shared external tool integration
+- [ ] 5.0 Create Dashboard Integration and Responsive UI Components
+  - [ ] 5.1 Create main recipe wizard page component for dashboard integration
+  - [ ] 5.2 Implement dynamic step routing with [step] parameter
+  - [ ] 5.3 Create layout component for recipe wizard pages
+  - [ ] 5.4 Implement simplified entry point layout for health concern step
+  - [ ] 5.5 Add full dashboard layout for subsequent steps with breadcrumbs
+  - [ ] 5.6 Create mobile-first responsive design with 375px, 768px, 1024px breakpoints
+  - [ ] 5.7 Implement touch-friendly interface with minimum 44px touch targets
+  - [ ] 5.8 Add tablet and desktop layout adaptations
+  - [ ] 5.9 Implement WCAG AA accessibility compliance across all components
+  - [ ] 5.10 Add keyboard navigation support for all interactive elements
+  - [ ] 5.11 Create consistent visual hierarchy with clear step titles and descriptions
+  - [ ] 5.12 Implement progressive disclosure patterns for detailed information
+  - [ ] 5.13 Add loading animations and user feedback throughout the wizard
+  - [ ] 5.14 Write comprehensive unit tests for all UI components and layouts
+- [ ] 6.0 Implement Enhanced Error Handling, Testing, and Multi-Agent Performance Optimization
+  - [ ] 6.1 Implement comprehensive error handling for specialized agent failures with fallback strategies
+  - [ ] 6.2 Add graceful degradation for external tool API failures with cached safety data
+  - [ ] 6.3 Implement intelligent rate limiting with agent priority (medical analysis first)
+  - [ ] 6.4 Create agent-specific retry mechanisms with temperature adjustment for failed requests
+  - [ ] 6.5 Add enhanced session timeout handling with agent context preservation
+  - [ ] 6.6 Implement network connectivity error handling with offline safety warnings
+  - [ ] 6.7 Create comprehensive monitoring for agent performance and external tool reliability
+  - [ ] 6.8 Add specialized agent response time optimization (<2 seconds per agent)
+  - [ ] 6.9 Implement intelligent caching strategy for agent responses and external tool data
+  - [ ] 6.10 Add agent-specific performance tracking and temperature optimization
+  - [ ] 6.11 Create safety warning generation and display effectiveness tracking
+  - [ ] 6.12 Add research citation accuracy and availability monitoring
+  - [ ] 6.13 Implement user completion funnel analysis with agent-specific metrics
+  - [ ] 6.14 Create comprehensive integration tests for multi-agent workflow
+  - [ ] 6.15 Implement end-to-end testing for all agent scenarios and external tool integrations
+  - [ ] 6.16 Add performance testing for agent orchestration and external API calls
+  - [ ] 6.17 Create enhanced user feedback collection with agent performance insights
+  - [ ] 6.18 Implement production deployment with specialized agent monitoring
+  - [ ] 6.19 Write comprehensive documentation for multi-agent architecture and external tool integration

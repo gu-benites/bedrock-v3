@@ -252,6 +252,10 @@ export interface RecipeWizardActions {
   setError: (error: string | null) => void;
   resetWizard: () => void;
   clearError: () => void;
+
+  // State clearing for navigation consistency
+  clearStepsAfter: (currentStep: RecipeStep) => void;
+  clearStepData: (step: RecipeStep) => void;
 }
 
 // ============================================================================
