@@ -5,27 +5,22 @@ alwaysApply: false
 ---
 # Task List Management
 
+### Important Constraints:
+- FIRST OF ALL - STUDY AND ANALYZE ALL THE FILES INVOLVED IN THE TASK LIST BEFORE YOU START WORKING ON IT.
+- **DO NOT USE YOUR OWN KNOWLEDGE REGARDING OPENAI, VERCEL. ONLY INFORMATION PROVIDED IN THE TASK LIST SHOULD BE USED AND ANALYZED BECAUSE IT IS ALREADY WORKING, WE ARE JUST MIGRATING. THIS IS JUST REGARDING AI STREAMING AND CALLS TO THE API. OPENAI AGENTS JS SDK IS NEW FROM APRIL 2025 AND YOU HAVE NO KNOWLEDGE ABOUT IT BESIDES THE ONE I AM GIVING IT NOW. **
+
 Guidelines for managing task lists in markdown files to track progress on completing a PRD
-
-## Test Implementation First
-
-- **First of all** you need to implement and get a passed on all test files to only later continue to follow the sequence of core features implementation
-- **Constraints**: before you implement any feature you need to make sure that all tests are passing
-
-### **Update the tests task list as you work:**
-   - Mark test tasks and subtasks as completed (`[x]`) as they pass, and only if they pass..
-   - Add to the list new tests necessary as they emerge.
 
 ### **Maintain the “Relevant Files” section:**
    - List every file created or modified.
    - Give each file a one‑line description of its purpose.
 
 ## Task Implementation
-- **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say “yes” or "y"
+- **One sub-task at a time:** Do **NOT** start the next parent task until you ask the user for permission and they say “yes” or "y" after you finish all subttasks under the current parent task.
 - **Completion protocol:**  
   1. When you finish a **sub‑task**, immediately mark it as completed by changing `[ ]` to `[x]`.  
   2. If **all** subtasks underneath a parent task are now `[x]`, also mark the **parent task** as completed.  
-- Stop after each sub‑task and wait for the user’s go‑ahead.
+- Stop after each parent task and wait for the user’s go‑ahead.
 
 ## Task List Maintenance
 

@@ -9,7 +9,7 @@ import {
   setOpenAIAPI
 } from '@openai/agents';
 import { parse } from 'best-effort-json-parser';
-import { getPromptManager, PromptManagerError } from '@/features/recipe-wizard/services';
+import { getPromptManager, PromptManagerError } from '@/lib/ai/utils/prompt-manager';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -55,13 +55,14 @@ function validateStreamingRequest(data: any): { isValid: boolean; errors?: strin
 function prepareTemplateVariables(feature: string, data: any): Record<string, any> {
   // For recipe-wizard feature
   if (feature === 'recipe-wizard') {
-    const demographics = data.demographics || {};
+    // Handle both nested demographics object and flat structure
+    const demographics = data.demographics || data;
     return {
-      healthConcern: data.healthConcern || '',
+      healthConcern: data.healthConcern || data.health_concern || '',
       gender: demographics.gender || '',
-      ageCategory: demographics.ageCategory || '',
-      specificAge: demographics.specificAge || '',
-      language: demographics.language || 'en'
+      ageCategory: demographics.ageCategory || demographics.age_category || '',
+      specificAge: demographics.specificAge || demographics.age_specific || demographics.age_value || '',
+      language: demographics.language || demographics.user_language || 'en'
     };
   }
 

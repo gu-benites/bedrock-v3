@@ -1,12 +1,33 @@
 /**
  * @fileoverview Prompt Manager service for loading and processing YAML prompt configurations
- * for the Recipe Wizard OpenAI Agents SDK integration.
+ * for AI streaming integrations. Moved from recipe-wizard to be shared across features.
  */
 
 import * as yaml from 'js-yaml';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { PromptConfig } from '../types/recipe-wizard.types';
+
+/**
+ * Prompt configuration interface
+ */
+export interface PromptConfig {
+  version: string;
+  description: string;
+  config: {
+    model: string;
+    temperature: number;
+    max_tokens: number;
+    [key: string]: any;
+  };
+  template: string;
+  schema: {
+    type: string;
+    name?: string;
+    schema?: any;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
 
 /**
  * Error class for prompt management operations
@@ -42,8 +63,16 @@ export class PromptManager {
   private readonly promptsBasePath: string;
 
   private constructor() {
-    // Set base path for prompts directory
-    this.promptsBasePath = path.join(process.cwd(), 'src', 'features', 'recipe-wizard', 'prompts');
+    // Set base path for prompts directory - now supports create-recipe
+    this.promptsBasePath = path.join(process.cwd(), 'src', 'features', 'create-recipe', 'prompts');
+  }
+
+  /**
+   * Set custom prompts base path (useful for different features)
+   */
+  public setPromptsBasePath(basePath: string): void {
+    (this as any).promptsBasePath = basePath;
+    this.clearCache(); // Clear cache when path changes
   }
 
   /**
@@ -266,16 +295,10 @@ export class PromptManager {
    * Preload prompt configurations for all available steps
    */
   public async preloadPrompts(): Promise<void> {
-    // Available prompt configurations for recipe wizard steps
-    const promptNames = [
-      'potential-causes',
-      'potential-symptoms',
-      'medical-properties'
-    ];
-
     try {
+      const availablePrompts = await this.getAvailablePrompts();
       await Promise.all(
-        promptNames.map(name => this.loadPromptConfig(name))
+        availablePrompts.map(name => this.loadPromptConfig(name))
       );
     } catch (error) {
       throw new PromptManagerError(

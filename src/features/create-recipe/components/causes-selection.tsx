@@ -8,7 +8,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
-import { fetchPotentialCauses } from '../services/recipe-api.service';
 import type { PotentialCause } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
 
@@ -30,9 +29,16 @@ export function CausesSelection() {
     clearError
   } = useRecipeStore();
 
+  const {
+    isStreamingCauses,
+    streamingError
+  } = useRecipeStore();
+
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
-  const [isLoadingCauses, setIsLoadingCauses] = useState(false);
   const [selectedCauseIds, setSelectedCauseIds] = useState<Set<string>>(new Set());
+
+  // Determine if we're in a loading state (either local loading or streaming from demographics)
+  const isLoadingCauses = isStreamingCauses || isLoading;
 
   /**
    * Initialize selected causes from store
@@ -45,7 +51,7 @@ export function CausesSelection() {
   }, [selectedCauses]);
 
   /**
-   * Fetch potential causes on component mount
+   * Check if potential causes are available (now loaded via AI streaming from demographics step)
    */
   const loadPotentialCauses = useCallback(async () => {
     // If data is missing, check if we should redirect to earlier steps
@@ -55,23 +61,15 @@ export function CausesSelection() {
       return;
     }
 
-    if (potentialCauses.length > 0) {
-      return; // Already loaded
+    // Potential causes should already be loaded via AI streaming from demographics step
+    // If not available and not currently streaming, show message to go back and complete demographics
+    if (potentialCauses.length === 0 && !isStreamingCauses) {
+      setError('Potential causes not found. Please go back to the demographics step to generate them.');
+      return;
     }
 
-    setIsLoadingCauses(true);
     clearError();
-
-    try {
-      const causes = await fetchPotentialCauses(healthConcern, demographics);
-      setPotentialCauses(causes);
-    } catch (error) {
-      console.error('Failed to fetch potential causes:', error);
-      setError('Failed to load potential causes. Please try again.');
-    } finally {
-      setIsLoadingCauses(false);
-    }
-  }, [healthConcern, demographics, potentialCauses.length, setPotentialCauses, setError, clearError]);
+  }, [healthConcern, demographics, potentialCauses.length, setError, clearError]);
 
   /**
    * Check if we have required data and show appropriate state
@@ -188,11 +186,11 @@ export function CausesSelection() {
       )}
 
       {/* Error Display */}
-      {error && (
+      {(error || streamingError) && (
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <p className="text-destructive text-sm">{error}</p>
-            {error.includes('Failed to load') && (
+            <p className="text-destructive text-sm">{error || streamingError}</p>
+            {(error?.includes('Failed to load') || streamingError?.includes('failed')) && (
               <button
                 onClick={handleRetry}
                 className="px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 text-sm"
@@ -209,13 +207,40 @@ export function CausesSelection() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center space-y-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground">Loading potential causes...</p>
+            <p className="text-muted-foreground">
+              {isStreamingCauses
+                ? 'AI is analyzing your information to identify potential causes...'
+                : 'Loading potential causes...'
+              }
+            </p>
+            {isStreamingCauses && (
+              <p className="text-xs text-muted-foreground">
+                This may take a few moments as we generate personalized recommendations
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Streaming Progress Indicator */}
+      {isStreamingCauses && potentialCauses.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center space-x-3">
+            <div className="animate-pulse rounded-full h-3 w-3 bg-blue-600"></div>
+            <div>
+              <p className="text-sm font-medium text-blue-800">
+                Generating potential causes... ({potentialCauses.length} found so far)
+              </p>
+              <p className="text-xs text-blue-600">
+                You can review the causes below while we continue analyzing
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       {/* Causes Selection */}
-      {!isLoadingCauses && potentialCauses.length > 0 && (
+      {potentialCauses.length > 0 && !isLoading && (
         <form onSubmit={onSubmit} className="space-y-6">
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
@@ -327,7 +352,7 @@ export function CausesSelection() {
       )}
 
       {/* Empty State */}
-      {!isLoadingCauses && potentialCauses.length === 0 && !error && (
+      {!isLoadingCauses && potentialCauses.length === 0 && !error && !streamingError && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             No potential causes found. Please go back and check your health concern.

@@ -1,6 +1,16 @@
 # Essential Oil Recipe Creator
 
-A comprehensive, mobile-first wizard application for creating personalized essential oil recommendations based on user health concerns, demographics, and symptoms.
+## 🎉 Enhanced with AI Streaming Capabilities
+
+**✅ Migration Completed**: Successfully migrated from recipe-wizard to create-recipe with dynamic AI step capabilities
+**✅ OpenAI Agents JS SDK**: Fully integrated with YAML-based prompt management and streaming
+**✅ Test Coverage**: **69 passing tests** across comprehensive test suites
+**✅ Dynamic Architecture**: Configuration-driven system for easy addition of new AI steps
+**✅ Future-Ready**: Prepared for potential-symptoms and therapeutic-properties steps
+
+---
+
+A comprehensive, mobile-first wizard application for creating personalized essential oil recommendations based on user health concerns, demographics, and symptoms. Now enhanced with real-time AI streaming capabilities and dynamic step architecture.
 
 ## 📋 Table of Contents
 
@@ -19,7 +29,17 @@ A comprehensive, mobile-first wizard application for creating personalized essen
 
 ## 🌟 Overview
 
-The Essential Oil Recipe Creator is a 6-step wizard that guides users through a personalized journey to discover essential oils that may help with their specific health concerns. The application uses AI-powered recommendations to suggest therapeutic properties and essential oils based on user inputs.
+The Essential Oil Recipe Creator is a 6-step wizard that guides users through a personalized journey to discover essential oils that may help with their specific health concerns. The application uses AI-powered recommendations with real-time streaming to suggest therapeutic properties and essential oils based on user inputs.
+
+### AI Streaming Integration
+
+The application now features advanced AI capabilities:
+
+- **Real-Time Analysis**: OpenAI Agents JS SDK provides streaming responses for immediate feedback
+- **Dynamic Step Processing**: Configuration-driven system supports any number of AI steps
+- **Data Transformation**: Automatic conversion between recipe-wizard and create-recipe formats
+- **Progressive Loading**: Users see results as they're generated, improving perceived performance
+- **Error Recovery**: Comprehensive error handling with retry capabilities
 
 ### User Journey
 

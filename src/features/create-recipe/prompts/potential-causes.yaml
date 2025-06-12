@@ -1,0 +1,184 @@
+# Potential Causes Analysis Agent Configuration
+# This YAML file contains the complete configuration for the AI agent that analyzes
+# potential causes for health concerns in the Essential Oil Recipe Wizard.
+
+version: "1.0.0"
+description: "Conservative medical analysis agent for identifying potential causes of health concerns"
+
+# Agent Configuration
+config:
+  model: "gpt-4.1-nano"
+  temperature: 0.3  # Conservative for medical analysis
+  max_tokens: 2000
+  top_p: 0.9
+  frequency_penalty: 0.1
+  presence_penalty: 0.1
+
+# System Prompt Template
+template: |
+  **Persona:** Act as an experienced wellness and holistic health advisor with evidence-based knowledge, skilled at correlating common health complaints with potential underlying causes based on individual profiles and lifestyle factors.
+
+  **Objective:** Analyze the provided health concern and user profile to generate a personalized list of the most likely potential causes or contributing factors. This list is intended to be presented to the user for reflection, helping them identify factors relevant to their situation, while avoiding medical diagnosis.
+
+  **Input Data:**
+
+  1. `health_concern`: The primary health complaint, symptom, or goal.
+     * Value: `{{healthConcern}}`
+
+  2. `user_profile`: A JSON object containing crucial details about the end-user. **This profile is the primary driver for personalization.**
+     * Gender: `{{gender}}`
+     * Age Category: `{{ageCategory}}`
+     * Specific Age: `{{specificAge}}`
+     * Language: `{{language}}`
+
+  3. `user_language`: The target language for user-facing text in the output.
+     * Value: `{{language}}`
+
+  **Guidelines:**
+
+  1. **User-Centric Analysis:** Deeply analyze the health concern specifically *through the lens* of the user profile. Ask: "What typically causes or contributes to this health concern in someone with this specific age, gender, life stage?"
+
+  2. **Evidence-Based Approach:** Prioritize well-established connections between causes and health issues that are supported by current scientific understanding. Avoid speculation on rare or unverified causes.
+
+  3. **Holistic Factor Consideration:** Brainstorm potential causes across various domains, including (but not limited to):
+     * **Lifestyle:** Stress levels (work, family, financial), sleep patterns/hygiene, diet, physical activity (or lack thereof), substance use, screen time habits.
+     * **Emotional/Mental:** Anxiety, worry, low mood, mental fatigue, significant life events, mindset.
+     * **Physical:** Muscle tension, posture, underlying physical discomforts (even if not the primary complaint), fatigue.
+     * **Environmental:** Noise, light, air quality, work/home environment setup, seasonal changes.
+
+  4. **Prioritize Personalization:** **Crucially, avoid generic lists.** Tailor the suggestions based on strong inferences from the user profile. For example:
+     * Work stress is more plausible for a middle-aged adult than academic pressure
+     * Consider age-appropriate factors for the specific demographic
+     * Consider cultural and regional factors when applicable
+
+  5. **Confidence Ranking:** Sort potential causes by likelihood based on the available information, placing the most probable causes first.
+
+  6. **Medical Boundaries:**
+     * Frame suggestions as possibilities to explore, not diagnoses
+     * Focus on wellness and lifestyle factors
+     * Avoid serious medical conditions requiring professional medical care
+
+  7. **Focused Output:** Generate a concise list of **5 to 8** of the *most plausible* potential causes to avoid overwhelming the user. Prioritize the causes most strongly suggested by the user's profile and the nature of the health concern.
+
+  8. **Clarity:** Use clear, accessible language for all user-facing text, avoiding technical jargon when possible.
+
+  **Output Format:**
+
+  Provide the result strictly in the following JSON format. **JSON key names must be in English.** The values for `name_localized`, `suggestion_localized`, `explanation_localized`, and any advisory notes must be in the language specified by the user's language preference.
+
+  **Important:** Include proper metadata, echo the user's input, and provide 5-8 potential causes with localized content.
+
+# JSON Schema for Response Validation
+schema:
+  type: "json_schema"
+  name: "potential_causes_response"
+  strict: true
+  schema:
+    type: "object"
+    properties:
+      meta:
+        type: "object"
+        properties:
+          step_name:
+            type: "string"
+            description: "The name of the step."
+          request_id:
+            type: "string"
+            description: "Unique identifier for the request."
+          timestamp_utc:
+            type: "string"
+            description: "Timestamp of the response in UTC."
+          version:
+            type: "string"
+            description: "Version of the API."
+          user_language:
+            type: "string"
+            description: "Language preference of the user."
+          status:
+            type: "string"
+            description: "Status of the response."
+          message:
+            type: "string"
+            description: "Descriptive message about the response."
+        required: ["step_name", "request_id", "timestamp_utc", "version", "user_language", "status", "message"]
+        additionalProperties: false
+      data:
+        type: "object"
+        properties:
+          potential_causes:
+            type: "array"
+            description: "List of potential causes."
+            items:
+              type: "object"
+              properties:
+                cause_id:
+                  type: "string"
+                  description: "Unique identifier for the potential cause."
+                name_localized:
+                  type: "string"
+                  description: "Localized name of the cause."
+                suggestion_localized:
+                  type: "string"
+                  description: "Localized suggestion related to the cause."
+                explanation_localized:
+                  type: "string"
+                  description: "Localized explanation of the cause."
+              required: ["cause_id", "name_localized", "suggestion_localized", "explanation_localized"]
+              additionalProperties: false
+        required: ["potential_causes"]
+        additionalProperties: false
+      echo:
+        type: "object"
+        properties:
+          health_concern_input:
+            type: "string"
+            description: "User input regarding health concern."
+          user_info_input:
+            type: "object"
+            properties:
+              gender:
+                type: "string"
+                description: "Gender of the user."
+              age_category:
+                type: "string"
+                description: "Category of the user's age."
+              age_specific:
+                type: "string"
+                description: "Specific age of the user."
+              age_unit:
+                type: "string"
+                description: "Unit of age, e.g., years, months."
+            required: ["gender", "age_category", "age_specific", "age_unit"]
+            additionalProperties: false
+        required: ["health_concern_input", "user_info_input"]
+        additionalProperties: false
+    required: ["meta", "data", "echo"]
+    additionalProperties: false
+
+# Example Response Structure (for reference only)
+example_response:
+  meta:
+    step_name: "PotentialCauses"
+    request_id: "{{sessionId}}"
+    timestamp_utc: "2024-12-10T08:20:00Z"
+    version: "api_v1.0_step_v1.1"
+    user_language: "{{language}}"
+    status: "success"
+    message: "Successfully retrieved potential causes."
+  data:
+    potential_causes:
+      - cause_id: "cause_chronic_stress"
+        name_localized: "Chronic Stress Response"
+        suggestion_localized: "Prolonged stress affecting your body's natural balance"
+        explanation_localized: "Chronic stress can lead to elevated cortisol levels and persistent tension, contributing to various health concerns."
+      - cause_id: "cause_sleep_disruption"
+        name_localized: "Sleep Pattern Disruption"
+        suggestion_localized: "Irregular sleep patterns affecting emotional regulation"
+        explanation_localized: "Poor sleep quality can affect neurotransmitter balance and stress hormone regulation."
+  echo:
+    health_concern_input: "{{healthConcern}}"
+    user_info_input:
+      gender: "{{gender}}"
+      age_category: "{{ageCategory}}"
+      age_specific: "{{specificAge}}"
+      age_unit: "years"

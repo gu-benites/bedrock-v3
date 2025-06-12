@@ -67,6 +67,10 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
   // Loading and error states
   isLoading: false,
   error: null,
+
+  // AI Streaming states
+  isStreamingCauses: false,
+  streamingError: null,
   
   // Metadata
   lastUpdated: new Date(),
@@ -279,6 +283,30 @@ export const useRecipeStore = create<RecipeStore>()(
       clearError: () => {
         set((state) => ({
           error: null,
+          lastUpdated: new Date()
+        }));
+      },
+
+      // AI Streaming state management actions
+      setStreamingCauses: (isStreaming: boolean) => {
+        set((state) => ({
+          isStreamingCauses: isStreaming,
+          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+          lastUpdated: new Date()
+        }));
+      },
+
+      setStreamingError: (error: string | null) => {
+        set((state) => ({
+          streamingError: error,
+          isStreamingCauses: false, // Stop streaming on error
+          lastUpdated: new Date()
+        }));
+      },
+
+      clearStreamingError: () => {
+        set((state) => ({
+          streamingError: null,
           lastUpdated: new Date()
         }));
       },
@@ -525,6 +553,14 @@ export const useRecipeStatus = () => useRecipeStore((state) => ({
   setLoading: state.setLoading,
   setError: state.setError,
   clearError: state.clearError
+}));
+
+export const useRecipeStreaming = () => useRecipeStore((state) => ({
+  isStreamingCauses: state.isStreamingCauses,
+  streamingError: state.streamingError,
+  setStreamingCauses: state.setStreamingCauses,
+  setStreamingError: state.setStreamingError,
+  clearStreamingError: state.clearStreamingError
 }));
 
 /**

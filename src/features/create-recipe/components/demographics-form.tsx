@@ -11,7 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { demographicsSchema } from '../schemas/recipe-schemas';
-import type { DemographicsData } from '../types/recipe.types';
+import type { DemographicsData, PotentialCause } from '../types/recipe.types';
+import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import { cn } from '@/lib/utils';
 
 /**
@@ -36,10 +37,45 @@ const GENDER_OPTIONS = [
  * Demographics Form component
  */
 export function DemographicsForm() {
-  const { demographics, updateDemographics, isLoading, error } = useRecipeStore();
+  const {
+    healthConcern,
+    demographics,
+    updateDemographics,
+    setPotentialCauses,
+    isLoading,
+    error,
+    setLoading,
+    setError,
+    clearError
+  } = useRecipeStore();
+
+  const {
+    isStreamingCauses,
+    streamingError,
+    setStreamingCauses,
+    setStreamingError,
+    clearStreamingError
+  } = useRecipeStore();
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+
+  // Configure AI streaming hook for potential causes
+  const {
+    startStream,
+    partialData,
+    finalData,
+    error: streamError,
+    isComplete
+  } = useAIStreaming<PotentialCause[]>({
+    jsonArrayPath: 'data.potential_causes',
+    onError: (error) => {
+      console.error('Streaming error:', error);
+      setStreamingError(`AI analysis failed: ${error.message}`);
+      return false; // Don't retry on error
+    }
+  });
 
   const {
     register,
@@ -112,20 +148,109 @@ export function DemographicsForm() {
   }, [demographics, setValue]);
 
   /**
-   * Handle form submission
+   * Handle form submission and initiate AI streaming for potential causes
    */
   const onSubmit = async (data: DemographicsData) => {
+    if (!healthConcern) {
+      setError('Health concern is required to proceed');
+      return;
+    }
+
     try {
+      // Save demographics data first
       updateDemographics(data);
       markCurrentStepCompleted();
 
-      if (canGoNext()) {
-        await goToNext();
-      }
+      // Start AI streaming for potential causes
+      setStreamingCauses(true);
+      clearError();
+      clearStreamingError();
+
+      console.log('Starting AI streaming for potential causes...');
+
+      await startStream('/api/ai/streaming', {
+        feature: 'recipe-wizard',
+        step: 'potential-causes',
+        data: {
+          healthConcern: healthConcern.healthConcern,
+          demographics: {
+            gender: data.gender,
+            ageCategory: data.ageCategory,
+            specificAge: data.specificAge,
+            language: 'en' // Default language
+          }
+        }
+      });
+
+      console.log('AI streaming initiated successfully');
+
     } catch (error) {
       console.error('Form submission failed:', error);
+      setStreamingError(error instanceof Error ? error.message : 'Failed to start AI analysis');
     }
   };
+
+  /**
+   * Handle streaming data updates
+   */
+  React.useEffect(() => {
+    if (partialData && Array.isArray(partialData)) {
+      console.log('Received partial streaming data:', partialData);
+
+      // Transform recipe-wizard format to create-recipe format
+      const transformedCauses = partialData.map(cause => ({
+        cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
+        cause_suggestion: cause.suggestion_localized || '',
+        explanation: cause.explanation_localized || ''
+      }));
+
+      setPotentialCauses(transformedCauses);
+    }
+  }, [partialData, setPotentialCauses]);
+
+  /**
+   * Handle streaming completion
+   */
+  React.useEffect(() => {
+    if (isComplete && finalData) {
+      console.log('Streaming completed with final data:', finalData);
+
+      // Extract potential causes from final data
+      let causes: any[] = [];
+      if (Array.isArray(finalData)) {
+        causes = finalData;
+      } else if (finalData && typeof finalData === 'object' && 'data' in finalData) {
+        const data = finalData as any;
+        if (data.data?.potential_causes && Array.isArray(data.data.potential_causes)) {
+          causes = data.data.potential_causes;
+        }
+      }
+
+      // Transform to create-recipe format
+      const transformedCauses = causes.map(cause => ({
+        cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
+        cause_suggestion: cause.suggestion_localized || '',
+        explanation: cause.explanation_localized || ''
+      }));
+
+      setPotentialCauses(transformedCauses);
+      setStreamingCauses(false);
+
+      // Navigate to causes step
+      if (canGoNext()) {
+        goToNext();
+      }
+    }
+  }, [isComplete, finalData, setPotentialCauses, canGoNext, goToNext]);
+
+  /**
+   * Handle streaming errors
+   */
+  React.useEffect(() => {
+    if (streamError) {
+      setStreamingError(`AI analysis failed: ${streamError}`);
+    }
+  }, [streamError, setStreamingError]);
 
   /**
    * Handle continue to next step
@@ -163,9 +288,9 @@ export function DemographicsForm() {
       </div>
 
       {/* Error Display */}
-      {error && (
+      {(error || streamingError) && (
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-          <p className="text-destructive text-sm">{error}</p>
+          <p className="text-destructive text-sm">{error || streamingError}</p>
         </div>
       )}
 
@@ -282,7 +407,7 @@ export function DemographicsForm() {
         </div>
 
         {/* Auto-save Status */}
-        {(isSaving || lastSaved) && (
+        {(isSaving || lastSaved) && !isStreamingCauses && (
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             {isSaving && (
               <>
@@ -293,6 +418,19 @@ export function DemographicsForm() {
             {lastSaved && !isSaving && (
               <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
             )}
+          </div>
+        )}
+
+        {/* AI Streaming Status */}
+        {isStreamingCauses && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+              <div>
+                <p className="text-sm font-medium text-blue-800">Analyzing your information...</p>
+                <p className="text-xs text-blue-600">AI is identifying potential causes based on your demographics</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -314,23 +452,23 @@ export function DemographicsForm() {
           </button>
 
           <div className="flex items-center space-x-4">
-            {isValid && (
+            {isValid && !isStreamingCauses && (
               <span className="text-sm text-green-600">✓ Ready to continue</span>
             )}
 
             <button
               type="button"
               onClick={handleContinue}
-              disabled={!isValid || isLoading}
+              disabled={!isValid || isLoading || isStreamingCauses}
               className={cn(
                 "px-6 py-2 rounded-md font-medium transition-colors",
                 "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                isValid
+                isValid && !isStreamingCauses
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "bg-muted text-muted-foreground cursor-not-allowed"
               )}
             >
-              {isLoading ? 'Processing...' : 'Continue →'}
+              {isStreamingCauses ? 'Analyzing...' : isLoading ? 'Processing...' : 'Continue →'}
             </button>
           </div>
         </div>

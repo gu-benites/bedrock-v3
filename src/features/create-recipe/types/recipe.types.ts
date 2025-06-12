@@ -220,6 +220,10 @@ export interface RecipeWizardState {
   // Loading and error states
   isLoading: boolean;
   error: string | null;
+
+  // AI Streaming states
+  isStreamingCauses: boolean;
+  streamingError: string | null;
   
   // Metadata
   lastUpdated: Date;
@@ -252,6 +256,11 @@ export interface RecipeWizardActions {
   setError: (error: string | null) => void;
   resetWizard: () => void;
   clearError: () => void;
+
+  // AI Streaming state management
+  setStreamingCauses: (isStreaming: boolean) => void;
+  setStreamingError: (error: string | null) => void;
+  clearStreamingError: () => void;
 
   // State clearing for navigation consistency
   clearStepsAfter: (currentStep: RecipeStep) => void;
