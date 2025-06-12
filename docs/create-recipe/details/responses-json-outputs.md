@@ -117,10 +117,6 @@ JSON output, designed with a "frontend first" mentality and adherence to high so
     "message": "Successfully identified therapeutic properties."
   },
   "data": {
-    "health_concern_details": {
-      "original_input": "herpes labial",
-      "normalized_english": "cold sores"
-    },
     "therapeutic_properties": [
       {
         "property_id": "4a02aec1-863f-49f8-b00a-816764f14d2d",
