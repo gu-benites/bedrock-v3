@@ -40,7 +40,7 @@ Symptoms → Click Continue → AI streams properties → Modal shows → Naviga
 **Mistake**: Created `.md` file instead of `.yaml` with wrong structure
 **Impact**: Prompt manager couldn't load configuration
 **Root Cause**: Documentation showed markdown examples instead of actual YAML
-**Fix**: Use proper `.yaml` format matching existing prompts
+**Fix**: Use proper `.yaml` format in `src/features/create-recipe/prompts/` matching existing prompts
 
 #### **5. Controller Premature Closure (CRITICAL)**
 **Mistake**: Frontend state management caused backend controller to close early

@@ -18,7 +18,7 @@ To add a new AI step, you need to:
 
 1. **Add Step Configuration** in `src/features/create-recipe/config/step-mapping.ts`
 2. **Create Prompt File** in `src/features/recipe-wizard/prompts/`
-3. **Update Store Types** (if needed) in `src/features/create-recipe/types/recipe.types.ts`
+3. **Update Store Types** (if needed) in `src/features/create-recipe/types/recipe.types.ts` # NOTE: This file is no longer used. Update src/features/create-recipe/store/recipe-store.ts directly
 4. **Add Store Properties** (if needed) in `src/features/create-recipe/store/recipe-store.ts`
 5. **Create Tests** for the new step
 

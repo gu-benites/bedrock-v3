@@ -1,6 +1,9 @@
 # Improvements for AI-Powered Holistic Protocol Generator
 
-This document outlines suggested improvements to the AI-Powered Holistic Protocol Generator, aiming to enhance its personalization, holistic depth, and the "art" of aromatherapy blending, as if guided by a master aromatherapist.
+This document outlines suggested **potential future improvements** to the AI-Powered Holistic Protocol Generator (part of the Create Recipe feature). It aims to explore ways to enhance the system's personalization, holistic depth, and capture the "art" of aromatherapy blending, as if guided by a master aromatherapist. These ideas build upon the current architecture and steps described in the core documentation files within `docs/create-recipe/current-files/`.
+
+## Current System Context
+The current workflow progresses through defined steps, starting with user intake and proceeding through analysis, selection, and protocol formulation. The suggestions below propose enhancements to this existing flow and its data structures.
 
 ## I. Enhanced User Intake & Contextual Understanding (Pre-Step 01 or as part of it)
 

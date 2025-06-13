@@ -11,7 +11,7 @@ The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities us
 - **Content-Type**: `application/json`
 - **Response-Type**: `text/event-stream` (SSE streaming)
 - **Streaming Method**: Buffer-based with best-effort-json-parser
-- **Data Delivery**: Complete items only (no partial/word-by-word updates)
+- **Data Delivery**: Complete, validated items are delivered as they become available. Partial data is also streamed for frontend progressive rendering.
 
 ## Authentication
 

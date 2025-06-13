@@ -60,7 +60,7 @@ const { startStream } = useAIStreaming({
 ## 🚀 5-Minute Setup Checklist
 
 ### 1. Create Prompt File ⚠️ **YAML FORMAT REQUIRED**
-📁 `src/features/create-recipe/prompts/{step-name}.yaml`
+📁 `/src/features/create-recipe/prompts/your-new-step.yaml`
 
 **CRITICAL**: Must be `.yaml` file, not `.md`! Study existing prompts for exact format.
 

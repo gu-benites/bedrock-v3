@@ -76,20 +76,7 @@
 
 **Output Format:**
 
-Provide the result strictly in the following JSON format. **JSON key names must be in English.** The values for `symptom_name`, `symptom_suggestion`, and `explanation` must be in the language specified by `user_language`.
 
-```json
-{
-  "potential_symptoms": [
-    {
-      "symptom_name": "A very short label for the potential symptom (2-4 words), in {{ $('Edit Fields').item.json.userInfo.user_language }}.", // e.g., "Dor Tensional", "Tensão no Pescoço", "Irritabilidade"
-      "symptom_suggestion": "A clear, concise description of the potential symptom, written in {{ $('Edit Fields').item.json.userInfo.user_language }}.", // e.g., "Sensação de pressão ou aperto em ambos os lados da cabeça, como uma faixa."
-      "explanation": "A brief (1-2 sentence) justification explaining why this symptom is commonly associated with the 'health_concern' given the 'selected_causes', written in {{ $('Edit Fields').item.json.userInfo.user_language }}." // e.g., "Este é o tipo clássico de dor de cabeça associado ao estresse e tensão muscular, causas indicadas pelo usuário."
-    }
-    // Add more symptom objects (targeting 5-10 total), following the same format and requirements.
-  ]
-}
-```
 **Notes**
 
 - Focus on listing potential and commonly associated symptoms; this is not a diagnostic tool.

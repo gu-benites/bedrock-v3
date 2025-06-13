@@ -6,6 +6,14 @@ This guide helps developers troubleshoot common issues with the Create Recipe AI
 
 ## Common Issues and Solutions
 
+## ⚠️ CRITICAL WARNINGS - READ FIRST
+
+This system uses a specific workflow pattern: **AI streams data for the NEXT step while staying on the CURRENT step.**
+
+Attempting to load data on the next step's mount instead of streaming from the previous step is a common source of errors and breaks the intended user experience flow.
+
+For thorough validation and correct implementation patterns, refer to the comprehensive checklists and guidance in [Adding New AI Streaming Steps to Create-Recipe Workflow](/docs/create-recipe/current-files/adding-new-ai-streaming-steps.md) and the [Quick Reference: Adding New AI Streaming Step](/docs/create-recipe/current-files/quick-reference-new-step.md).
+ 
 ### 1. AI Streaming Issues
 
 #### Issue: Streaming Not Starting
@@ -16,9 +24,11 @@ This guide helps developers troubleshoot common issues with the Create Recipe AI
 - Component remains in loading state indefinitely
 
 **Possible Causes:**
+- **Incorrect Workflow Pattern:** Attempting to load data on component mount instead of streaming from the previous step.
 - Missing or invalid health concern data
 - Demographics data not properly formatted
 - Network connectivity issues
+- **Prompt Configuration Errors:** Incorrect file format, location, or content in the prompt `.yaml` file.
 - API endpoint not responding
 
 **Solutions:**

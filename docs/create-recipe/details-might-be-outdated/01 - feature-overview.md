@@ -98,26 +98,19 @@ The system is designed to be driven via a series of API calls. The workflow is i
 
 ### Example API Call
 
-curl --location "${API_BASE_URL}/v1/analysis" \
---header "Authorization: Bearer ${API_TOKEN}" \
+curl --location "${API_BASE_URL}/api/ai/streaming" \
 --header 'Content-Type: application/json' \
---header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
 --data '{
-  "request_id": "'"${REQUEST_ID}"'",
-  "step": "PotentialCauses",
-  "health_concern": "dermatite atopica",
-  "user_profile": {
-    "gender": "male",
-    "age_value": 8,
-    "age_unit": "years", // babies are 'months'
-    "age_category": "child",
-    "language": "PT_BR"
-  },
-  "session_context": {
-    "session_id": "'"${SESSION_ID}"'",
-    "previous_selections": {}
-  },
-  "options": {
-    "possible_option": 8
+  "feature": "create-recipe",
+  "step": "potential-causes",
+  "data": {
+    "healthConcern": "chronic anxiety and stress",
+    "demographics": {
+      "gender": "female",
+      "ageCategory": "adult",
+      "specificAge": 28,
+      "language": "en"
+    }
   }
 }'

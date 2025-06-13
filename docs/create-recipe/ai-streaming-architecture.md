@@ -30,7 +30,9 @@ This document outlines the architecture of the AI streaming system that powers t
 **1. React Components**
 - `AIStreamingModal`: Terminal-style streaming interface with hidden scrollbars
 - `DemographicsForm`: Enhanced with streaming capabilities and modal integration
-- `CausesSelection`: Updated to handle AI-generated data with progressive display
+- `CausesSelection`: Updated to handle AI-generated data with progressive display for selecting potential causes.
+- `TherapeuticPropertiesSelection`: Component for displaying and selecting AI-generated therapeutic properties.
+- `EssentialOilsSelection`: Component for displaying and selecting AI-generated essential oils.
 
 **2. Custom Hooks**
 - `useAIStreaming`: Core streaming functionality with buffer-based processing
@@ -126,6 +128,8 @@ User Input → Form Validation → State Update → API Request → Prompt Loadi
 │  • potentialCauses                                          │
 │  • selectedCauses                                           │
 │                                                             │
+│  • potentialTherapeuticProperties                           │
+│  • potentialEssentialOils                                   │
 │  Streaming State:                                           │
 │  • isStreamingCauses                                        │
 │  • streamingError                                           │
@@ -136,6 +140,11 @@ User Input → Form Validation → State Update → API Request → Prompt Loadi
 │  • setPotentialCauses()                                     │
 │  • setStreamingCauses()                                     │
 │  • setStreamingError()                                      │
+│  • setPotentialTherapeuticProperties()                      │
+│  • setPotentialEssentialOils()                              │
+│                                                             │
+│  // NOTE: For complex streaming steps, the store-based pattern is     │
+│  // recommended to manage streaming state and data effectively.    │
 └─────────────────────────────────────────────────────────────┘
 ```
 

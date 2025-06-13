@@ -1,3 +1,5 @@
+This document explores UI/UX design ideas for a progress indicator (breadcrumb or sidebar) within the multi-phase, multi-step Create Recipe AI streaming workflow.
+
 Brainstorm of the UI/UX for a progress indicator (breadcrumb or sidebar) for this multi-phase, multi-step workflow.
 
 **Overarching Goals for the Progress Indicator:**
