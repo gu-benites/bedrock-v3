@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the architecture of the AI streaming system that powers the Create Recipe feature. The system integrates OpenAI Agents JS SDK with a dynamic, configuration-driven approach to enable real-time AI processing across multiple steps.
+This document outlines the architecture of the AI streaming system that powers the Create Recipe feature. The system integrates OpenAI Agents JS SDK with a buffer-based streaming approach using best-effort-json-parser to deliver complete, validated AI responses in real-time without partial updates.
 
 ## System Architecture
 
@@ -28,28 +28,31 @@ This document outlines the architecture of the AI streaming system that powers t
 #### Frontend Layer
 
 **1. React Components**
-- `GenericStepSelector`: Reusable component for any AI step
-- `DemographicsForm`: Enhanced with streaming capabilities
-- `CausesSelection`: Updated to handle AI-generated data
+- `AIStreamingModal`: Terminal-style streaming interface with hidden scrollbars
+- `DemographicsForm`: Enhanced with streaming capabilities and modal integration
+- `CausesSelection`: Updated to handle AI-generated data with progressive display
 
 **2. Custom Hooks**
-- `useAIStreaming`: Core streaming functionality
-- `useDynamicStepProcessor`: Generic step processing
+- `useAIStreaming`: Core streaming functionality with buffer-based processing
+- `useAutoScroll`: Automatic scrolling for streaming content
 - `useRecipeStore`: State management with streaming support
 
-**3. Configuration System**
-- `step-mapping.ts`: Dynamic step definitions
-- Data transformation rules
-- Validation specifications
-- Dependency management
+**3. UI Components**
+- Terminal-style code block interface
+- Animated ellipsis indicators for loading states
+- Progressive item reveal with fade-in animations
+- Compact spacing for terminal-like density
 
 #### API Layer
 
 **1. Streaming Endpoint** (`/api/ai/streaming`)
+- Server-Sent Events (SSE) implementation
+- Buffer-based streaming with best-effort-json-parser
+- Complete item validation and filtering
+- Duplicate prevention and item tracking
 - Request validation and processing
 - Dynamic prompt loading
 - OpenAI SDK integration
-- Response streaming and formatting
 
 **2. Prompt Manager** (`src/lib/ai/utils/prompt-manager.ts`)
 - YAML configuration loading
@@ -66,9 +69,11 @@ This document outlines the architecture of the AI streaming system that powers t
 - Error handling and retry logic
 
 **2. Response Processing**
+- Buffer accumulation and parsing with best-effort-json-parser
+- Complete item validation (minimum content length requirements)
 - JSON schema validation
-- Data transformation
-- Progressive data extraction
+- Data transformation and cleaning
+- Progressive data extraction (complete items only)
 - Error recovery mechanisms
 
 ## Data Flow Architecture

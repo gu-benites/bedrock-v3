@@ -29,7 +29,7 @@ export interface StreamConfig {
  * Stream event types from SSE.
  */
 export interface StreamEvent {
-  type: 'text_chunk' | 'structured_data' | 'completion' | 'error';
+  type: 'text_chunk' | 'structured_data' | 'structured_complete' | 'completion' | 'error';
   content?: string;
   data?: any;
   message?: string;
@@ -85,21 +85,35 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
   const [partialData, setPartialData] = useState<T | null>(null);
 
   // Refs for cleanup and retry logic
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
   const retryCountRef = useRef<number>(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
    * Clean up connections and timers
    */
   const cleanup = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    try {
+      // Abort any ongoing request first
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+
+      // Clear reader reference without calling releaseLock
+      // The abort signal will handle the cleanup
+      if (readerRef.current) {
+        readerRef.current = null;
+      }
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    } catch (cleanupError) {
+      // Ignore cleanup errors - they're usually harmless
+      console.debug('Cleanup error (harmless):', cleanupError);
     }
   }, []);
 
@@ -150,25 +164,50 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
 
         case 'structured_data':
           if (streamEvent.data) {
+            console.log('📦 Received complete structured item:', {
+              index: (streamEvent as any).index,
+              name: streamEvent.data.name_localized,
+              hasAllFields: !!(streamEvent.data.name_localized && streamEvent.data.suggestion_localized && streamEvent.data.explanation_localized)
+            });
+
             setPartialData(prev => {
               const prevArray = Array.isArray(prev) ? prev : [];
-              // Assumes the incoming data is an item to be added to an array
-              return [...prevArray, streamEvent.data] as T;
+
+              // Only add if this is a complete item with all required fields
+              if (streamEvent.data.name_localized &&
+                  streamEvent.data.suggestion_localized &&
+                  streamEvent.data.explanation_localized) {
+                const newArray = [...prevArray, streamEvent.data];
+                console.log('✅ Added complete item, total items:', newArray.length);
+                return newArray as T;
+              } else {
+                console.log('⏳ Skipping incomplete item');
+                return prevArray as T;
+              }
             });
           }
+          break;
+
+        case 'structured_complete':
+          if (streamEvent.data) {
+            setFinalData(streamEvent.data as T);
+          }
+          setIsComplete(true);
+          setIsStreaming(false);
+          // Don't call cleanup here - let the stream complete naturally
           break;
 
         case 'completion':
           setFinalData(streamEvent.data);
           setIsComplete(true);
           setIsStreaming(false);
-          cleanup();
+          // Don't call cleanup here - let the stream complete naturally
           break;
 
         case 'error':
           setError(streamEvent.message || 'Unknown streaming error');
           setIsStreaming(false);
-          cleanup();
+          // Don't call cleanup here - let the error handling in createStreamingConnection handle it
           break;
 
         default:
@@ -193,8 +232,8 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
       console.log(`Retrying connection (attempt ${retryCountRef.current}/${mergedConfig.maxRetries}) in ${delay}ms`);
 
       timeoutRef.current = setTimeout(() => {
-        // Retry by creating a new EventSource
-        createEventSourceConnection(url, requestData);
+        // Retry by creating a new streaming connection
+        createStreamingConnection(url, requestData);
       }, delay);
     } else {
       setError('Failed to establish streaming connection after maximum retries');
@@ -204,41 +243,129 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
   }, [mergedConfig.maxRetries, mergedConfig.retryDelay, cleanup]);
 
   /**
-   * Create EventSource connection
+   * Create fetch-based streaming connection (replaces EventSource)
    */
-  const createEventSourceConnection = useCallback((url: string, requestData: StreamRequest) => {
-    // Create SSE connection
-    const eventSource = new EventSource(url);
-    eventSourceRef.current = eventSource;
+  const createStreamingConnection = useCallback(async (url: string, requestData: StreamRequest) => {
+    try {
+      // Create abort controller for this request
+      abortControllerRef.current = new AbortController();
 
-    // Set up timeout
-    timeoutRef.current = setTimeout(() => {
-      setError('Streaming connection timeout');
-      setIsStreaming(false);
-      cleanup();
-    }, mergedConfig.timeout);
+      // Set up timeout
+      timeoutRef.current = setTimeout(() => {
+        setError('Streaming connection timeout');
+        setIsStreaming(false);
+        cleanup();
+      }, mergedConfig.timeout);
 
-    // Handle connection events
-    eventSource.onopen = () => {
-      retryCountRef.current = 0; // Reset retry count on successful connection
+      // Make POST request with streaming
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+          'Cache-Control': 'no-cache'
+        },
+        body: JSON.stringify(requestData),
+        signal: abortControllerRef.current.signal
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      if (!response.body) {
+        throw new Error('No response body available for streaming');
+      }
+
+      // Reset retry count on successful connection
+      retryCountRef.current = 0;
+
+      // Clear timeout since connection is established
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-    };
 
-    eventSource.onmessage = handleStreamEvent;
+      // Process streaming response
+      const reader = response.body.getReader();
+      readerRef.current = reader;
+      const decoder = new TextDecoder();
 
-    eventSource.onerror = () => {
-      cleanup();
+      try {
+        while (true) {
+          // Check if we should abort before reading
+          if (abortControllerRef.current?.signal.aborted) {
+            break;
+          }
+
+          const { done, value } = await reader.read();
+
+          if (done) {
+            // Stream completed successfully
+            console.log('Stream completed naturally');
+            setIsComplete(true);
+            setIsStreaming(false);
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+
+          // Parse SSE data
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.substring(6));
+
+                // Create synthetic event object for compatibility
+                const syntheticEvent = {
+                  data: JSON.stringify(data),
+                  type: 'message'
+                } as MessageEvent;
+
+                handleStreamEvent(syntheticEvent);
+              } catch (parseError) {
+                console.warn('Failed to parse SSE data:', line);
+              }
+            }
+          }
+        }
+      } catch (readError) {
+        // Don't log errors if the request was aborted
+        if (!abortControllerRef.current?.signal.aborted) {
+          console.error('Error reading stream:', readError);
+          throw readError;
+        }
+      } finally {
+        // Clean up reader reference and set streaming to false
+        readerRef.current = null;
+        setIsStreaming(false);
+      }
+
+    } catch (error) {
+      // Don't retry if the request was aborted
+      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
+        console.log('Streaming connection aborted - this is normal during cleanup');
+        setIsStreaming(false);
+        return;
+      }
+
+      console.error('Streaming connection error:', error);
+      setIsStreaming(false);
       handleConnectionError(url, requestData);
-    };
+    }
   }, [mergedConfig.timeout, cleanup, handleStreamEvent, handleConnectionError]);
 
   /**
    * Start streaming from the specified URL
    */
   const startStream = useCallback(async (url: string, requestData: StreamRequest) => {
+    // Prevent starting a new stream if one is already active
+    if (isStreaming) {
+      console.warn('Stream already active, cleaning up before starting new one');
+      cleanup();
+    }
+
     // Reset state for new stream
     setStreamingText('');
     setIsComplete(false);
@@ -251,27 +378,17 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
     cleanup();
 
     try {
-      // For testing purposes, we'll create the EventSource immediately
-      // In a real implementation, you might want to send a POST first to initiate the stream
+      console.log('AI streaming initiated successfully');
 
-      // Send POST request to initiate streaming (optional, depends on API design)
-      await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      // Create initial EventSource connection
-      createEventSourceConnection(url, requestData);
+      // Create streaming connection directly (no separate POST needed)
+      await createStreamingConnection(url, requestData);
 
     } catch (fetchError) {
       console.error('Failed to initiate streaming:', fetchError);
       setError(fetchError instanceof Error ? fetchError.message : 'Failed to start streaming');
       setIsStreaming(false);
     }
-  }, [cleanup, createEventSourceConnection]);
+  }, [isStreaming, cleanup, createStreamingConnection]);
 
   // Cleanup on unmount
   useEffect(() => {

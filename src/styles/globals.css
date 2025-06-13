@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbars for terminal-like components */
+@layer utilities {
+  .scrollbar-hide {
+    /* Firefox */
+    scrollbar-width: none;
+    /* Safari and Chrome */
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

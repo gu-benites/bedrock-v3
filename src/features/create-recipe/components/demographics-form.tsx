@@ -14,6 +14,7 @@ import { demographicsSchema } from '../schemas/recipe-schemas';
 import type { DemographicsData, PotentialCause } from '../types/recipe.types';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import { cn } from '@/lib/utils';
+import { AIStreamingModal } from '@/components/ui/ai-streaming-modal';
 
 /**
  * Age category options (simplified as per user preferences)
@@ -41,6 +42,7 @@ export function DemographicsForm() {
     healthConcern,
     demographics,
     updateDemographics,
+    potentialCauses,
     setPotentialCauses,
     isLoading,
     error,
@@ -57,6 +59,9 @@ export function DemographicsForm() {
     clearStreamingError
   } = useRecipeStore();
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
+
+  // Ref to track if we've already navigated to avoid infinite loops
+  const hasNavigatedRef = React.useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -161,6 +166,9 @@ export function DemographicsForm() {
       updateDemographics(data);
       markCurrentStepCompleted();
 
+      // Reset navigation flag for new streaming session
+      hasNavigatedRef.current = false;
+
       // Start AI streaming for potential causes
       setStreamingCauses(true);
       clearError();
@@ -191,17 +199,29 @@ export function DemographicsForm() {
   };
 
   /**
-   * Handle streaming data updates
+   * Handle streaming data updates - Only complete items
    */
   React.useEffect(() => {
-    if (partialData && Array.isArray(partialData)) {
-      console.log('Received partial streaming data:', partialData);
+    if (partialData && Array.isArray(partialData) && partialData.length > 0) {
+      console.log('📥 Received complete streaming items:', partialData.length, 'total');
+
+      // Only process items that have all required fields (complete items only)
+      const completeItems = partialData.filter((cause: any) =>
+        cause.name_localized &&
+        cause.suggestion_localized &&
+        cause.explanation_localized &&
+        cause.name_localized.length > 5 &&
+        cause.suggestion_localized.length > 10 &&
+        cause.explanation_localized.length > 15
+      );
+
+      console.log('✅ Complete items found:', completeItems.length, 'of', partialData.length);
 
       // Transform recipe-wizard format to create-recipe format
-      const transformedCauses = partialData.map(cause => ({
-        cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
-        cause_suggestion: cause.suggestion_localized || '',
-        explanation: cause.explanation_localized || ''
+      const transformedCauses = completeItems.map((cause: any, index: number) => ({
+        cause_name: cause.name_localized,
+        cause_suggestion: cause.suggestion_localized,
+        explanation: cause.explanation_localized
       }));
 
       setPotentialCauses(transformedCauses);
@@ -212,7 +232,7 @@ export function DemographicsForm() {
    * Handle streaming completion
    */
   React.useEffect(() => {
-    if (isComplete && finalData) {
+    if (isComplete && finalData && !hasNavigatedRef.current) {
       console.log('Streaming completed with final data:', finalData);
 
       // Extract potential causes from final data
@@ -227,7 +247,7 @@ export function DemographicsForm() {
       }
 
       // Transform to create-recipe format
-      const transformedCauses = causes.map(cause => ({
+      const transformedCauses = causes.map((cause: any) => ({
         cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
         cause_suggestion: cause.suggestion_localized || '',
         explanation: cause.explanation_localized || ''
@@ -236,12 +256,17 @@ export function DemographicsForm() {
       setPotentialCauses(transformedCauses);
       setStreamingCauses(false);
 
-      // Navigate to causes step
-      if (canGoNext()) {
-        goToNext();
-      }
+      // Mark that we've navigated to prevent infinite loops
+      hasNavigatedRef.current = true;
+
+      // Navigate to causes step after a short delay to ensure state is updated
+      setTimeout(() => {
+        if (canGoNext()) {
+          goToNext();
+        }
+      }, 100);
     }
-  }, [isComplete, finalData, setPotentialCauses, canGoNext, goToNext]);
+  }, [isComplete, finalData, setPotentialCauses, setStreamingCauses]);
 
   /**
    * Handle streaming errors
@@ -421,18 +446,7 @@ export function DemographicsForm() {
           </div>
         )}
 
-        {/* AI Streaming Status */}
-        {isStreamingCauses && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-              <div>
-                <p className="text-sm font-medium text-blue-800">Analyzing your information...</p>
-                <p className="text-xs text-blue-600">AI is identifying potential causes based on your demographics</p>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Action Buttons */}
         <div className="flex justify-between items-center pt-4">
@@ -473,6 +487,28 @@ export function DemographicsForm() {
           </div>
         </div>
       </form>
+
+      {/* AI Streaming Modal */}
+      <AIStreamingModal
+        isOpen={isStreamingCauses}
+        title="AI Analysis in Progress"
+        description="Identifying potential causes based on your demographics and health concerns"
+        items={potentialCauses.map((cause, index) => ({
+          id: `cause-${index}-${cause.cause_name?.slice(0, 10) || 'unknown'}`, // Stable ID based on content
+          title: cause.cause_name || `Potential Cause ${index + 1}`,
+          subtitle: cause.cause_suggestion || 'Analyzing recommendations...',
+          description: cause.explanation || 'Detailed analysis in progress...',
+          timestamp: new Date()
+        }))}
+        totalExpected={150}
+        showProgress={true}
+        maxVisibleItems={50}
+        className="max-w-4xl"
+        onClose={() => {
+          // Optional: Allow users to minimize modal but keep streaming
+          console.log('User requested to close modal');
+        }}
+      />
     </div>
   );
 }

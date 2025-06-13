@@ -85,85 +85,83 @@ async function handleStructuredOnlyStreaming(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder
 ): Promise<void> {
-  console.log('[Structured-Only Streaming] Starting bulletproof structured-only processing');
+  console.log('[Structured-Only Streaming] Starting buffer-based structured processing');
 
-  let accumulatedText = '';
-  let lastSentDataLength = 0;
+  let buffer = '';
   let totalChunksProcessed = 0;
   let totalItemsSent = 0;
-  let buffer = '';
-  let lastCompleteItemIndex = -1;
+  let lastSentItemCount = 0;
   let finalData: any = null;
 
-  // Track the most complete version of each item we've seen
-  const itemBuffers: Record<number, any> = {};
+  // Track sent items to prevent duplicates
+  const sentItems = new Set<string>();
 
-  // Helper to send an item update
-  const sendItemUpdate = (index: number, data: any) => {
-    // Only send if this is a new or updated item
-    if (index > lastCompleteItemIndex || 
-        (itemBuffers[index] && 
-         JSON.stringify(itemBuffers[index]) !== JSON.stringify(data))) {
-      
-      const sseEvent = `data: ${JSON.stringify({
-        type: 'structured_data',
-        field: 'potential_causes',
-        index,
-        data,
-        timestamp: new Date().toISOString()
-      })}\n\n`;
+  // Helper to send complete items only
+  const sendCompleteItems = (parsedData: any) => {
+    if (!parsedData?.data?.potential_causes || !Array.isArray(parsedData.data.potential_causes)) {
+      return;
+    }
 
-      controller.enqueue(encoder.encode(sseEvent));
-      totalItemsSent++;
-      itemBuffers[index] = { ...data }; // Store a copy
-      lastCompleteItemIndex = Math.max(lastCompleteItemIndex, index);
+    const causes = parsedData.data.potential_causes;
 
-      console.log('[Structured-Only Streaming] ✅ Sent item:', {
-        index,
-        name: data.name_localized,
-        suggestionLength: data.suggestion_localized?.length || 0,
-        explanationLength: data.explanation_localized?.length || 0,
-        totalSent: totalItemsSent
-      });
+    // Only process items we haven't sent yet
+    for (let i = lastSentItemCount; i < causes.length; i++) {
+      const cause = causes[i];
+      if (!cause || typeof cause !== 'object' || !cause.cause_id) continue;
+
+      // Check if this cause is truly complete (not partial)
+      const hasCompleteFields =
+        cause.name_localized && cause.name_localized.length > 10 &&
+        cause.suggestion_localized && cause.suggestion_localized.length > 20 &&
+        cause.explanation_localized && cause.explanation_localized.length > 30 &&
+        !cause.name_localized.endsWith('...') &&
+        !cause.suggestion_localized.endsWith('...') &&
+        !cause.explanation_localized.endsWith('...');
+
+      if (hasCompleteFields) {
+        const itemKey = `${i}-${cause.cause_id}`;
+
+        // Only send if we haven't sent this exact item before
+        if (!sentItems.has(itemKey)) {
+          const cleanData = {
+            cause_id: cause.cause_id,
+            name_localized: cause.name_localized.trim(),
+            suggestion_localized: cause.suggestion_localized.trim(),
+            explanation_localized: cause.explanation_localized.trim(),
+            ...(cause.confidence && { confidence: cause.confidence }),
+            ...(cause.tags && { tags: cause.tags })
+          };
+
+          const sseEvent = `data: ${JSON.stringify({
+            type: 'structured_data',
+            field: 'potential_causes',
+            index: i,
+            data: cleanData,
+            timestamp: new Date().toISOString()
+          })}\n\n`;
+
+          controller.enqueue(encoder.encode(sseEvent));
+          sentItems.add(itemKey);
+          totalItemsSent++;
+          lastSentItemCount = i + 1;
+
+          console.log('[Structured-Only Streaming] ✅ Sent complete item:', {
+            index: i,
+            name: cleanData.name_localized,
+            totalSent: totalItemsSent
+          });
+        }
+      }
     }
   };
 
-  // Process the accumulated text and extract any complete items
-  const processAccumulatedText = () => {
+  // Process buffer using best-effort-json-parser (like reference code)
+  const processBuffer = () => {
     try {
-      // Use best-effort-json-parser to parse the accumulated text
-      const parsed = parse(accumulatedText);
-      if (!parsed || typeof parsed !== 'object') return;
-
-      // Check if we have a valid structure with potential_causes
-      if (parsed.data?.potential_causes && Array.isArray(parsed.data.potential_causes)) {
-        const causes = parsed.data.potential_causes;
-        
-        // Process each cause we find
-        for (let i = 0; i < causes.length; i++) {
-          const cause = causes[i];
-          if (!cause || typeof cause !== 'object' || !cause.cause_id) continue;
-
-          // Check if this cause has all required fields
-          const hasName = cause.name_localized?.length > 0;
-          const hasSuggestion = cause.suggestion_localized?.length > 0;
-          const hasExplanation = cause.explanation_localized?.length > 0;
-
-          // Only process if we have all required fields
-          if (hasName && hasSuggestion && hasExplanation) {
-            const cleanData = {
-              cause_id: cause.cause_id,
-              name_localized: cause.name_localized,
-              suggestion_localized: cause.suggestion_localized,
-              explanation_localized: cause.explanation_localized,
-              // Include any additional fields
-              ...(cause.confidence && { confidence: cause.confidence }),
-              ...(cause.tags && { tags: cause.tags })
-            };
-
-            sendItemUpdate(i, cleanData);
-          }
-        }
+      // Use best-effort-json-parser to parse the buffer
+      const parsed = parse(buffer);
+      if (parsed) {
+        sendCompleteItems(parsed);
       }
     } catch (error) {
       // Ignore parse errors - we'll try again with more data
@@ -171,26 +169,30 @@ async function handleStructuredOnlyStreaming(
   };
 
   try {
-    // Use toTextStream() to get character-by-character updates
+    // Use toTextStream() to get character-by-character updates (like reference code)
     const textStream = result.toTextStream();
 
     for await (const textChunk of textStream) {
-      accumulatedText += textChunk;
+      buffer += textChunk;
       totalChunksProcessed++;
 
-      // Process the accumulated text to extract complete items
-      processAccumulatedText();
-
-      // Log progress every 50 chunks to avoid spam
+      // Process buffer every 50 chunks to reduce frequency (like reference code approach)
       if (totalChunksProcessed % 50 === 0) {
+        processBuffer();
+      }
+
+      // Log progress every 200 chunks to avoid spam
+      if (totalChunksProcessed % 200 === 0) {
         console.log('[Structured-Only Streaming] Progress:', {
-          accumulatedLength: accumulatedText.length,
+          bufferLength: buffer.length,
           chunksProcessed: totalChunksProcessed,
-          itemsSent: totalItemsSent,
-          lastCompleteItemIndex
+          itemsSent: totalItemsSent
         });
       }
     }
+
+    // Final processing to catch any remaining complete items
+    processBuffer();
 
     console.log('[Structured-Only Streaming] Text streaming completed, waiting for final result');
 
@@ -199,22 +201,8 @@ async function handleStructuredOnlyStreaming(
     finalData = result.finalOutput;
 
     if (finalData && typeof finalData === 'object') {
-      // Process final data to ensure we have all complete items
-      if (finalData.data?.potential_causes && Array.isArray(finalData.data.potential_causes)) {
-        finalData.data.potential_causes.forEach((cause: any, index: number) => {
-          if (cause && typeof cause === 'object' && cause.cause_id) {
-            const cleanData = {
-              cause_id: cause.cause_id,
-              name_localized: cause.name_localized || '',
-              suggestion_localized: cause.suggestion_localized || '',
-              explanation_localized: cause.explanation_localized || '',
-              ...(cause.confidence && { confidence: cause.confidence }),
-              ...(cause.tags && { tags: cause.tags })
-            };
-            sendItemUpdate(index, cleanData);
-          }
-        });
-      }
+      // Final processing to ensure we have all complete items
+      sendCompleteItems(finalData);
 
       const completionEvent = `data: ${JSON.stringify({
         type: 'structured_complete',
@@ -222,8 +210,8 @@ async function handleStructuredOnlyStreaming(
         stats: {
           totalChunksProcessed,
           totalItemsSent,
-          finalTextLength: accumulatedText.length,
-          itemsProcessed: Object.keys(itemBuffers).length
+          finalBufferLength: buffer.length,
+          itemsProcessed: sentItems.size
         },
         timestamp: new Date().toISOString()
       })}\n\n`;
@@ -232,7 +220,7 @@ async function handleStructuredOnlyStreaming(
       console.log('[Structured-Only Streaming] ✅ Final completion sent:', {
         totalChunksProcessed,
         totalItemsSent,
-        itemsProcessed: Object.keys(itemBuffers).length,
+        itemsProcessed: sentItems.size,
         finalOutputKeys: finalData ? Object.keys(finalData) : []
       });
     }

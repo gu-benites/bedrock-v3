@@ -2,14 +2,16 @@
 
 ## Overview
 
-The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities for the application. It integrates with the OpenAI Agents JS SDK to deliver progressive responses for various AI-powered features.
+The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities using Server-Sent Events (SSE) and buffer-based streaming with best-effort-json-parser. It integrates with the OpenAI Agents JS SDK to deliver progressive, complete responses for AI-powered features.
 
 ## Endpoint Details
 
 - **URL**: `/api/ai/streaming`
 - **Method**: `POST`
 - **Content-Type**: `application/json`
-- **Response-Type**: `text/plain` (streaming)
+- **Response-Type**: `text/event-stream` (SSE streaming)
+- **Streaming Method**: Buffer-based with best-effort-json-parser
+- **Data Delivery**: Complete items only (no partial/word-by-word updates)
 
 ## Authentication
 
@@ -44,26 +46,34 @@ interface StreamingRequest {
 
 ## Response Formats
 
-### Structured Streaming Response
+### Structured Streaming Response (SSE)
 
-When `streaming_mode` is `'structured'` (default), the endpoint returns JSON objects separated by newlines:
-
-```
-{"partial": true, "data": {"potential_causes": [...]}}
-{"partial": true, "data": {"potential_causes": [...]}}
-{"partial": false, "data": {"potential_causes": [...], "meta": {...}}}
-```
-
-### Text Streaming Response
-
-When `streaming_mode` is `'text'`, the endpoint returns plain text chunks:
+When `streaming_mode` is `'structured'` (default), the endpoint returns Server-Sent Events with complete items only:
 
 ```
-Analyzing your health concern...
-Based on your demographics, potential causes include:
-1. Chronic stress from work pressure
-2. Sleep pattern disruption
-...
+data: {"type": "structured_data", "field": "potential_causes", "index": 0, "data": {"cause_id": "cause_1", "name_localized": "Stress", "suggestion_localized": "Manage work stress", "explanation_localized": "High stress levels can trigger symptoms"}, "timestamp": "2024-12-10T08:20:00Z"}
+
+data: {"type": "structured_data", "field": "potential_causes", "index": 1, "data": {"cause_id": "cause_2", "name_localized": "Sleep Issues", "suggestion_localized": "Improve sleep hygiene", "explanation_localized": "Poor sleep can affect immune function"}, "timestamp": "2024-12-10T08:20:01Z"}
+
+data: {"type": "structured_complete", "data": {"potential_causes": [...], "meta": {...}}, "stats": {"totalItemsSent": 6, "itemsProcessed": 6}, "timestamp": "2024-12-10T08:20:05Z"}
+```
+
+**Key Features:**
+- **Complete items only**: No partial or word-by-word updates
+- **Buffer-based processing**: Uses best-effort-json-parser for reliable parsing
+- **Validation**: Only sends items with substantial content (10+ chars for name, 20+ for suggestion, 30+ for explanation)
+- **Duplicate prevention**: Tracks sent items to prevent duplicates
+
+### Text Streaming Response (SSE)
+
+When `streaming_mode` is `'text'`, the endpoint returns text chunks as SSE:
+
+```
+data: {"type": "text_chunk", "data": "Analyzing your health concern...", "timestamp": "2024-12-10T08:20:00Z"}
+
+data: {"type": "text_chunk", "data": "Based on your demographics, potential causes include:", "timestamp": "2024-12-10T08:20:01Z"}
+
+data: {"type": "completion", "data": "Analysis complete.", "timestamp": "2024-12-10T08:20:05Z"}
 ```
 
 ## Step-Specific Requests
@@ -335,7 +345,7 @@ For testing purposes, mock responses are available when the `X-Mock-Response` he
 
 ## Integration Examples
 
-### JavaScript/TypeScript
+### JavaScript/TypeScript (Manual Implementation)
 
 ```typescript
 async function streamAIResponse(requestData: StreamingRequest) {
@@ -343,6 +353,8 @@ async function streamAIResponse(requestData: StreamingRequest) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
+      'Cache-Control': 'no-cache'
     },
     body: JSON.stringify(requestData)
   });
@@ -355,29 +367,51 @@ async function streamAIResponse(requestData: StreamingRequest) {
     if (done) break;
 
     const chunk = decoder.decode(value);
-    const lines = chunk.split('\n').filter(line => line.trim());
-    
+    const lines = chunk.split('\n');
+
     for (const line of lines) {
-      try {
-        const data = JSON.parse(line);
-        // Process streaming data
-        console.log('Received:', data);
-      } catch (e) {
-        // Handle non-JSON chunks
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.substring(6));
+
+          // Handle different event types
+          switch (data.type) {
+            case 'structured_data':
+              console.log('New item:', data.data);
+              break;
+            case 'structured_complete':
+              console.log('Analysis complete:', data.data);
+              break;
+            case 'error':
+              console.error('Stream error:', data.message);
+              break;
+          }
+        } catch (e) {
+          console.warn('Failed to parse SSE data:', line);
+        }
       }
     }
   }
 }
 ```
 
-### React Hook Integration
+### React Hook Integration (Recommended)
 
 ```typescript
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 
 function MyComponent() {
-  const { startStream, partialData, finalData, isComplete } = useAIStreaming({
-    jsonArrayPath: 'data.potential_causes'
+  const {
+    startStream,
+    partialData,
+    finalData,
+    isStreaming,
+    isComplete,
+    error
+  } = useAIStreaming({
+    jsonArrayPath: 'data.potential_causes',
+    timeout: 45000,
+    maxRetries: 5
   });
 
   const handleStartStreaming = async () => {
@@ -390,9 +424,77 @@ function MyComponent() {
 
   return (
     <div>
-      <button onClick={handleStartStreaming}>Start AI Analysis</button>
-      {partialData && <div>Partial results: {partialData.length} items</div>}
+      <button onClick={handleStartStreaming} disabled={isStreaming}>
+        {isStreaming ? 'Analyzing...' : 'Start AI Analysis'}
+      </button>
+
+      {/* Progressive results */}
+      {partialData && (
+        <div>
+          <p>Found {partialData.length} potential causes:</p>
+          {partialData.map((cause, index) => (
+            <div key={index}>{cause.name_localized}</div>
+          ))}
+        </div>
+      )}
+
+      {/* Error handling */}
+      {error && <div className="error">Error: {error}</div>}
+
+      {/* Completion */}
       {isComplete && <div>Analysis complete!</div>}
+    </div>
+  );
+}
+```
+
+### AI Streaming Modal Integration
+
+```typescript
+import AIStreamingModal from '@/components/ui/ai-streaming-modal';
+
+function ComponentWithModal() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [streamingItems, setStreamingItems] = useState([]);
+
+  const { startStream, partialData, isStreaming } = useAIStreaming({
+    jsonArrayPath: 'data.potential_causes'
+  });
+
+  // Transform data for modal display
+  useEffect(() => {
+    if (partialData && Array.isArray(partialData)) {
+      const modalItems = partialData.map((cause) => ({
+        title: cause.name_localized,
+        subtitle: cause.suggestion_localized,
+        description: cause.explanation_localized,
+        timestamp: new Date()
+      }));
+      setStreamingItems(modalItems);
+    }
+  }, [partialData]);
+
+  const handleAnalyze = async () => {
+    setIsModalOpen(true);
+    await startStream('/api/ai/streaming', {
+      feature: 'create-recipe',
+      step: 'potential-causes',
+      data: { healthConcern: 'anxiety', demographics: {...} }
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={handleAnalyze}>Analyze Potential Causes</button>
+
+      <AIStreamingModal
+        isOpen={isModalOpen}
+        title="AI Analysis in Progress"
+        description="Identifying potential causes based on your demographics"
+        items={streamingItems}
+        onClose={() => setIsModalOpen(false)}
+        maxVisibleItems={100}
+      />
     </div>
   );
 }
