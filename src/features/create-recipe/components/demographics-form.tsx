@@ -500,10 +500,9 @@ export function DemographicsForm() {
           description: cause.explanation || 'Detailed analysis in progress...',
           timestamp: new Date()
         }))}
-        totalExpected={150}
-        showProgress={true}
         maxVisibleItems={50}
         className="max-w-4xl"
+        analysisType="causes"
         onClose={() => {
           // Optional: Allow users to minimize modal but keep streaming
           console.log('User requested to close modal');

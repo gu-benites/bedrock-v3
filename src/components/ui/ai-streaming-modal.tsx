@@ -28,6 +28,12 @@ interface AIStreamingModalProps {
   onClose?: () => void;
   className?: string;
   maxVisibleItems?: number;
+  // Dynamic content configuration
+  analysisType?: string; // e.g., "causes", "symptoms", "properties"
+  terminalTitle?: string; // e.g., "Potential Causes Analysis", "Symptoms Analysis"
+  terminalSubtitle?: string; // e.g., "Understanding factors...", "Identifying symptoms..."
+  loadingMessage?: string; // e.g., "analyzing demographics...", "analyzing causes..."
+  progressMessage?: string; // e.g., "Analyzing more potential causes..."
 }
 
 /**
@@ -48,8 +54,53 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
   items,
   onClose,
   className,
-  maxVisibleItems = 100
+  maxVisibleItems = 100,
+  analysisType = "causes",
+  terminalTitle,
+  terminalSubtitle,
+  loadingMessage,
+  progressMessage
 }) => {
+  // Dynamic content based on analysis type
+  const getDefaultContent = (type: string) => {
+    switch (type) {
+      case 'symptoms':
+        return {
+          terminalTitle: 'Potential Symptoms Analysis',
+          terminalSubtitle: 'Identifying symptoms that may manifest based on your selected causes.',
+          loadingMessage: 'analyzing selected causes...',
+          progressMessage: 'Analyzing more potential symptoms...'
+        };
+      case 'properties':
+        return {
+          terminalTitle: 'Therapeutic Properties Analysis',
+          terminalSubtitle: 'Finding therapeutic properties to address your symptoms.',
+          loadingMessage: 'analyzing symptoms...',
+          progressMessage: 'Analyzing more therapeutic properties...'
+        };
+      case 'oils':
+        return {
+          terminalTitle: 'Essential Oils Analysis',
+          terminalSubtitle: 'Recommending essential oils with the identified properties.',
+          loadingMessage: 'analyzing properties...',
+          progressMessage: 'Analyzing more essential oils...'
+        };
+      case 'causes':
+      default:
+        return {
+          terminalTitle: 'Potential Causes Analysis',
+          terminalSubtitle: 'Understanding factors that may contribute to your symptoms.',
+          loadingMessage: 'analyzing demographics...',
+          progressMessage: 'Analyzing more potential causes...'
+        };
+    }
+  };
+
+  const defaultContent = getDefaultContent(analysisType);
+  const finalTerminalTitle = terminalTitle || defaultContent.terminalTitle;
+  const finalTerminalSubtitle = terminalSubtitle || defaultContent.terminalSubtitle;
+  const finalLoadingMessage = loadingMessage || defaultContent.loadingMessage;
+  const finalProgressMessage = progressMessage || defaultContent.progressMessage;
   const { scrollRef } = useAutoScroll([items.length, items], {
     threshold: 50,
     smooth: true,
@@ -182,7 +233,7 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                         {displayItems.length === 0 ? (
                           <div className="flex items-center justify-center h-24">
                             <div className="text-center">
-                              <div className="text-green-400 mb-1">$ analyzing demographics...</div>
+                              <div className="text-green-400 mb-1">$ {finalLoadingMessage}</div>
                               <div className="flex items-center justify-center space-x-1">
                                 <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
                                 <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
@@ -194,8 +245,8 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                           <>
                             {/* Terminal header */}
                             <div className="text-cyan-400 mb-2">
-                              <div className="text-sm font-bold"># Potential Causes Analysis</div>
-                              <div className="text-slate-400 text-xs">Understanding factors that may contribute to your symptoms.</div>
+                              <div className="text-sm font-bold"># {finalTerminalTitle}</div>
+                              <div className="text-slate-400 text-xs">{finalTerminalSubtitle}</div>
                             </div>
 
                             {/* Progressive Item Reveal */}
@@ -260,7 +311,7 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       <div className="text-center">
                         <p className="text-sm font-medium text-primary">
-                          Analyzing more potential causes...
+                          {finalProgressMessage}
                         </p>
                         <p className="text-xs text-primary/70">
                           AI is processing your information to find additional insights

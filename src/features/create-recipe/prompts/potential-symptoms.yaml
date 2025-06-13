@@ -1,0 +1,163 @@
+# Potential Symptoms Analysis Agent Configuration
+# Based on docs/create-recipe/prompts/prompt-for-potential-symptons.md
+
+version: "1.0.0"
+description: "Analyze selected potential causes to identify specific symptoms that may manifest"
+
+# Agent Configuration
+config:
+  model: "gpt-4o-mini"
+  temperature: 0.7
+  max_tokens: 4000
+  top_p: 0.9
+  frequency_penalty: 0.1
+  presence_penalty: 0.1
+
+# System Prompt Template
+template: |
+  **Identify Potential Symptoms**
+
+  **Persona:** Act as a knowledgeable health assistant or symptom correlator, capable of identifying typical symptoms associated with a specific health concern, especially when linked to particular underlying causes or contributing factors.
+
+  **Objective:** Analyze the user's primary health_concern and the selected_causes they identified as relevant, to generate a list of potential symptoms commonly experienced in this context. This list helps the user further refine their understanding of their situation and prepares for selecting targeted therapeutic properties later.
+
+  **Input Data:**
+
+  1. health_concern: {{health_concern}}
+  2. userInfo:
+     - Gender: {{gender}}
+     - Age Category: {{age_category}}
+     - Specific Age: {{age_specific}}
+     - Language: {{user_language}}
+  3. selected_causes:
+     {{#each selected_causes}}
+     - Cause ID: {{cause_id}}
+     - Name: {{name_localized}}
+     - Suggestion: {{suggestion_localized}}
+     - Explanation: {{explanation_localized}}
+     {{/each}}
+
+  **Processing Steps:**
+
+  1. **Input Evaluation:**
+     - Thoroughly understand the user's primary health_concern: {{health_concern}}
+     - Carefully review each item in the selected_causes array. The link between the concern and these specific causes is paramount for generating relevant symptoms.
+     - Note the userInfo for contextual nuances (age: {{age_specific}} {{age_category}}, gender: {{gender}}), but prioritize the concern-cause relationship.
+
+  2. **Symptom Identification:**
+     - Identify and describe common characteristics or variations of the health_concern itself (Primary Symptoms).
+     - Expand to include other physical sensations commonly accompanying the main concern due to the selected causes (Secondary Physical Symptoms - e.g., muscle tension from stress).
+     - Include relevant emotional or cognitive symptoms often linked to the concern and causes (Associated Non-Physical Symptoms - e.g., irritability from pain/stress).
+     - **Crucially, prioritize symptoms that strongly correlate with the selected_causes.**
+
+  3. **Output Construction:**
+     - Generate a list of **5 to 10** relevant potential symptoms.
+     - Frame descriptions using clear, accessible language.
+     - Ensure phrasing suggests potentiality or common association, not definitive diagnosis.
+     - Craft a concise explanation for each symptom, explicitly linking it back to the health_concern and the selected_causes.
+
+  **Output Format:**
+  Provide a structured JSON response following the exact schema provided.
+
+  **Notes:**
+  - Focus on listing potential and commonly associated symptoms; this is not a diagnostic tool.
+  - Ensure all user-facing text is accurately translated according to the user_language: {{user_language}}
+  - Handle user data with sensitivity and prioritize the direct link between the health concern and selected causes.
+  - Generate unique symptom_ids for each symptom.
+  - Include proper meta information with current timestamp and success status.
+  - Echo back the input data in the echo section for verification.
+
+# JSON Schema for Response Validation
+schema:
+  type: "json_schema"
+  name: "potential_symptoms_response"
+  strict: true
+  schema:
+    type: "object"
+    properties:
+      meta:
+        type: "object"
+        properties:
+          step_name:
+            type: "string"
+            description: "The name of the step in the API process"
+          request_id:
+            type: "string"
+            description: "The unique identifier for the request"
+          timestamp_utc:
+            type: "string"
+            description: "The UTC timestamp of the response"
+          version:
+            type: "string"
+            description: "Version information of the API step"
+          user_language:
+            type: "string"
+            description: "Language used by the user"
+          status:
+            type: "string"
+            description: "The status of the response"
+          message:
+            type: "string"
+            description: "A message providing additional information about the response"
+        required: ["step_name", "request_id", "timestamp_utc", "version", "user_language", "status", "message"]
+        additionalProperties: false
+      data:
+        type: "object"
+        properties:
+          potential_symptoms:
+            type: "array"
+            description: "List of potential symptoms related to the health concern"
+            items:
+              type: "object"
+              properties:
+                symptom_id:
+                  type: "string"
+                  description: "Unique identifier for the symptom"
+                name_localized:
+                  type: "string"
+                  description: "Localized name of the symptom"
+                suggestion_localized:
+                  type: "string"
+                  description: "Localized suggestion regarding the symptom"
+                explanation_localized:
+                  type: "string"
+                  description: "Localized explanation of the symptom"
+              required: ["symptom_id", "name_localized", "suggestion_localized", "explanation_localized"]
+              additionalProperties: false
+        required: ["potential_symptoms"]
+        additionalProperties: false
+      echo:
+        type: "object"
+        properties:
+          health_concern_input:
+            type: "string"
+            description: "The health concern input provided by the user"
+          user_info_input:
+            type: "object"
+            properties:
+              gender:
+                type: "string"
+                description: "Gender of the user"
+              age_category:
+                type: "string"
+                description: "General age category of the user"
+              age_specific:
+                type: "string"
+                description: "Specific age of the user"
+              age_unit:
+                type: "string"
+                description: "Unit of measurement for the user's age"
+            required: ["gender", "age_category", "age_specific", "age_unit"]
+            additionalProperties: false
+          selected_cause_ids:
+            type: "array"
+            description: "List of selected cause IDs related to the health concern"
+            items:
+              type: "string"
+              description: "Unique identifier for each selected cause"
+        required: ["health_concern_input", "user_info_input", "selected_cause_ids"]
+        additionalProperties: false
+    required: ["meta", "data", "echo"]
+    additionalProperties: false
+
+

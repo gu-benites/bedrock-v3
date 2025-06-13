@@ -10,6 +10,13 @@ import {
 } from '@openai/agents';
 import { parse } from 'best-effort-json-parser';
 import { getPromptManager, PromptManagerError } from '@/lib/ai/utils/prompt-manager';
+import {
+  STREAMING_DATA_TYPES,
+  isItemComplete,
+  cleanItemData,
+  detectDataTypes,
+  getPrimaryDisplayField
+} from '@/lib/ai/config/streaming-data-types';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -66,6 +73,11 @@ function prepareTemplateVariables(feature: string, data: any): Record<string, an
     };
   }
 
+  // For create-recipe feature - pass data as-is since it's already in the correct format
+  if (feature === 'create-recipe') {
+    return data;
+  }
+
   // Default: return data as-is for other features
   return data;
 }
@@ -90,66 +102,62 @@ async function handleStructuredOnlyStreaming(
   let buffer = '';
   let totalChunksProcessed = 0;
   let totalItemsSent = 0;
-  let lastSentItemCount = 0;
   let finalData: any = null;
 
-  // Track sent items to prevent duplicates
+  // Track sent items and counts per data type to prevent duplicates
   const sentItems = new Set<string>();
+  const lastSentCounts = new Map<string, number>();
 
-  // Helper to send complete items only
+  // Use imported configuration for all supported data types
+
+  /**
+   * Generic helper to send complete items for any data type
+   */
   const sendCompleteItems = (parsedData: any) => {
-    if (!parsedData?.data?.potential_causes || !Array.isArray(parsedData.data.potential_causes)) {
+    if (!parsedData?.data || typeof parsedData.data !== 'object') {
       return;
     }
 
-    const causes = parsedData.data.potential_causes;
+    // Dynamically detect and process all supported data types
+    for (const [dataType, config] of Object.entries(STREAMING_DATA_TYPES)) {
+      const items = parsedData.data[dataType];
 
-    // Only process items we haven't sent yet
-    for (let i = lastSentItemCount; i < causes.length; i++) {
-      const cause = causes[i];
-      if (!cause || typeof cause !== 'object' || !cause.cause_id) continue;
+      if (!Array.isArray(items)) {
+        continue; // Skip if this data type is not present
+      }
 
-      // Check if this cause is truly complete (not partial)
-      const hasCompleteFields =
-        cause.name_localized && cause.name_localized.length > 10 &&
-        cause.suggestion_localized && cause.suggestion_localized.length > 20 &&
-        cause.explanation_localized && cause.explanation_localized.length > 30 &&
-        !cause.name_localized.endsWith('...') &&
-        !cause.suggestion_localized.endsWith('...') &&
-        !cause.explanation_localized.endsWith('...');
+      const lastSentCount = lastSentCounts.get(dataType) || 0;
 
-      if (hasCompleteFields) {
-        const itemKey = `${i}-${cause.cause_id}`;
+      for (let i = lastSentCount; i < items.length; i++) {
+        const item = items[i];
 
-        // Only send if we haven't sent this exact item before
-        if (!sentItems.has(itemKey)) {
-          const cleanData = {
-            cause_id: cause.cause_id,
-            name_localized: cause.name_localized.trim(),
-            suggestion_localized: cause.suggestion_localized.trim(),
-            explanation_localized: cause.explanation_localized.trim(),
-            ...(cause.confidence && { confidence: cause.confidence }),
-            ...(cause.tags && { tags: cause.tags })
-          };
+        if (isItemComplete(item, config)) {
+          const itemKey = `${dataType}-${i}-${item[config.idField]}`;
 
-          const sseEvent = `data: ${JSON.stringify({
-            type: 'structured_data',
-            field: 'potential_causes',
-            index: i,
-            data: cleanData,
-            timestamp: new Date().toISOString()
-          })}\n\n`;
+          if (!sentItems.has(itemKey)) {
+            const cleanData = cleanItemData(item, config);
 
-          controller.enqueue(encoder.encode(sseEvent));
-          sentItems.add(itemKey);
-          totalItemsSent++;
-          lastSentItemCount = i + 1;
+            const sseEvent = `data: ${JSON.stringify({
+              type: 'structured_data',
+              field: dataType,
+              index: i,
+              data: cleanData,
+              timestamp: new Date().toISOString()
+            })}\n\n`;
 
-          console.log('[Structured-Only Streaming] ✅ Sent complete item:', {
-            index: i,
-            name: cleanData.name_localized,
-            totalSent: totalItemsSent
-          });
+            controller.enqueue(encoder.encode(sseEvent));
+            sentItems.add(itemKey);
+            totalItemsSent++;
+            lastSentCounts.set(dataType, i + 1);
+
+            const primaryField = getPrimaryDisplayField(dataType);
+            console.log(`[Structured-Only Streaming] ✅ Sent complete ${config.displayName}:`, {
+              index: i,
+              name: cleanData[primaryField] || 'Unknown',
+              totalSent: totalItemsSent,
+              dataType
+            });
+          }
         }
       }
     }
@@ -202,44 +210,37 @@ async function handleStructuredOnlyStreaming(
 
     if (finalData && typeof finalData === 'object') {
       // Final processing to ensure we have all complete items
-      sendCompleteItems(finalData);
+      try {
+        sendCompleteItems(finalData);
 
-      const completionEvent = `data: ${JSON.stringify({
-        type: 'structured_complete',
-        data: finalData,
-        stats: {
+        const completionEvent = `data: ${JSON.stringify({
+          type: 'structured_complete',
+          data: finalData,
+          stats: {
+            totalChunksProcessed,
+            totalItemsSent,
+            finalBufferLength: buffer.length,
+            itemsProcessed: sentItems.size
+          },
+          timestamp: new Date().toISOString()
+        })}\n\n`;
+
+        controller.enqueue(encoder.encode(completionEvent));
+        console.log('[Structured-Only Streaming] ✅ Final completion sent:', {
           totalChunksProcessed,
           totalItemsSent,
-          finalBufferLength: buffer.length,
-          itemsProcessed: sentItems.size
-        },
-        timestamp: new Date().toISOString()
-      })}\n\n`;
-
-      controller.enqueue(encoder.encode(completionEvent));
-      console.log('[Structured-Only Streaming] ✅ Final completion sent:', {
-        totalChunksProcessed,
-        totalItemsSent,
-        itemsProcessed: sentItems.size,
-        finalOutputKeys: finalData ? Object.keys(finalData) : []
-      });
+          itemsProcessed: sentItems.size,
+          finalOutputKeys: finalData ? Object.keys(finalData) : []
+        });
+      } catch (finalError) {
+        console.error('[Structured-Only Streaming] ❌ Error sending final data:', finalError);
+        // Don't throw here - we want to complete gracefully
+      }
     }
   } catch (error) {
     console.error('[Structured-Only Streaming] ❌ Error processing final output:', error);
-
-    // Send error event
-    const errorEvent = `data: ${JSON.stringify({
-      type: 'error',
-      error: error instanceof Error ? error.message : 'Unknown completion error',
-      timestamp: new Date().toISOString(),
-      recovery: 'Streaming completed with errors. Some data may be incomplete.'
-    })}\n\n`;
-    
-    try {
-      controller.enqueue(encoder.encode(errorEvent));
-    } catch (e) {
-      console.error('Failed to send error event:', e);
-    }
+    // Don't try to send error events here - the controller might be closed
+    // The error will be handled by the outer try-catch in the stream handler
   }
 }
 

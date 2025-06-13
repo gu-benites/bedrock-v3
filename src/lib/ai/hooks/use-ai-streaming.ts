@@ -166,22 +166,24 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
           if (streamEvent.data) {
             console.log('📦 Received complete structured item:', {
               index: (streamEvent as any).index,
-              name: streamEvent.data.name_localized,
-              hasAllFields: !!(streamEvent.data.name_localized && streamEvent.data.suggestion_localized && streamEvent.data.explanation_localized)
+              dataType: (streamEvent as any).field,
+              itemKeys: Object.keys(streamEvent.data)
             });
 
             setPartialData(prev => {
               const prevArray = Array.isArray(prev) ? prev : [];
 
-              // Only add if this is a complete item with all required fields
-              if (streamEvent.data.name_localized &&
-                  streamEvent.data.suggestion_localized &&
-                  streamEvent.data.explanation_localized) {
+              // Generic validation - check if item has meaningful string content
+              const hasRequiredContent = Object.values(streamEvent.data).some(
+                value => typeof value === 'string' && value.length > 3 && !value.endsWith('...')
+              );
+
+              if (hasRequiredContent) {
                 const newArray = [...prevArray, streamEvent.data];
                 console.log('✅ Added complete item, total items:', newArray.length);
                 return newArray as T;
               } else {
-                console.log('⏳ Skipping incomplete item');
+                console.log('⏳ Skipping incomplete item - insufficient content');
                 return prevArray as T;
               }
             });

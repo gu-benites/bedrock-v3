@@ -125,3 +125,156 @@ json schema provided
   }
 }
 ```
+
+Schema:
+{
+  "name": "potential_symptoms_response",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "meta": {
+        "type": "object",
+        "properties": {
+          "step_name": {
+            "type": "string",
+            "description": "The name of the step in the API process."
+          },
+          "request_id": {
+            "type": "string",
+            "description": "The unique identifier for the request."
+          },
+          "timestamp_utc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The UTC timestamp of the response."
+          },
+          "version": {
+            "type": "string",
+            "description": "Version information of the API step."
+          },
+          "user_language": {
+            "type": "string",
+            "description": "Language used by the user."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response."
+          },
+          "message": {
+            "type": "string",
+            "description": "A message providing additional information about the response."
+          }
+        },
+        "required": [
+          "step_name",
+          "request_id",
+          "timestamp_utc",
+          "version",
+          "user_language",
+          "status",
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "potential_symptoms": {
+            "type": "array",
+            "description": "List of potential symptoms related to the health concern.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "symptom_id": {
+                  "type": "string",
+                  "description": "Unique identifier for the symptom."
+                },
+                "name_localized": {
+                  "type": "string",
+                  "description": "Localized name of the symptom."
+                },
+                "suggestion_localized": {
+                  "type": "string",
+                  "description": "Localized suggestion regarding the symptom."
+                },
+                "explanation_localized": {
+                  "type": "string",
+                  "description": "Localized explanation of the symptom."
+                }
+              },
+              "required": [
+                "symptom_id",
+                "name_localized",
+                "suggestion_localized",
+                "explanation_localized"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "potential_symptoms"
+        ],
+        "additionalProperties": false
+      },
+      "echo": {
+        "type": "object",
+        "properties": {
+          "health_concern_input": {
+            "type": "string",
+            "description": "The health concern input provided by the user."
+          },
+          "user_info_input": {
+            "type": "object",
+            "properties": {
+              "gender": {
+                "type": "string",
+                "description": "Gender of the user."
+              },
+              "age_category": {
+                "type": "string",
+                "description": "General age category of the user."
+              },
+              "age_specific": {
+                "type": "string",
+                "description": "Specific age of the user."
+              },
+              "age_unit": {
+                "type": "string",
+                "description": "Unit of measurement for the user's age."
+              }
+            },
+            "required": [
+              "gender",
+              "age_category",
+              "age_specific",
+              "age_unit"
+            ],
+            "additionalProperties": false
+          },
+          "selected_cause_ids": {
+            "type": "array",
+            "description": "List of selected cause IDs related to the health concern.",
+            "items": {
+              "type": "string",
+              "description": "Unique identifier for each selected cause."
+            }
+          }
+        },
+        "required": [
+          "health_concern_input",
+          "user_info_input",
+          "selected_cause_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "meta",
+      "data",
+      "echo"
+    ],
+    "additionalProperties": false
+  },
+  "strict": true
+}

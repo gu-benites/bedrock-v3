@@ -8,12 +8,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Brain } from 'lucide-react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
-import { fetchPotentialSymptoms } from '../services/recipe-api.service';
 import { symptomsSelectionSchema } from '../schemas/recipe-schemas';
 import type { PotentialSymptom } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
+import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
+import AIStreamingModal from '@/components/ui/ai-streaming-modal';
 
 /**
  * Form data interface
@@ -38,12 +40,20 @@ export function SymptomsSelection() {
     error,
     setLoading,
     setError,
-    clearError
+    clearError,
+    isStreamingSymptoms,
+    setStreamingSymptoms
   } = useRecipeStore();
 
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
-  const [isLoadingSymptoms, setIsLoadingSymptoms] = useState(false);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [streamingItems, setStreamingItems] = useState<any[]>([]);
+
+  // AI Streaming setup
+  const { startStream, partialData, isStreaming, isComplete, finalData, error: streamingError } = useAIStreaming({
+    jsonArrayPath: 'data.potential_symptoms'
+  });
 
   const {
     handleSubmit,
@@ -64,7 +74,92 @@ export function SymptomsSelection() {
   }, [selectedSymptoms]);
 
   /**
-   * Fetch potential symptoms on component mount
+   * Handle streaming data updates - Transform symptoms data
+   */
+  useEffect(() => {
+    if (partialData && Array.isArray(partialData) && partialData.length > 0) {
+      console.log('📥 Received streaming symptoms:', partialData.length, 'total');
+
+      // Only process items that have all required fields (complete items only)
+      const completeItems = partialData.filter((symptom: any) =>
+        symptom.name_localized &&
+        symptom.suggestion_localized &&
+        symptom.explanation_localized &&
+        symptom.name_localized.length > 5 &&
+        symptom.suggestion_localized.length > 10 &&
+        symptom.explanation_localized.length > 15
+      );
+
+      console.log('✅ Complete symptoms found:', completeItems.length, 'of', partialData.length);
+
+      // Transform to match PotentialSymptom interface
+      const transformedSymptoms: PotentialSymptom[] = completeItems.map((symptom: any) => ({
+        symptom_name: symptom.name_localized,
+        symptom_suggestion: symptom.suggestion_localized,
+        explanation: symptom.explanation_localized
+      }));
+
+      setPotentialSymptoms(transformedSymptoms);
+
+      // Transform for modal display
+      const modalItems = completeItems.map((symptom: any) => ({
+        title: symptom.name_localized,
+        subtitle: symptom.suggestion_localized,
+        description: symptom.explanation_localized,
+        timestamp: new Date()
+      }));
+      setStreamingItems(modalItems);
+    }
+  }, [partialData, setPotentialSymptoms]);
+
+  /**
+   * Handle streaming completion - Close modal automatically
+   */
+  useEffect(() => {
+    if (isComplete && finalData) {
+      console.log('✅ Symptoms streaming completed with final data:', finalData);
+
+      // Close modal automatically when streaming is complete
+      setIsModalOpen(false);
+
+      // Process final data if needed (fallback)
+      if (Array.isArray(finalData)) {
+        const transformedSymptoms: PotentialSymptom[] = finalData.map((symptom: any) => ({
+          symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+          symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+          explanation: symptom.explanation_localized || symptom.explanation || ''
+        }));
+
+        if (transformedSymptoms.length > 0) {
+          setPotentialSymptoms(transformedSymptoms);
+        }
+      } else if (finalData && typeof finalData === 'object' && 'data' in finalData) {
+        const data = finalData as any;
+        if (data.data?.potential_symptoms && Array.isArray(data.data.potential_symptoms)) {
+          const symptoms = data.data.potential_symptoms;
+          const transformedSymptoms: PotentialSymptom[] = symptoms.map((symptom: any) => ({
+            symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+            symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+            explanation: symptom.explanation_localized || symptom.explanation || ''
+          }));
+
+          if (transformedSymptoms.length > 0) {
+            setPotentialSymptoms(transformedSymptoms);
+          }
+        }
+      }
+    }
+  }, [isComplete, finalData, setPotentialSymptoms]);
+
+  /**
+   * Sync streaming state with store
+   */
+  useEffect(() => {
+    setStreamingSymptoms(isStreaming);
+  }, [isStreaming, setStreamingSymptoms]);
+
+  /**
+   * Load potential symptoms using AI streaming
    */
   const loadPotentialSymptoms = useCallback(async () => {
     // If data is missing, let navigation handle redirects
@@ -76,19 +171,37 @@ export function SymptomsSelection() {
       return; // Already loaded
     }
 
-    setIsLoadingSymptoms(true);
     clearError();
+    setIsModalOpen(true);
 
     try {
-      const symptoms = await fetchPotentialSymptoms(healthConcern, demographics, selectedCauses);
-      setPotentialSymptoms(symptoms);
+      // Prepare data for symptoms analysis
+      const requestData = {
+        feature: 'create-recipe',
+        step: 'potential-symptoms',
+        data: {
+          health_concern: healthConcern?.healthConcern || '',
+          gender: demographics.gender,
+          age_category: demographics.ageCategory,
+          age_specific: demographics.specificAge?.toString() || demographics.ageCategory,
+          selected_causes: selectedCauses.map(cause => ({
+            cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`,
+            name_localized: cause.cause_name,
+            suggestion_localized: cause.cause_suggestion,
+            explanation_localized: cause.explanation
+          })),
+          user_language: 'PT_BR'
+        }
+      };
+
+      console.log('🚀 Starting symptoms analysis with data:', requestData);
+      await startStream('/api/ai/streaming', requestData);
     } catch (error) {
-      console.error('Failed to fetch potential symptoms:', error);
+      console.error('Failed to start symptoms streaming:', error);
       setError('Failed to load potential symptoms. Please try again.');
-    } finally {
-      setIsLoadingSymptoms(false);
+      setIsModalOpen(false);
     }
-  }, [healthConcern, demographics, selectedCauses, potentialSymptoms.length, setPotentialSymptoms, setError, clearError]);
+  }, [healthConcern, demographics, selectedCauses, potentialSymptoms.length, startStream, setError, clearError]);
 
   /**
    * Check if we have required data and show appropriate state
@@ -99,9 +212,9 @@ export function SymptomsSelection() {
       return;
     } else {
       clearError();
-      loadPotentialSymptoms();
+      // Don't auto-load symptoms - let user trigger analysis
     }
-  }, [healthConcern, demographics, selectedCauses, loadPotentialSymptoms, clearError]);
+  }, [healthConcern, demographics, selectedCauses, clearError]);
 
   useEffect(() => {
     const cleanup = checkRequiredData();
@@ -226,18 +339,43 @@ export function SymptomsSelection() {
         </div>
       )}
 
-      {/* Loading State */}
-      {isLoadingSymptoms && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground">Loading potential symptoms...</p>
+      {/* AI Analysis Button */}
+      {potentialSymptoms.length === 0 && !isStreaming && !error && (
+        <div className="text-center py-12 space-y-6">
+          <div className="space-y-2">
+            <Brain className="h-12 w-12 text-primary mx-auto" />
+            <h3 className="text-lg font-semibold">Ready for AI Analysis</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Based on your selected causes, our AI will identify potential symptoms you might be experiencing.
+            </p>
           </div>
+
+          <button
+            onClick={loadPotentialSymptoms}
+            disabled={isStreaming || selectedCauses.length === 0}
+            className={cn(
+              "px-8 py-3 rounded-lg font-medium transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+              "flex items-center space-x-2 mx-auto",
+              selectedCauses.length > 0 && !isStreaming
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            )}
+          >
+            <Brain className="h-5 w-5" />
+            <span>{isStreaming ? 'Analyzing...' : 'Analyze Potential Symptoms'}</span>
+          </button>
+
+          {selectedCauses.length === 0 && (
+            <p className="text-sm text-destructive">
+              Please go back and select at least one cause first.
+            </p>
+          )}
         </div>
       )}
 
       {/* Symptoms Selection */}
-      {!isLoadingSymptoms && potentialSymptoms.length > 0 && (
+      {potentialSymptoms.length > 0 && !isStreaming && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
@@ -348,20 +486,16 @@ export function SymptomsSelection() {
         </form>
       )}
 
-      {/* Empty State */}
-      {!isLoadingSymptoms && potentialSymptoms.length === 0 && !error && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No potential symptoms found. Please go back and check your selected causes.
-          </p>
-          <button
-            onClick={handleGoBack}
-            className="mt-4 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
-          >
-            ← Go Back
-          </button>
-        </div>
-      )}
+      {/* AI Streaming Modal */}
+      <AIStreamingModal
+        isOpen={isModalOpen}
+        title="AI Analysis in Progress"
+        description="Identifying potential symptoms based on your selected causes"
+        items={streamingItems}
+        onClose={() => setIsModalOpen(false)}
+        maxVisibleItems={100}
+        analysisType="symptoms"
+      />
     </div>
   );
 }

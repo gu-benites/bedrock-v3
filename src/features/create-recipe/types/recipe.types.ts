@@ -223,6 +223,7 @@ export interface RecipeWizardState {
 
   // AI Streaming states
   isStreamingCauses: boolean;
+  isStreamingSymptoms: boolean;
   streamingError: string | null;
   
   // Metadata
@@ -259,6 +260,7 @@ export interface RecipeWizardActions {
 
   // AI Streaming state management
   setStreamingCauses: (isStreaming: boolean) => void;
+  setStreamingSymptoms: (isStreaming: boolean) => void;
   setStreamingError: (error: string | null) => void;
   clearStreamingError: () => void;
 
