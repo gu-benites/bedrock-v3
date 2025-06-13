@@ -148,7 +148,7 @@ describe('WizardContainer', () => {
       
       render(<WizardContainer />);
       
-      expect(screen.getByTestId('properties-display')).toBeInTheDocument();
+      expect(screen.getByTestId('therapeutic-properties')).toBeInTheDocument();
     });
 
     it('should render oils display when on oils step', () => {

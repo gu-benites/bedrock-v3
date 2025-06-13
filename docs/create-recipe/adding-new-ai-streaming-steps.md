@@ -14,12 +14,93 @@ Symptoms → Click Continue → AI streams properties → Modal shows → Naviga
 
 **Key Principle**: When adding a new step, you modify the PREVIOUS step to stream your data, not your step to auto-load data.
 
+## 🚨 **CRITICAL LESSONS FROM THERAPEUTIC PROPERTIES IMPLEMENTATION**
+
+### **❌ Major Mistakes That Caused Implementation Failures:**
+
+#### **1. React Hook Form + Local State Conflict (CRITICAL)**
+**Mistake**: Used `useForm` with `handleSubmit` while managing selection state locally
+**Impact**: Form submission failed silently, preventing AI streaming
+**Root Cause**: Documentation didn't warn about this conflict
+**Fix**: Choose ONE approach - either pure react-hook-form OR pure local state
+
+#### **2. Local Modal State vs Store State (CRITICAL)**
+**Mistake**: Used `useState` for modal instead of store-based streaming state
+**Impact**: Controller closure errors, inconsistent state management
+**Root Cause**: Documentation showed mixed patterns without clear guidance
+**Fix**: Use store-based streaming state for complex analysis steps
+
+#### **3. Timeout Configuration (MAJOR)**
+**Mistake**: Used default 30s timeout for 57s AI analysis
+**Impact**: Frontend closed connection before backend completed
+**Root Cause**: No timeout guidelines for different analysis types
+**Fix**: Configure 60s+ timeout for complex therapeutic analysis
+
+#### **4. Prompt File Format (MAJOR)**
+**Mistake**: Created `.md` file instead of `.yaml` with wrong structure
+**Impact**: Prompt manager couldn't load configuration
+**Root Cause**: Documentation showed markdown examples instead of actual YAML
+**Fix**: Use proper `.yaml` format matching existing prompts
+
+#### **5. Controller Premature Closure (CRITICAL)**
+**Mistake**: Frontend state management caused backend controller to close early
+**Impact**: "Controller is already closed" errors, streaming failures
+**Root Cause**: No explanation of frontend-backend streaming lifecycle
+**Fix**: Proper connection lifecycle management with store-based state
+
 ## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Step-by-Step Implementation Guide](#step-by-step-implementation-guide)
-3. [Code Examples](#code-examples)
-4. [Testing Guidelines](#testing-guidelines)
-5. [Common Pitfalls and Troubleshooting](#common-pitfalls-and-troubleshooting)
+1. [Implementation Pattern Decision Tree](#implementation-pattern-decision-tree)
+2. [Architecture Overview](#architecture-overview)
+3. [Step-by-Step Implementation Guide](#step-by-step-implementation-guide)
+4. [Code Examples](#code-examples)
+5. [Testing Guidelines](#testing-guidelines)
+6. [Common Pitfalls and Troubleshooting](#common-pitfalls-and-troubleshooting)
+7. [Validation Checklist](#validation-checklist)
+
+## Implementation Pattern Decision Tree
+
+### **🎯 Choose the Right Streaming Pattern**
+
+#### **Store-Based Pattern (Recommended for Complex Steps)**
+**Use When:**
+- AI analysis takes >30 seconds (like therapeutic properties)
+- Need robust error handling and state management
+- Multiple components need access to streaming state
+- Want seamless user experience with auto-navigation
+
+**Examples**: Therapeutic properties analysis, essential oils recommendations
+
+**Key Characteristics:**
+- Uses `isStreamingProperties` from store
+- Modal controlled by store state: `<AIStreamingModal isOpen={isStreamingProperties} />`
+- Requires timeout configuration: `timeout: 60000`
+- More setup but more reliable
+
+#### **Hook-Based Pattern (For Simple Steps)**
+**Use When:**
+- AI analysis takes <30 seconds
+- Self-contained component with simple requirements
+- Basic error handling sufficient
+
+**Examples**: Quick symptom analysis, simple data transformations
+
+**Key Characteristics:**
+- Uses local `isModalOpen` state
+- Modal controlled locally: `<AIStreamingModal isOpen={isModalOpen} />`
+- Default timeout usually sufficient
+- Simpler setup but less robust
+
+### **⚠️ CRITICAL: Never Mix Patterns**
+```typescript
+// ❌ WRONG - Mixed patterns cause controller closure
+const [isModalOpen, setIsModalOpen] = useState(false); // Local state
+const { isStreamingProperties } = useRecipeStore(); // Store state
+// Don't use both!
+
+// ✅ CORRECT - Choose one pattern consistently
+const { isStreamingProperties, setStreamingProperties } = useRecipeStore();
+<AIStreamingModal isOpen={isStreamingProperties} />
+```
 
 ## Architecture Overview
 
@@ -858,7 +939,64 @@ Test the full workflow:
 
 ## Common Pitfalls and Troubleshooting
 
-### 1. Modal Won't Close Automatically
+### **🚨 CRITICAL ISSUES FROM REAL IMPLEMENTATION**
+
+#### **1. Silent Form Submission Failure (CRITICAL)**
+
+**Problem**: Button click doesn't trigger AI streaming, no errors shown
+**Symptoms**:
+- Button appears to work but nothing happens
+- No console logs or network requests
+- Modal never opens
+
+**Root Cause**: React Hook Form + local state management conflict
+```typescript
+// ❌ WRONG - This combination causes silent failures
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const { handleSubmit } = useForm();
+const onSubmit = async (data: any) => { /* never called */ };
+<form onSubmit={handleSubmit(onSubmit)}>
+```
+
+**Solution**: Choose ONE approach consistently
+```typescript
+// ✅ CORRECT Option 1: Pure local state (recommended for streaming)
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const onSubmit = async () => { /* direct function */ };
+<button type="button" onClick={onSubmit}>Continue</button>
+
+// ✅ CORRECT Option 2: Pure react-hook-form (for simple forms only)
+const { handleSubmit, register } = useForm();
+const onSubmit = async (data: any) => { /* form data */ };
+<form onSubmit={handleSubmit(onSubmit)}>
+```
+
+#### **2. Controller Closure Errors (CRITICAL)**
+
+**Problem**: Backend logs show "Controller is already closed" errors
+**Symptoms**:
+- Streaming starts but fails to complete
+- Frontend receives partial data then stops
+- Backend continues processing but can't send final data
+
+**Root Cause**: Local modal state + timeout issues cause premature connection closure
+```typescript
+// ❌ WRONG - Local state causes controller issues
+const [isModalOpen, setIsModalOpen] = useState(false);
+const { startStream } = useAIStreaming({ timeout: 30000 }); // Too short
+```
+
+**Solution**: Use store-based state + appropriate timeout
+```typescript
+// ✅ CORRECT - Store state + proper timeout
+const { isStreamingProperties, setStreamingProperties } = useRecipeStore();
+const { startStream } = useAIStreaming({
+  timeout: 60000, // 60s for complex analysis
+  maxRetries: 2
+});
+```
+
+#### **3. Modal Won't Close Automatically (MAJOR)**
 
 **Problem**: Modal stays open after streaming completes
 
@@ -866,12 +1004,12 @@ Test the full workflow:
 
 **Solution**:
 ```typescript
-// WRONG - Missing isComplete
+// ❌ WRONG - Missing isComplete
 const { startStream, partialData, isStreaming } = useAIStreaming({
   jsonArrayPath: 'data.therapeutic_properties'
 });
 
-// CORRECT - Include isComplete and finalData
+// ✅ CORRECT - Include isComplete and finalData
 const {
   startStream,
   partialData,
@@ -880,15 +1018,20 @@ const {
   finalData,      // ← Add this
   error
 } = useAIStreaming({
-  jsonArrayPath: 'data.therapeutic_properties'
+  jsonArrayPath: 'data.therapeutic_properties',
+  timeout: 60000  // ← Add appropriate timeout
 });
 
 // Add completion handler
 useEffect(() => {
   if (isComplete && finalData) {
-    setIsModalOpen(false);  // ← Close modal automatically
+    setStreamingProperties(false);  // ← Stop store streaming state
+    // Navigate after short delay
+    setTimeout(() => {
+      if (canGoNext()) goToNext();
+    }, 100);
   }
-}, [isComplete, finalData]);
+}, [isComplete, finalData, setStreamingProperties]);
 ```
 
 ### 2. Hardcoded Modal Content
@@ -995,5 +1138,57 @@ useEffect(() => {
 3. Error handling works
 4. Navigation works properly
 
+## Validation Checklist
+
+### **📋 Pre-Implementation Validation**
+- [ ] **Pattern Decision**: Chosen store-based vs hook-based pattern based on complexity
+- [ ] **Existing Steps Study**: Analyzed working demographics, causes, symptoms implementations
+- [ ] **Timeout Planning**: Determined appropriate timeout based on expected AI analysis duration
+- [ ] **State Management**: Decided on store vs local state management approach
+- [ ] **Form Strategy**: Chosen react-hook-form vs local state (not both)
+
+### **🔧 Implementation Validation**
+- [ ] **Prompt File**: Created `.yaml` file (not `.md`) in correct location
+- [ ] **Model Configuration**: Used `gpt-4.1-nano` (not `gpt-4o-mini`) for create-recipe
+- [ ] **Data Type Config**: Added configuration to `streaming-data-types.ts`
+- [ ] **Timeout Config**: Set appropriate timeout in `useAIStreaming` (60s+ for complex)
+- [ ] **Store Integration**: Added state and actions to recipe store
+- [ ] **Error Handling**: Added streaming error handling with store state reset
+- [ ] **Completion Handling**: Added `isComplete` effect to stop streaming and navigate
+- [ ] **Modal Configuration**: Set correct `analysisType` for dynamic content
+- [ ] **Button Implementation**: Used `type="button"` with direct `onClick` (not form submit)
+
+### **🧪 Functional Testing**
+- [ ] **Button Click**: Triggers AI streaming (check console logs)
+- [ ] **Modal Behavior**: Opens with correct title and analysis type
+- [ ] **Real-time Updates**: Data appears progressively in modal terminal
+- [ ] **Auto-close**: Modal closes automatically when streaming completes
+- [ ] **Data Persistence**: Data saved correctly to store
+- [ ] **Navigation**: Auto-navigates to next step after completion
+- [ ] **Error Handling**: Network failures and timeouts handled gracefully
+- [ ] **State Consistency**: No mixed local/store state management
+- [ ] **Backend Logs**: No "Controller is already closed" errors
+- [ ] **Performance**: Streaming completes within expected timeframe
+
+### **🔍 Debug Validation (If Issues)**
+- [ ] **Browser Console**: No JavaScript errors during streaming
+- [ ] **Network Tab**: API request sent with correct data structure
+- [ ] **Backend Logs**: No streaming errors or controller issues
+- [ ] **Prompt Loading**: Prompt manager can load YAML configuration
+- [ ] **Data Type Recognition**: Streaming processes new data type correctly
+- [ ] **Store State**: React DevTools shows correct state updates
+- [ ] **Timeout Testing**: Streaming doesn't fail due to timeout issues
+
+### **📊 Quality Assurance**
+- [ ] **Code Consistency**: Follows same patterns as working steps
+- [ ] **Error Messages**: User-friendly error messages for failures
+- [ ] **Loading States**: Appropriate loading indicators during streaming
+- [ ] **Accessibility**: Modal and buttons accessible via keyboard
+- [ ] **Mobile Compatibility**: Works correctly on mobile devices
+- [ ] **Performance**: No memory leaks or excessive re-renders
+
+This comprehensive validation ensures new AI streaming steps work correctly on the first implementation attempt, avoiding the trial-and-error process experienced during therapeutic properties development.
+
+---
+
 This documentation provides everything needed to add new AI streaming steps to the create-recipe workflow while maintaining consistency and avoiding common pitfalls.
-```

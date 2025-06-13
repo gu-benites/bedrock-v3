@@ -14,7 +14,7 @@ import { HealthConcernChatInput } from './health-concern-chat-input';
 import { DemographicsForm } from './demographics-form';
 import { CausesSelection } from './causes-selection';
 import { SymptomsSelection } from './symptoms-selection';
-import { PropertiesDisplay } from './properties-display';
+import { TherapeuticPropertiesSelection } from './therapeutic-properties-selection';
 import { OilsDisplay } from './oils-display';
 import { MobileLayout } from './mobile-layout';
 import { DashboardLayout } from './dashboard-layout';
@@ -48,7 +48,7 @@ function StepRenderer({ step, sessionId, layout }: { step: RecipeStep; sessionId
     case RecipeStep.SYMPTOMS:
       return <SymptomsSelection key={`symptoms-${sessionId}`} />;
     case RecipeStep.PROPERTIES:
-      return <PropertiesDisplay key={`properties-${sessionId}`} />;
+      return <TherapeuticPropertiesSelection key={`properties-${sessionId}`} />;
     case RecipeStep.OILS:
       return <OilsDisplay key={`oils-${sessionId}`} />;
     default:

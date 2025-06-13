@@ -6,23 +6,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Brain } from 'lucide-react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
-import { symptomsSelectionSchema } from '../schemas/recipe-schemas';
-import type { PotentialSymptom } from '../types/recipe.types';
+import type { PotentialSymptom, TherapeuticProperty } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import AIStreamingModal from '@/components/ui/ai-streaming-modal';
-
-/**
- * Form data interface
- */
-interface SymptomsSelectionData {
-  selectedSymptoms: PotentialSymptom[];
-}
 
 /**
  * Symptoms Selection component
@@ -36,13 +26,17 @@ export function SymptomsSelection() {
     potentialSymptoms,
     updateSelectedSymptoms,
     setPotentialSymptoms,
+    therapeuticProperties,
+    updateTherapeuticProperties,
     isLoading,
     error,
     setLoading,
     setError,
     clearError,
     isStreamingSymptoms,
-    setStreamingSymptoms
+    setStreamingSymptoms,
+    isStreamingProperties,
+    setStreamingProperties
   } = useRecipeStore();
 
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
@@ -50,21 +44,32 @@ export function SymptomsSelection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
 
+  // Therapeutic Properties streaming state
+  const hasNavigatedRef = useRef(false);
+
   // Ref to track if we've already initiated auto-loading to prevent duplicates
   const hasAutoLoadedRef = useRef(false);
 
-  // AI Streaming setup
+  // AI Streaming setup for symptoms
   const { startStream, partialData, isStreaming, isComplete, finalData, error: streamingError } = useAIStreaming({
     jsonArrayPath: 'data.potential_symptoms'
   });
 
+  // AI Streaming setup for therapeutic properties
   const {
-    handleSubmit,
-    formState: { isValid }
-  } = useForm<SymptomsSelectionData>({
-    resolver: zodResolver(symptomsSelectionSchema),
-    mode: 'onChange'
+    startStream: startPropertiesStream,
+    partialData: propertiesPartialData,
+    isStreaming: isStreamingPropertiesData,
+    isComplete: isPropertiesComplete,
+    finalData: propertiesFinalData,
+    error: propertiesStreamingError
+  } = useAIStreaming({
+    jsonArrayPath: 'data.therapeutic_properties',
+    timeout: 60000, // 60 seconds timeout for therapeutic properties analysis
+    maxRetries: 2
   });
+
+
 
   /**
    * Initialize selected symptoms from store
@@ -158,11 +163,68 @@ export function SymptomsSelection() {
   }, [isComplete, finalData, setPotentialSymptoms]);
 
   /**
+   * Handle therapeutic properties streaming data updates
+   */
+  useEffect(() => {
+    if (propertiesPartialData && Array.isArray(propertiesPartialData) && propertiesPartialData.length > 0) {
+      console.log('📥 Received streaming properties:', propertiesPartialData.length, 'total');
+
+      // Transform to match TherapeuticProperty interface
+      const transformedProperties: TherapeuticProperty[] = propertiesPartialData.map((property: any) => ({
+        property_id: property.property_id,
+        property_name: property.property_name_localized,
+        property_name_localized: property.property_name_localized,
+        property_name_english: property.property_name_english,
+        description: property.description_contextual_localized,
+        description_localized: property.description_contextual_localized,
+        relevancy: property.relevancy_score,
+        addresses_cause_ids: property.addresses_cause_ids || [],
+        addresses_symptom_ids: property.addresses_symptom_ids || []
+      }));
+
+      updateTherapeuticProperties(transformedProperties);
+    }
+  }, [propertiesPartialData, updateTherapeuticProperties]);
+
+  /**
+   * Handle therapeutic properties streaming completion - Navigate to properties step
+   */
+  useEffect(() => {
+    if (isPropertiesComplete && propertiesFinalData && !hasNavigatedRef.current) {
+      console.log('✅ Properties streaming completed, navigating...');
+      hasNavigatedRef.current = true;
+
+      // Stop streaming state
+      setStreamingProperties(false);
+
+      // Navigate to properties step after a short delay to ensure state is updated
+      setTimeout(() => {
+        if (canGoNext()) {
+          goToNext();
+        }
+      }, 100);
+    }
+  }, [isPropertiesComplete, propertiesFinalData, canGoNext, goToNext, setStreamingProperties]);
+
+  /**
+   * Handle therapeutic properties streaming errors
+   */
+  useEffect(() => {
+    if (propertiesStreamingError) {
+      console.error('🔥 Properties streaming error:', propertiesStreamingError);
+      setError(`Failed to analyze therapeutic properties: ${propertiesStreamingError}`);
+      setStreamingProperties(false);
+      hasNavigatedRef.current = false;
+    }
+  }, [propertiesStreamingError, setError, setStreamingProperties]);
+
+  /**
    * Sync streaming state with store
    */
   useEffect(() => {
     setStreamingSymptoms(isStreaming);
-  }, [isStreaming, setStreamingSymptoms]);
+    setStreamingProperties(isStreamingPropertiesData);
+  }, [isStreaming, setStreamingSymptoms, isStreamingPropertiesData, setStreamingProperties]);
 
   /**
    * Load potential symptoms using AI streaming (auto-triggered on mount)
@@ -281,7 +343,7 @@ export function SymptomsSelection() {
   };
 
   /**
-   * Handle form submission
+   * Handle form submission - Start therapeutic properties streaming
    */
   const onSubmit = async () => {
     if (selectedSymptomIds.size === 0) {
@@ -291,13 +353,46 @@ export function SymptomsSelection() {
 
     try {
       markCurrentStepCompleted();
+      clearError();
+      hasNavigatedRef.current = false;
 
-      if (canGoNext()) {
-        await goToNext();
-      }
+      // Start therapeutic properties streaming (stay on current page)
+      setStreamingProperties(true);
+
+      const requestData = {
+        feature: 'create-recipe',
+        step: 'therapeutic-properties',
+        data: {
+          health_concern: healthConcern?.healthConcern || '',
+          demographics: {
+            gender: demographics?.gender,
+            age_category: demographics?.ageCategory,
+            age_specific: demographics?.specificAge?.toString()
+          },
+          selected_causes: selectedCauses.map(cause => ({
+            cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`,
+            name_localized: cause.cause_name,
+            suggestion_localized: cause.cause_suggestion,
+            explanation_localized: cause.explanation
+          })),
+          selected_symptoms: selectedSymptoms.map(symptom => ({
+            symptom_id: `symptom_${Date.now()}_${Math.random()}`,
+            name_localized: symptom.symptom_name,
+            suggestion_localized: symptom.symptom_suggestion,
+            explanation_localized: symptom.explanation
+          })),
+          user_language: 'PT_BR'
+        }
+      };
+
+      console.log('🚀 Starting therapeutic properties analysis with data:', requestData);
+      await startPropertiesStream('/api/ai/streaming', requestData);
+
     } catch (error) {
-      console.error('Form submission failed:', error);
-      setError('Failed to proceed to next step. Please try again.');
+      console.error('Failed to start properties streaming:', error);
+      setError('Failed to analyze therapeutic properties. Please try again.');
+      setStreamingProperties(false);
+      hasNavigatedRef.current = false;
     }
   };
 
@@ -389,7 +484,7 @@ export function SymptomsSelection() {
 
       {/* Symptoms Selection */}
       {potentialSymptoms.length > 0 && !isStreaming && (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
@@ -482,7 +577,8 @@ export function SymptomsSelection() {
               )}
 
               <button
-                type="submit"
+                type="button"
+                onClick={onSubmit}
                 disabled={!isFormValid || isLoading}
                 className={cn(
                   "px-6 py-2 rounded-md font-medium transition-colors",
@@ -496,10 +592,10 @@ export function SymptomsSelection() {
               </button>
             </div>
           </div>
-        </form>
+        </div>
       )}
 
-      {/* AI Streaming Modal */}
+      {/* AI Streaming Modal for Symptoms */}
       <AIStreamingModal
         isOpen={isModalOpen}
         title="AI Analysis in Progress"
@@ -508,6 +604,23 @@ export function SymptomsSelection() {
         onClose={() => setIsModalOpen(false)}
         maxVisibleItems={100}
         analysisType="symptoms"
+      />
+
+      {/* AI Streaming Modal for Therapeutic Properties */}
+      <AIStreamingModal
+        isOpen={isStreamingProperties}
+        title="AI Analysis in Progress"
+        description="Identifying therapeutic properties to address your symptoms"
+        items={therapeuticProperties.map((property, index) => ({
+          id: `property-${index}-${property.property_name?.slice(0, 10) || 'unknown'}`,
+          title: property.property_name || property.property_name_localized || `Therapeutic Property ${index + 1}`,
+          subtitle: property.property_name_english || 'Therapeutic property',
+          description: property.description || property.description_localized || '',
+          timestamp: new Date()
+        }))}
+        onClose={() => console.log('User requested to close properties modal')}
+        maxVisibleItems={100}
+        analysisType="properties"
       />
     </div>
   );

@@ -1,0 +1,190 @@
+# Therapeutic Properties Analysis Agent Configuration
+# Based on docs/create-recipe/prompts/prompt-for-therapeutic-properties.md
+
+version: "1.0.0"
+description: "Analyze selected symptoms to identify relevant therapeutic properties for essential oil blends"
+
+# Agent Configuration
+config:
+  model: "gpt-4.1-nano"
+  temperature: 0.3
+  max_tokens: 4000
+  top_p: 0.9
+  frequency_penalty: 0.1
+  presence_penalty: 0.1
+
+# System Prompt Template
+template: |
+  **Identify Required Therapeutic Properties**
+
+  **Persona:** Act as an expert researcher specializing in **holistic therapeutic properties** (covering medical, physical, mental, and emotional aspects), with a deep understanding of how these properties address specific health concerns, symptoms, and their underlying causes. Emphasize the **interconnectedness** of mind and body.
+
+  **Objective:** Based on the provided input data, identify and prioritize key therapeutic properties needed for an effective and holistic essential oil blend. The focus is on identifying the *actions* required, not specific oils yet. **Crucially, the output must explicitly link each selected property back to the specific causes and symptoms it primarily targets from the user's input.**
+
+  **Input Data:**
+
+  1. health_concern: {{health_concern}}
+  2. userInfo:
+     - Gender: {{gender}}
+     - Age Category: {{age_category}}
+     - Specific Age: {{age_specific}}
+     - Language: {{user_language}}
+  3. selected_causes:
+     {{#each selected_causes}}
+     - Cause ID: {{cause_id}}
+     - Name: {{name_localized}}
+     - Suggestion: {{suggestion_localized}}
+     - Explanation: {{explanation_localized}}
+     {{/each}}
+  4. selected_symptoms:
+     {{#each selected_symptoms}}
+     - Symptom ID: {{symptom_id}}
+     - Name: {{name_localized}}
+     - Suggestion: {{suggestion_localized}}
+     - Explanation: {{explanation_localized}}
+     {{/each}}
+
+  **Processing Steps:**
+
+  1. **Symptom-Driven Analysis:**
+     - Examine the selected_symptoms. Determine the core therapeutic actions (properties) required to alleviate them, considering physical, mental, and emotional dimensions. **Note which property addresses which specific symptom(s).**
+
+  2. **Cause Consideration:**
+     - Analyze the selected_causes. Identify properties addressing these underlying factors from a holistic perspective. **Note which property addresses which specific cause(s).**
+
+  3. **Holistic Integration & Prioritization:**
+     - Synthesize properties from symptoms and causes. Prioritize those offering the most direct or comprehensive support for the primary health_concern and the most impactful selected_symptoms and selected_causes. Assign a relevancy score (1-5, 5 being highest).
+
+  4. **Refinement & Scope:**
+     - Consolidate the list. Select **5 to 8** key therapeutic properties providing a well-rounded and diverse approach (covering different needed actions).
+
+  5. **Property Focus:**
+     - Ensure the output contains *only* therapeutic property names, descriptions, and the link fields. **Do not list essential oils or chemical constituents.**
+
+  **Important Clarification:**
+
+  - Each therapeutic property must be listed individually, even if they are related or complementary. For example, instead of combining "Propriedades nutritivas e fortalecedoras" into one entry, list "Propriedades nutritivas" and "Propriedades fortalecedoras" as separate properties.
+  - Avoid aggregating multiple properties into a single entry. Each entry should represent a single, distinct therapeutic property.
+
+  **Example Therapeutic Properties (Non-Exhaustive List for Inspiration):**
+
+  **Medical/Physical:** Analgesic, Anti-inflammatory, Antispasmodic, Relaxante Muscular, Decongestant, Expectorant, Antiemetic, Cicatrizant, Antiviral, Antibacterial, Antifungal, Antioxidant, Hypotensive, Antipyretic, Diuretic, Vasodilator, Vasoconstrictor, Rubefacient.
+
+  **Emotional/Mental/Energetic:** Calmante (Calming), Sedative (Leve/Moderate), Ansiolítico (Anxiolytic), Antidepressant/Uplifting, Nervino Relaxante (Nervine Relaxant), Adaptogênico (Adaptogen), Equilibrante do Humor (Mood Balancing), Revigorante (Energizing), Estimulante Mental (Cognitive Enhancer), Grounding, Comforting, Neuroprotetor.
+
+  **Output Format:**
+  Provide a structured JSON response following the exact schema provided.
+
+  **Notes:**
+  - Focus strictly on therapeutic properties; do not list specific essential oils
+  - Ensure the selected properties reflect the interconnectedness of mind and body relevant to the user's inputs
+  - Tailor the description for each property to explicitly connect it to the user's specific situation
+  - Accurately populate addresses_cause_ids and addresses_symptom_ids using the exact IDs from the input that each property primarily targets
+  - Adhere strictly to the Important Clarification regarding listing each property individually
+  - Ensure each property object includes a property_id field containing a newly generated, unique, standard random UUID string
+  - Ensure all user-facing text is accurately translated according to the user_language: {{user_language}}
+  - Include proper meta information with current timestamp and success status
+  - Echo back the input data in the echo section for verification
+
+# JSON Schema for Response Validation
+schema:
+  type: "json_schema"
+  name: "therapeutic_properties_response"
+  strict: true
+  schema:
+    type: "object"
+    properties:
+      meta:
+        type: "object"
+        properties:
+          step_name:
+            type: "string"
+            description: "The name of the step in the API process"
+          request_id:
+            type: "string"
+            description: "The unique identifier for the request"
+          timestamp_utc:
+            type: "string"
+            description: "The UTC timestamp of the response"
+          version:
+            type: "string"
+            description: "Version information of the API step"
+          user_language:
+            type: "string"
+            description: "Language used by the user"
+          status:
+            type: "string"
+            description: "The status of the response"
+          message:
+            type: "string"
+            description: "A message providing additional information about the response"
+        required: ["step_name", "request_id", "timestamp_utc", "version", "user_language", "status", "message"]
+        additionalProperties: false
+      data:
+        type: "object"
+        properties:
+          therapeutic_properties:
+            type: "array"
+            description: "List of therapeutic properties identified for the health concern"
+            items:
+              type: "object"
+              properties:
+                property_id:
+                  type: "string"
+                  description: "Unique identifier for the therapeutic property"
+                property_name_localized:
+                  type: "string"
+                  description: "Localized name of the therapeutic property"
+                property_name_english:
+                  type: "string"
+                  description: "English name of the therapeutic property"
+                description_contextual_localized:
+                  type: "string"
+                  description: "Localized contextual description of how this property helps"
+                addresses_cause_ids:
+                  type: "array"
+                  items:
+                    type: "string"
+                    description: "IDs of causes this property addresses"
+                addresses_symptom_ids:
+                  type: "array"
+                  items:
+                    type: "string"
+                    description: "IDs of symptoms this property addresses"
+                relevancy_score:
+                  type: "integer"
+                  minimum: 1
+                  maximum: 5
+                  description: "Relevancy score (1-5, 5 being highest)"
+              required: ["property_id", "property_name_localized", "property_name_english", "description_contextual_localized", "addresses_cause_ids", "addresses_symptom_ids", "relevancy_score"]
+              additionalProperties: false
+        required: ["therapeutic_properties"]
+        additionalProperties: false
+      echo:
+        type: "object"
+        properties:
+          health_concern:
+            type: "string"
+            description: "The health concern provided by the user"
+          gender:
+            type: "string"
+            description: "User's gender"
+          age_category:
+            type: "string"
+            description: "User's age category"
+          age_specific:
+            type: "string"
+            description: "User's specific age"
+          user_language:
+            type: "string"
+            description: "User's language preference"
+          selected_causes_count:
+            type: "integer"
+            description: "Number of causes selected by the user"
+          selected_symptoms_count:
+            type: "integer"
+            description: "Number of symptoms selected by the user"
+        required: ["health_concern", "gender", "age_category", "age_specific", "user_language", "selected_causes_count", "selected_symptoms_count"]
+        additionalProperties: false
+    required: ["meta", "data", "echo"]
+    additionalProperties: false

@@ -47,12 +47,12 @@ export const STREAMING_DATA_TYPES: Record<string, DataTypeConfig> = {
 
   therapeutic_properties: {
     idField: 'property_id',
-    requiredFields: ['name_localized', 'description_localized'],
-    minLengths: { 
-      name_localized: 5, 
-      description_localized: 15 
+    requiredFields: ['property_name_localized', 'description_contextual_localized'],
+    minLengths: {
+      property_name_localized: 5,
+      description_contextual_localized: 15
     },
-    optionalFields: ['relevancy', 'causes_addressed', 'symptoms_addressed'],
+    optionalFields: ['property_name_english', 'relevancy_score', 'addresses_cause_ids', 'addresses_symptom_ids'],
     displayName: 'Therapeutic Property'
   },
 

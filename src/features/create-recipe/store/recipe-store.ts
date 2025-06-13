@@ -71,6 +71,7 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
   // AI Streaming states
   isStreamingCauses: false,
   isStreamingSymptoms: false,
+  isStreamingProperties: false,
   streamingError: null,
   
   // Metadata
@@ -305,11 +306,20 @@ export const useRecipeStore = create<RecipeStore>()(
         }));
       },
 
+      setStreamingProperties: (isStreaming: boolean) => {
+        set((state) => ({
+          isStreamingProperties: isStreaming,
+          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+          lastUpdated: new Date()
+        }));
+      },
+
       setStreamingError: (error: string | null) => {
         set((state) => ({
           streamingError: error,
           isStreamingCauses: false, // Stop streaming on error
           isStreamingSymptoms: false, // Stop streaming on error
+          isStreamingProperties: false, // Stop streaming on error
           lastUpdated: new Date()
         }));
       },
@@ -568,9 +578,11 @@ export const useRecipeStatus = () => useRecipeStore((state) => ({
 export const useRecipeStreaming = () => useRecipeStore((state) => ({
   isStreamingCauses: state.isStreamingCauses,
   isStreamingSymptoms: state.isStreamingSymptoms,
+  isStreamingProperties: state.isStreamingProperties,
   streamingError: state.streamingError,
   setStreamingCauses: state.setStreamingCauses,
   setStreamingSymptoms: state.setStreamingSymptoms,
+  setStreamingProperties: state.setStreamingProperties,
   setStreamingError: state.setStreamingError,
   clearStreamingError: state.clearStreamingError
 }));

@@ -14,45 +14,124 @@ Current Step → User clicks Continue → AI streams NEXT step data → Modal sh
 1. **Current step component**: Receives pre-loaded data from previous step
 2. **Previous step component**: Streams data for your new step
 
+## 🚨 **CRITICAL WARNINGS - READ FIRST**
+
+### **❌ DO NOT Use React Hook Form with Local State**
+```typescript
+// ❌ WRONG - This will cause silent form submission failures
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const { handleSubmit } = useForm(); // Don't mix these!
+
+// ✅ CORRECT - Choose ONE approach:
+// Option 1: Pure local state (recommended for streaming steps)
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const onSubmit = () => { /* direct function */ };
+
+// Option 2: Pure react-hook-form (for simple forms only)
+const { handleSubmit, register } = useForm();
+// No local state management
+```
+
+### **❌ DO NOT Use Local Modal State for Streaming**
+```typescript
+// ❌ WRONG - Causes controller closure issues
+const [isModalOpen, setIsModalOpen] = useState(false);
+
+// ✅ CORRECT - Use store-based streaming state
+const { isStreamingProperties, setStreamingProperties } = useRecipeStore();
+<AIStreamingModal isOpen={isStreamingProperties} />
+```
+
+### **❌ DO NOT Use Default Timeouts for Complex Analysis**
+```typescript
+// ❌ WRONG - 30s timeout for complex AI analysis
+const { startStream } = useAIStreaming({
+  jsonArrayPath: 'data.therapeutic_properties'
+});
+
+// ✅ CORRECT - Configure appropriate timeout
+const { startStream } = useAIStreaming({
+  jsonArrayPath: 'data.therapeutic_properties',
+  timeout: 60000, // 60s for complex analysis
+  maxRetries: 2
+});
+```
+
 ## 🚀 5-Minute Setup Checklist
 
-### 1. Create Prompt File
-📁 `src/features/create-recipe/prompts/prompt-for-{step-name}.md`
+### 1. Create Prompt File ⚠️ **YAML FORMAT REQUIRED**
+📁 `src/features/create-recipe/prompts/{step-name}.yaml`
+
+**CRITICAL**: Must be `.yaml` file, not `.md`! Study existing prompts for exact format.
 
 ```yaml
----
-model: gpt-4o-mini
-temperature: 0.3
-max_tokens: 4000
-response_format: json
-feature: create-recipe
-step: {step-name}
-description: "Brief description"
 version: "1.0.0"
----
+description: "Brief description of what this step analyzes"
+config:
+  model: "gpt-4.1-nano"  # Use gpt-4.1-nano for create-recipe, NOT gpt-4o-mini
+  temperature: 0.3
+  max_tokens: 4000
+  response_format: "json_schema"
+  timeout_seconds: 60
 
-# Your Prompt Title
+template: |
+  # Your Prompt Title
 
-## Context
-- Health Concern: {{healthConcern}}
-- Demographics: {{demographics.gender}}, {{demographics.ageCategory}}
-- Previous Data: {{previousStepData}}
+  You are an expert analyzing {{healthConcern}} for therapeutic recommendations.
 
-## Response Format
-```json
-{
-  "data": {
-    "your_data_type": [
-      {
-        "id_field": "unique_id",
-        "name_localized": "Display name",
-        "description_localized": "Description"
-      }
-    ]
+  ## Context
+  - Health Concern: {{health_concern}}
+  - Demographics: {{demographics.gender}}, {{demographics.age_category}}
+  - Previous Data: {{selected_previous_step_items}}
+
+  ## Task
+  Analyze the provided data and identify relevant items for the next step.
+
+  ## Response Format
+  Provide a structured JSON response following this exact schema:
+
+  ```json
+  {
+    "data": {
+      "your_data_type": [
+        {
+          "id_field": "unique_identifier",
+          "name_localized": "Display name in user language",
+          "description_localized": "Detailed description"
+        }
+      ]
+    }
   }
-}
+  ```
+
+schema:
+  type: "object"
+  properties:
+    data:
+      type: "object"
+      properties:
+        your_data_type:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id_field:
+                type: "string"
+              name_localized:
+                type: "string"
+              description_localized:
+                type: "string"
+            required: ["id_field", "name_localized", "description_localized"]
+      required: ["your_data_type"]
+  required: ["data"]
 ```
-```
+
+**⚠️ CRITICAL PROMPT REQUIREMENTS:**
+- File must be `.yaml` extension
+- Use `gpt-4.1-nano` model for create-recipe
+- Include `timeout_seconds: 60` for complex analysis
+- Template variables must match request data structure
+- Schema must match exact response format expected
 
 ### 2. Add Data Type Configuration
 📁 `src/lib/ai/config/streaming-data-types.ts`
@@ -183,64 +262,88 @@ export function YourStepSelection() {
 ### 3B. Update Previous Step Component (Streams Next Step Data)
 📁 `src/features/create-recipe/components/{previous-step}-selection.tsx`
 
-```typescript
-// Add to the PREVIOUS step component (the one that streams data for YOUR step)
+**⚠️ CRITICAL PATTERN CHOICE**: Choose the correct streaming pattern based on your step:
 
+#### **Pattern A: Store-Based Streaming (Recommended for Complex Steps)**
+Use when you need consistent state management and error handling:
+
+```typescript
+// ✅ CORRECT - Store-based pattern (like therapeutic properties)
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import AIStreamingModal from '@/components/ui/ai-streaming-modal';
 
-// Add AI streaming hook for YOUR step
+// Get store streaming state
+const {
+  isStreamingYourStep,
+  setStreamingYourStep,
+  setYourStepData
+} = useRecipeStore();
+
+// Configure AI streaming with appropriate timeout
 const {
   startStream,
   partialData,
-  isStreaming: isStreamingYourStep,
+  isStreaming: isStreamingData,
   isComplete: isYourStepComplete,
   finalData: yourStepFinalData,
   error: yourStepStreamingError
 } = useAIStreaming({
-  jsonArrayPath: 'data.your_data_type'
+  jsonArrayPath: 'data.your_data_type',
+  timeout: 60000, // 60s for complex analysis
+  maxRetries: 2
 });
 
-const [streamingItems, setStreamingItems] = useState<any[]>([]);
 const hasNavigatedRef = useRef(false);
+
+// ✅ CRITICAL: Sync streaming state with store
+useEffect(() => {
+  setStreamingYourStep(isStreamingData);
+}, [isStreamingData, setStreamingYourStep]);
+
+// ✅ CRITICAL: Handle streaming errors
+useEffect(() => {
+  if (yourStepStreamingError) {
+    console.error('Streaming error:', yourStepStreamingError);
+    setError(`Failed to analyze: ${yourStepStreamingError}`);
+    setStreamingYourStep(false);
+    hasNavigatedRef.current = false;
+  }
+}, [yourStepStreamingError, setError, setStreamingYourStep]);
 
 // Handle YOUR step streaming data updates
 useEffect(() => {
   if (partialData && Array.isArray(partialData) && partialData.length > 0) {
+    console.log('📥 Received streaming data:', partialData.length, 'items');
+
     const transformed: YourDataType[] = partialData.map((item: any) => ({
       item_name: item.name_localized,
       description: item.description_localized
     }));
 
     setYourStepData(transformed); // Save to store
-
-    const modalItems = partialData.map((item: any) => ({
-      title: item.name_localized,
-      subtitle: item.optional_field || 'Subtitle',
-      description: item.description_localized,
-      timestamp: new Date()
-    }));
-    setStreamingItems(modalItems);
   }
 }, [partialData, setYourStepData]);
 
-// Handle YOUR step streaming completion - Navigate to your step
+// ✅ CRITICAL: Handle streaming completion - Stop streaming and navigate
 useEffect(() => {
   if (isYourStepComplete && yourStepFinalData && !hasNavigatedRef.current) {
     console.log('✅ Your step streaming completed, navigating...');
     hasNavigatedRef.current = true;
 
-    // Navigate to your step
-    if (canGoNext()) {
-      goToNext();
-    }
+    // Stop streaming state
+    setStreamingYourStep(false);
+
+    // Navigate to your step after short delay to ensure state is updated
+    setTimeout(() => {
+      if (canGoNext()) {
+        goToNext();
+      }
+    }, 100);
   }
-}, [isYourStepComplete, yourStepFinalData, canGoNext, goToNext]);
+}, [isYourStepComplete, yourStepFinalData, canGoNext, goToNext, setStreamingYourStep]);
 
-// Update onSubmit to start YOUR step streaming
-const onSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
+// ✅ CRITICAL: Update onSubmit - NO REACT HOOK FORM!
+const onSubmit = async () => {  // ← No event parameter for direct button onClick
   // Validate current step
   if (selectedCurrentStepItems.length === 0) {
     setError('Please select at least one item.');
@@ -253,6 +356,8 @@ const onSubmit = async (e: React.FormEvent) => {
     hasNavigatedRef.current = false;
 
     // Start YOUR step streaming (stay on current page)
+    setStreamingYourStep(true);  // ← Set store streaming state
+
     const requestData = {
       feature: 'create-recipe',
       step: 'your-step-name',
@@ -260,34 +365,56 @@ const onSubmit = async (e: React.FormEvent) => {
         health_concern: healthConcern?.healthConcern || '',
         demographics: {
           gender: demographics?.gender,
-          age_category: demographics?.ageCategory
+          age_category: demographics?.ageCategory,
+          age_specific: demographics?.specificAge?.toString()
         },
         selected_current_step_items: selectedCurrentStepItems.map(item => ({
-          // Transform current step data for AI
+          // Transform current step data for AI - use exact field names from prompt
+          item_id: `item_${Date.now()}_${Math.random()}`,
+          name_localized: item.item_name,
+          description_localized: item.description
         })),
         user_language: 'PT_BR'
       }
     };
 
+    console.log('🚀 Starting streaming with data:', requestData);
     await startStream('/api/ai/streaming', requestData);
 
   } catch (error) {
-    console.error('Failed to start your step streaming:', error);
+    console.error('Failed to start streaming:', error);
     setError('Failed to analyze next step. Please try again.');
+    setStreamingYourStep(false);  // ← Reset store streaming state
     hasNavigatedRef.current = false;
   }
 };
 
-// Add modal to JSX
+// ✅ CRITICAL: Add modal to JSX - Use store streaming state
 <AIStreamingModal
-  isOpen={isStreamingYourStep}
+  isOpen={isStreamingYourStep}  // ← Store state, not local state
   title="AI Analysis in Progress"
   description="Analyzing your selections for the next step"
-  items={streamingItems}
+  items={yourStepData.map((item, index) => ({  // ← Use store data directly
+    id: `item-${index}-${item.item_name?.slice(0, 10) || 'unknown'}`,
+    title: item.item_name || `Item ${index + 1}`,
+    subtitle: item.optional_field || 'Item description',
+    description: item.description || '',
+    timestamp: new Date()
+  }))}
   onClose={() => console.log('User requested to close modal')}
   maxVisibleItems={100}
-  analysisType="your-type"
+  analysisType="your-type"  // ← Must match your step type
 />
+
+// ✅ CRITICAL: Button must use direct onClick, not form submission
+<button
+  type="button"  // ← NOT "submit"
+  onClick={onSubmit}  // ← Direct function call
+  disabled={!isFormValid || isLoading}
+  className="px-6 py-2 bg-primary text-primary-foreground rounded-md"
+>
+  {isStreamingYourStep ? 'Analyzing...' : 'Continue →'}
+</button>
 ```
 
 ### 4. Update Store
@@ -359,22 +486,107 @@ useEffect(() => {
 }, [selectedItems, markCurrentStepCompleted]);
 ```
 
-### ❌ Common Mistakes
+### ❌ Common Mistakes & Fixes
 
-1. **Missing `isComplete`** → Modal won't close
-2. **Missing `analysisType`** → Hardcoded modal content
-3. **Wrong data type config** → Streaming won't work
-4. **Missing completion handler** → Poor UX
+#### **1. Silent Form Submission Failure**
+**Problem**: Button click doesn't trigger AI streaming
+**Cause**: React Hook Form + local state conflict
+**Fix**: Remove react-hook-form, use direct button onClick
 
-## 🧪 Testing Checklist
+#### **2. Controller Closure Errors**
+**Problem**: "Controller is already closed" in backend logs
+**Cause**: Local modal state management + timeout issues
+**Fix**: Use store-based streaming state + increase timeout
 
-- [ ] Modal opens when analysis starts
-- [ ] Real-time data appears in terminal
-- [ ] Modal closes automatically when done
+#### **3. Modal Won't Close**
+**Problem**: Modal stays open after streaming completes
+**Cause**: Missing `isComplete` handling
+**Fix**: Add completion effect to stop streaming state
+
+#### **4. Hardcoded Modal Content**
+**Problem**: Modal shows wrong analysis type
+**Cause**: Missing `analysisType` prop
+**Fix**: Set correct `analysisType` on modal
+
+#### **5. Prompt Not Found**
+**Problem**: API returns "Prompt not found"
+**Cause**: Wrong file format or location
+**Fix**: Use `.yaml` file in correct directory
+
+#### **6. Timeout Errors**
+**Problem**: Streaming fails after 30 seconds
+**Cause**: Default timeout too short for complex analysis
+**Fix**: Set `timeout: 60000` in useAIStreaming config
+
+## 🧪 **COMPREHENSIVE VALIDATION CHECKLIST**
+
+### **📋 Pre-Implementation Checklist**
+- [ ] Studied existing working steps (demographics, causes, symptoms)
+- [ ] Chosen correct streaming pattern (store-based vs hook-based)
+- [ ] Determined appropriate timeout for analysis complexity
+- [ ] Verified prompt file format and location requirements
+
+### **🔧 Implementation Checklist**
+- [ ] Created `.yaml` prompt file (not `.md`)
+- [ ] Used `gpt-4.1-nano` model in prompt config
+- [ ] Added data type configuration to streaming-data-types.ts
+- [ ] Used store-based streaming state (not local modal state)
+- [ ] Configured appropriate timeout in useAIStreaming
+- [ ] Added error handling for streaming failures
+- [ ] Removed react-hook-form if using local state management
+- [ ] Set correct `analysisType` on AIStreamingModal
+- [ ] Added completion handler to stop streaming state
+
+### **🧪 Testing Checklist**
+- [ ] Button click triggers AI streaming (check console logs)
+- [ ] Modal opens with correct title and analysis type
+- [ ] Real-time data appears in modal terminal
+- [ ] Modal closes automatically when streaming completes
 - [ ] Data saved to store correctly
 - [ ] Navigation works to next step
-- [ ] Error handling works
-- [ ] Modal content is dynamic (not "Potential Causes")
+- [ ] Error handling works (network failures, timeout)
+- [ ] No "Controller is already closed" errors in backend
+- [ ] Modal content is dynamic (not hardcoded)
+- [ ] Timeout sufficient for analysis complexity
+
+### **🔍 Debug Checklist (If Issues Occur)**
+- [ ] Check browser console for JavaScript errors
+- [ ] Check network tab for API request/response
+- [ ] Check backend logs for streaming errors
+- [ ] Verify prompt file can be loaded by prompt manager
+- [ ] Test with shorter timeout to isolate timeout issues
+- [ ] Verify data type configuration matches AI response
+- [ ] Check store state updates in React DevTools
+
+## 🎯 **STREAMING PATTERN DECISION TREE**
+
+### **When to Use Store-Based Pattern (Recommended)**
+✅ **Use for complex AI analysis steps like therapeutic properties**
+- Analysis takes >30 seconds
+- Need consistent error handling
+- Multiple components need streaming state
+- Want seamless user experience
+
+**Example**: Therapeutic properties, essential oils recommendations
+
+### **When to Use Hook-Based Pattern**
+✅ **Use for simpler analysis steps**
+- Analysis takes <30 seconds
+- Self-contained component
+- Simple error handling sufficient
+
+**Example**: Quick symptom analysis, simple data transformations
+
+### **Pattern Comparison**
+
+| Aspect | Store-Based | Hook-Based |
+|--------|-------------|------------|
+| State Management | `isStreamingProperties` in store | `isStreaming` from hook |
+| Modal Control | `<AIStreamingModal isOpen={isStreamingProperties} />` | `<AIStreamingModal isOpen={isModalOpen} />` |
+| Error Handling | Centralized in store | Local component handling |
+| Timeout Config | Required (60s+) | Default (30s) usually OK |
+| Complexity | Higher setup | Simpler setup |
+| Reliability | More robust | Basic functionality |
 
 ## 🎯 Available Analysis Types
 

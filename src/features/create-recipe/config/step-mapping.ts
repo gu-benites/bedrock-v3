@@ -123,7 +123,7 @@ export const STEP_CONFIGURATIONS: Record<string, StepConfig> = {
   'therapeutic-properties': {
     stepId: 'therapeutic-properties',
     displayName: 'Therapeutic Properties',
-    promptName: 'medical-properties',
+    promptName: 'therapeutic-properties',
     jsonArrayPath: 'data.therapeutic_properties',
     transformations: [DATA_TRANSFORMATIONS.THERAPEUTIC_PROPERTIES],
     dependencies: ['health-concern', 'demographics', 'potential-causes', 'potential-symptoms'],
