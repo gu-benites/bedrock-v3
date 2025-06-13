@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Brain } from 'lucide-react';
@@ -49,6 +49,9 @@ export function SymptomsSelection() {
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
+
+  // Ref to track if we've already initiated auto-loading to prevent duplicates
+  const hasAutoLoadedRef = useRef(false);
 
   // AI Streaming setup
   const { startStream, partialData, isStreaming, isComplete, finalData, error: streamingError } = useAIStreaming({
@@ -122,6 +125,9 @@ export function SymptomsSelection() {
       // Close modal automatically when streaming is complete
       setIsModalOpen(false);
 
+      // Reset auto-load flag so it can be triggered again if needed
+      hasAutoLoadedRef.current = false;
+
       // Process final data if needed (fallback)
       if (Array.isArray(finalData)) {
         const transformedSymptoms: PotentialSymptom[] = finalData.map((symptom: any) => ({
@@ -159,17 +165,34 @@ export function SymptomsSelection() {
   }, [isStreaming, setStreamingSymptoms]);
 
   /**
-   * Load potential symptoms using AI streaming
+   * Load potential symptoms using AI streaming (auto-triggered on mount)
    */
   const loadPotentialSymptoms = useCallback(async () => {
     // If data is missing, let navigation handle redirects
     if (!healthConcern || !demographics || selectedCauses.length === 0) {
+      console.log('⚠️ Missing required data for symptoms analysis:', {
+        hasHealthConcern: !!healthConcern,
+        hasDemographics: !!demographics,
+        causesCount: selectedCauses.length
+      });
       return;
     }
 
     if (potentialSymptoms.length > 0) {
+      console.log('✅ Symptoms already loaded, skipping analysis');
       return; // Already loaded
     }
+
+    if (isStreaming) {
+      console.log('⏳ Streaming already in progress, skipping duplicate request');
+      return; // Already streaming
+    }
+
+    console.log('🚀 Starting symptoms analysis...', {
+      healthConcern: healthConcern?.healthConcern,
+      causesCount: selectedCauses.length,
+      timestamp: new Date().toISOString()
+    });
 
     clearError();
     setIsModalOpen(true);
@@ -200,26 +223,30 @@ export function SymptomsSelection() {
       console.error('Failed to start symptoms streaming:', error);
       setError('Failed to load potential symptoms. Please try again.');
       setIsModalOpen(false);
+
+      // Reset auto-load flag on error so user can retry
+      hasAutoLoadedRef.current = false;
     }
   }, [healthConcern, demographics, selectedCauses, potentialSymptoms.length, startStream, setError, clearError]);
 
   /**
-   * Check if we have required data and show appropriate state
+   * Check if we have required data and symptoms (now loaded from causes page)
    */
-  const checkRequiredData = useCallback(() => {
-    if (!healthConcern || !demographics || selectedCauses.length === 0) {
-      // Don't set errors during reset/navigation - let the navigation system handle redirects
-      return;
-    } else {
-      clearError();
-      // Don't auto-load symptoms - let user trigger analysis
-    }
-  }, [healthConcern, demographics, selectedCauses, clearError]);
-
   useEffect(() => {
-    const cleanup = checkRequiredData();
-    return cleanup;
-  }, [checkRequiredData]);
+    // Check if we have required data
+    if (!healthConcern || !demographics || selectedCauses.length === 0) {
+      return;
+    }
+
+    // Symptoms should already be loaded from causes page
+    // If not available, show message to go back
+    if (potentialSymptoms.length === 0 && !isStreaming) {
+      setError('Potential symptoms not found. Please go back to the causes step to generate them.');
+      return;
+    }
+
+    clearError();
+  }, [healthConcern, demographics, selectedCauses.length, potentialSymptoms.length, isStreaming, setError, clearError]);
 
   /**
    * Handle symptom selection toggle
@@ -288,6 +315,7 @@ export function SymptomsSelection() {
    */
   const handleRetry = () => {
     clearError();
+    hasAutoLoadedRef.current = false; // Reset flag to allow retry
     loadPotentialSymptoms();
   };
 
@@ -339,38 +367,23 @@ export function SymptomsSelection() {
         </div>
       )}
 
-      {/* AI Analysis Button */}
+      {/* Missing Data State */}
       {potentialSymptoms.length === 0 && !isStreaming && !error && (
         <div className="text-center py-12 space-y-6">
           <div className="space-y-2">
-            <Brain className="h-12 w-12 text-primary mx-auto" />
-            <h3 className="text-lg font-semibold">Ready for AI Analysis</h3>
+            <Brain className="h-12 w-12 text-muted-foreground mx-auto" />
+            <h3 className="text-lg font-semibold text-muted-foreground">Missing Required Data</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Based on your selected causes, our AI will identify potential symptoms you might be experiencing.
+              Potential symptoms not found. Please go back to the causes step to generate them.
             </p>
           </div>
 
           <button
-            onClick={loadPotentialSymptoms}
-            disabled={isStreaming || selectedCauses.length === 0}
-            className={cn(
-              "px-8 py-3 rounded-lg font-medium transition-all duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-              "flex items-center space-x-2 mx-auto",
-              selectedCauses.length > 0 && !isStreaming
-                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
-            )}
+            onClick={handleGoBack}
+            className="mt-4 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
           >
-            <Brain className="h-5 w-5" />
-            <span>{isStreaming ? 'Analyzing...' : 'Analyze Potential Symptoms'}</span>
+            ← Go Back to Causes
           </button>
-
-          {selectedCauses.length === 0 && (
-            <p className="text-sm text-destructive">
-              Please go back and select at least one cause first.
-            </p>
-          )}
         </div>
       )}
 

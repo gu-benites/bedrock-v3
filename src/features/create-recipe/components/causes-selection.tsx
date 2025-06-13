@@ -5,11 +5,13 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
-import type { PotentialCause } from '../types/recipe.types';
+import type { PotentialCause, PotentialSymptom } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
+import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
+import AIStreamingModal from '@/components/ui/ai-streaming-modal';
 
 /**
  * Causes Selection component
@@ -22,20 +24,35 @@ export function CausesSelection() {
     potentialCauses,
     updateSelectedCauses,
     setPotentialCauses,
+    setPotentialSymptoms,
     isLoading,
     error,
     setLoading,
     setError,
-    clearError
-  } = useRecipeStore();
-
-  const {
+    clearError,
     isStreamingCauses,
     streamingError
   } = useRecipeStore();
 
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [selectedCauseIds, setSelectedCauseIds] = useState<Set<string>>(new Set());
+
+  // AI Streaming for symptoms (triggered when user clicks Continue)
+  const {
+    startStream,
+    partialData,
+    isStreaming: isStreamingSymptoms,
+    isComplete: isSymptomsComplete,
+    finalData: symptomsFinalData,
+    error: symptomsStreamingError
+  } = useAIStreaming({
+    jsonArrayPath: 'data.potential_symptoms'
+  });
+
+  const [streamingItems, setStreamingItems] = useState<any[]>([]);
+
+  // Ref to track navigation to prevent infinite loops
+  const hasNavigatedRef = useRef(false);
 
   // Determine if we're in a loading state (either local loading or streaming from demographics)
   const isLoadingCauses = isStreamingCauses || isLoading;
@@ -90,6 +107,62 @@ export function CausesSelection() {
   }, [checkRequiredData]);
 
   /**
+   * Handle symptoms streaming data updates
+   */
+  useEffect(() => {
+    if (partialData && Array.isArray(partialData) && partialData.length > 0) {
+      console.log('📥 Received streaming symptoms:', partialData.length, 'total');
+
+      // Transform to match PotentialSymptom interface
+      const transformedSymptoms: PotentialSymptom[] = partialData.map((symptom: any) => ({
+        symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+        symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+        explanation: symptom.explanation_localized || symptom.explanation || ''
+      }));
+
+      setPotentialSymptoms(transformedSymptoms);
+
+      // Transform for modal display
+      const modalItems = partialData.map((symptom: any) => ({
+        title: symptom.name_localized,
+        subtitle: symptom.suggestion_localized || 'Symptom suggestion',
+        description: symptom.explanation_localized,
+        timestamp: new Date()
+      }));
+      setStreamingItems(modalItems);
+    }
+  }, [partialData, setPotentialSymptoms]);
+
+  /**
+   * Handle symptoms streaming completion - Navigate to symptoms page
+   */
+  useEffect(() => {
+    if (isSymptomsComplete && symptomsFinalData && !hasNavigatedRef.current) {
+      console.log('✅ Symptoms streaming completed, navigating to symptoms page');
+
+      hasNavigatedRef.current = true;
+
+      // Process final data if needed (fallback)
+      if (Array.isArray(symptomsFinalData)) {
+        const transformedSymptoms: PotentialSymptom[] = symptomsFinalData.map((symptom: any) => ({
+          symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+          symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+          explanation: symptom.explanation_localized || symptom.explanation || ''
+        }));
+
+        if (transformedSymptoms.length > 0) {
+          setPotentialSymptoms(transformedSymptoms);
+        }
+      }
+
+      // Navigate to symptoms page
+      if (canGoNext()) {
+        goToNext();
+      }
+    }
+  }, [isSymptomsComplete, symptomsFinalData, canGoNext, goToNext, setPotentialSymptoms]);
+
+  /**
    * Handle cause selection toggle
    */
   const handleCauseToggle = (cause: PotentialCause) => {
@@ -122,7 +195,7 @@ export function CausesSelection() {
   };
 
   /**
-   * Handle form submission
+   * Handle form submission - Start symptoms streaming (following demographics pattern)
    */
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,15 +205,51 @@ export function CausesSelection() {
       return;
     }
 
+    if (isStreamingSymptoms) {
+      console.log('⏳ Symptoms streaming already in progress');
+      return;
+    }
+
     try {
+      // Mark step as completed
       markCurrentStepCompleted();
 
-      if (canGoNext()) {
-        await goToNext();
-      }
+      // Clear any previous errors
+      clearError();
+
+      // Reset navigation flag
+      hasNavigatedRef.current = false;
+
+      // Start symptoms streaming (stay on current page like demographics does)
+      console.log('🚀 Starting symptoms analysis from causes page...');
+
+      const requestData = {
+        feature: 'create-recipe',
+        step: 'potential-symptoms',
+        data: {
+          health_concern: healthConcern?.healthConcern || '',
+          demographics: {
+            gender: demographics?.gender,
+            age_category: demographics?.ageCategory,
+            age_specific: demographics?.specificAge?.toString()
+          },
+          selected_causes: selectedCauses.map(cause => ({
+            cause_id: `cause_${Date.now()}_${Math.random()}`,
+            name_localized: cause.cause_name,
+            suggestion_localized: cause.cause_suggestion,
+            explanation_localized: cause.explanation
+          })),
+          user_language: 'PT_BR'
+        }
+      };
+
+      console.log('🚀 Starting symptoms streaming with data:', requestData);
+      await startStream('/api/ai/streaming', requestData);
+
     } catch (error) {
-      console.error('Form submission failed:', error);
-      setError('Failed to proceed to next step. Please try again.');
+      console.error('Failed to start symptoms streaming:', error);
+      setError('Failed to analyze symptoms. Please try again.');
+      hasNavigatedRef.current = false;
     }
   };
 
@@ -365,6 +474,20 @@ export function CausesSelection() {
           </button>
         </div>
       )}
+
+      {/* AI Streaming Modal for Symptoms */}
+      <AIStreamingModal
+        isOpen={isStreamingSymptoms}
+        title="AI Analysis in Progress"
+        description="Analyzing your selected causes to identify potential symptoms"
+        items={streamingItems}
+        onClose={() => {
+          // Optional: Allow users to minimize modal but keep streaming
+          console.log('User requested to close symptoms streaming modal');
+        }}
+        maxVisibleItems={100}
+        analysisType="symptoms"
+      />
     </div>
   );
 }
