@@ -1,10 +1,10 @@
 /**
  * @fileoverview Zustand store for Essential Oil Recipe Creator wizard state management.
- * Implements persistent state with local storage and comprehensive state management.
+ * Implements non-persistent state for reset-on-refresh behavior.
+ * Data is intentionally not persisted so browser refresh clears all state.
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { RecipeStep } from '../types/recipe.types';
 import type {
   RecipeWizardState,
@@ -17,11 +17,9 @@ import type {
   PropertyOilSuggestions
 } from '../types/recipe.types';
 
-import { 
+import {
   DEFAULT_STEP,
-  STORAGE_KEYS,
-  DATA_RETENTION_DAYS,
-  STORAGE_VERSION
+  STORAGE_KEYS
 } from '../constants/recipe.constants';
 
 /**
@@ -79,77 +77,14 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
   sessionId: generateUUID()
 };
 
-/**
- * Custom storage implementation with data retention and versioning
- */
-const customStorage = createJSONStorage(() => ({
-  getItem: (name: string) => {
-    try {
-      const item = localStorage.getItem(name);
-      if (!item) return null;
-      
-      const parsed = JSON.parse(item);
-      
-      // Check version compatibility
-      if (parsed.version !== STORAGE_VERSION) {
-        console.warn('Storage version mismatch, clearing data');
-        localStorage.removeItem(name);
-        return null;
-      }
-      
-      // Check data retention period
-      const now = new Date().getTime();
-      const dataAge = now - parsed.timestamp;
-      const maxAge = DATA_RETENTION_DAYS * 24 * 60 * 60 * 1000; // Convert days to milliseconds
-      
-      if (dataAge > maxAge) {
-        console.info('Stored data expired, clearing');
-        localStorage.removeItem(name);
-        return null;
-      }
-      
-      // Parse dates back from strings
-      if (parsed.state.lastUpdated) {
-        parsed.state.lastUpdated = new Date(parsed.state.lastUpdated);
-      }
-      
-      return JSON.stringify(parsed.state);
-    } catch (error) {
-      console.error('Error reading from localStorage:', error);
-      return null;
-    }
-  },
-  
-  setItem: (name: string, value: string) => {
-    try {
-      const state = JSON.parse(value);
-      const wrappedData = {
-        version: STORAGE_VERSION,
-        timestamp: new Date().getTime(),
-        state
-      };
-      localStorage.setItem(name, JSON.stringify(wrappedData));
-    } catch (error) {
-      console.error('Error writing to localStorage:', error);
-    }
-  },
-  
-  removeItem: (name: string) => {
-    try {
-      localStorage.removeItem(name);
-    } catch (error) {
-      console.error('Error removing from localStorage:', error);
-    }
-  }
-}));
+
 
 /**
- * Main recipe wizard store with persistence
+ * Main recipe wizard store WITHOUT persistence for reset-on-refresh behavior
+ * Data is intentionally not persisted so browser refresh clears all state
  */
-export const useRecipeStore = create<RecipeStore>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+export const useRecipeStore = create<RecipeStore>()((set, get) => ({
+  ...initialState,
       
       // Step navigation actions
       setCurrentStep: (step: RecipeStep) => {
@@ -462,83 +397,22 @@ export const useRecipeStore = create<RecipeStore>()(
       resetWizard: () => {
         console.log('🔄 Starting recipe wizard reset...');
 
-        // Clear all localStorage data first
-        try {
-          localStorage.removeItem(STORAGE_KEYS.WIZARD_STATE);
-          localStorage.removeItem(STORAGE_KEYS.SESSION_BACKUP);
-
-          // Clear any other recipe-related localStorage items
-          const keysToRemove = [];
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && (key.includes('recipe') || key.includes('wizard') || key.includes('create-recipe'))) {
-              keysToRemove.push(key);
-            }
-          }
-          keysToRemove.forEach(key => localStorage.removeItem(key));
-
-        } catch (error) {
-          console.error('Error clearing localStorage during reset:', error);
-        }
-
-        // Reset to initial state with new session ID and explicitly clear error
+        // Reset to initial state with new session ID and explicitly clear all states
         set(() => ({
           ...initialState,
           error: null, // Explicitly clear any error state
           isLoading: false, // Explicitly clear loading state
+          isStreamingCauses: false, // Clear streaming states
+          isStreamingSymptoms: false,
+          isStreamingProperties: false,
+          streamingError: null,
           sessionId: generateUUID(), // Generate new session ID
           lastUpdated: new Date()
         }));
 
-        // Force a small delay to ensure all components re-render and clear any pending errors
-        setTimeout(() => {
-          // Double-check that error is cleared
-          const currentState = get();
-          if (currentState.error) {
-            console.log('Clearing residual error after reset:', currentState.error);
-            set((state) => ({ ...state, error: null }));
-          }
-          console.log('Recipe wizard reset completed - all data and errors cleared');
-        }, 150); // Slightly longer delay to ensure all effects have run
+        console.log('✅ Recipe wizard reset completed - all data and states cleared');
       }
-    }),
-    {
-      name: STORAGE_KEYS.WIZARD_STATE,
-      storage: customStorage,
-      
-      // Partial persistence - exclude loading and error states
-      partialize: (state) => ({
-        healthConcern: state.healthConcern,
-        demographics: state.demographics,
-        selectedCauses: state.selectedCauses,
-        selectedSymptoms: state.selectedSymptoms,
-        therapeuticProperties: state.therapeuticProperties,
-        suggestedOils: state.suggestedOils,
-        potentialCauses: state.potentialCauses,
-        potentialSymptoms: state.potentialSymptoms,
-        currentStep: state.currentStep,
-        completedSteps: state.completedSteps,
-        lastUpdated: state.lastUpdated,
-        sessionId: state.sessionId
-      }),
-      
-      // Version for migration handling
-      version: 1,
-      
-      // Migration function for future versions
-      migrate: (persistedState: any, version: number) => {
-        if (version === 0) {
-          // Migration from version 0 to 1
-          return {
-            ...persistedState,
-            sessionId: persistedState.sessionId || generateUUID()
-          };
-        }
-        return persistedState;
-      }
-    }
-  )
-);
+    }));
 
 /**
  * Selector hooks for specific parts of the state
@@ -589,11 +463,10 @@ export const useRecipeStreaming = () => useRecipeStore((state) => ({
 
 /**
  * Utility function to clear all recipe data
+ * Since we removed persistence, this just resets the store
  */
 export const clearRecipeData = () => {
   try {
-    localStorage.removeItem(STORAGE_KEYS.WIZARD_STATE);
-    localStorage.removeItem(STORAGE_KEYS.SESSION_BACKUP);
     useRecipeStore.getState().resetWizard();
   } catch (error) {
     console.error('Error clearing recipe data:', error);
