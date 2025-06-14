@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { DashboardSettings } from './DashboardSettings';
+import { DashboardSettings } from './dashboard-settings'; // Updated import path
 import { useSidebar, SidebarProvider } from '@/components/ui/sidebar'; // We need SidebarProvider to host the context
 
 // Mock the actual useSidebar hook

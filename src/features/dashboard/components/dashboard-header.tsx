@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DashboardSettings } from "./DashboardSettings"; // Adjusted path as needed
+import { DashboardSettings } from "./dashboard-settings"; // Adjusted path as needed
 
 const getPageTitleFromPathname = (pathname: string | null): string => {
   if (!pathname) return "Dashboard";

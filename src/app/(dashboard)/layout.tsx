@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 // Removed: import { redirect } from 'next/navigation';
 import { getServerLogger } from '@/lib/logger';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { DashboardAppSidebar } from '@/features/dashboard/components/DashboardAppSidebar';
+import { DashboardAppSidebar } from '@/features/dashboard/components/dashboard-app-sidebar';
 import { DashboardHeader } from '@/features/dashboard/components'; // Assuming DashboardHeader is here
 import { LoadingProvider as DashboardLoadingProvider } from "@/features/ui/providers/loading-provider";
 

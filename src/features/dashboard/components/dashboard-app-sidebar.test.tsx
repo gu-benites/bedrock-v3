@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { DashboardAppSidebar } from './DashboardAppSidebar';
+import { DashboardAppSidebar } from './dashboard-app-sidebar'; // Updated import path
 import { SidebarProvider } from '@/components/ui/sidebar'; // Original SidebarProvider
 
 // Mock child components to simplify testing and focus on DashboardAppSidebar structure
