@@ -19,14 +19,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state"
+const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
-type SidebarContext = {
+export type SidebarVariant = "sidebar" | "floating" | "inset"
+export type SidebarCollapsible = "offcanvas" | "icon" | "none"
+
+type SidebarContextType = {
   state: "expanded" | "collapsed"
   open: boolean
   setOpen: (open: boolean) => void
@@ -34,11 +37,15 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  variant: SidebarVariant
+  setVariant: React.Dispatch<React.SetStateAction<SidebarVariant>>
+  collapsible: SidebarCollapsible
+  setCollapsible: React.Dispatch<React.SetStateAction<SidebarCollapsible>>
 }
 
-const SidebarContext = React.createContext<SidebarContext | null>(null)
+const SidebarContext = React.createContext<SidebarContextType | null>(null)
 
-function useSidebar() {
+function useSidebar(): SidebarContextType {
   const context = React.useContext(SidebarContext)
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.")
@@ -53,6 +60,8 @@ const SidebarProvider = React.forwardRef<
     defaultOpen?: boolean
     open?: boolean
     onOpenChange?: (open: boolean) => void
+    initialVariant?: SidebarVariant
+    initialCollapsible?: SidebarCollapsible
   }
 >(
   (
@@ -60,6 +69,8 @@ const SidebarProvider = React.forwardRef<
       defaultOpen = true,
       open: openProp,
       onOpenChange: setOpenProp,
+      initialVariant = "sidebar",
+      initialCollapsible = "offcanvas",
       className,
       style,
       children,
@@ -69,6 +80,8 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
+    const [variant, setVariant] = React.useState<SidebarVariant>(initialVariant)
+    const [collapsible, setCollapsible] = React.useState<SidebarCollapsible>(initialCollapsible)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
@@ -116,7 +129,7 @@ const SidebarProvider = React.forwardRef<
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
 
-    const contextValue = React.useMemo<SidebarContext>(
+    const contextValue = React.useMemo<SidebarContextType>(
       () => ({
         state,
         open,
@@ -125,8 +138,12 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        variant,
+        setVariant,
+        collapsible,
+        setCollapsible,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, variant, collapsible]
     )
 
     return (
@@ -160,22 +177,21 @@ const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     side?: "left" | "right"
-    variant?: "sidebar" | "floating" | "inset"
-    collapsible?: "offcanvas" | "icon" | "none"
+    // variant and collapsible are now from context
   }
 >(
   (
     {
       side = "left",
-      variant = "sidebar",
-      collapsible = "offcanvas",
+      // variant = "sidebar", // Removed from props
+      // collapsible = "offcanvas", // Removed from props
       className,
       children,
       ...props
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, variant, collapsible } = useSidebar()
 
     if (collapsible === "none") {
       return (

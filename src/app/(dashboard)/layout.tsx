@@ -1,10 +1,13 @@
 
-import { DashboardLayout as DashboardLayoutComponent } from '@/features/dashboard/layout';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { getCurrentUserProfile } from '@/features/user-auth-data/services/profile.service';
 import { createClient } from '@/lib/supabase/server';
 // Removed: import { redirect } from 'next/navigation';
 import { getServerLogger } from '@/lib/logger';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { DashboardAppSidebar } from '@/features/dashboard/components/DashboardAppSidebar';
+import { DashboardHeader } from '@/features/dashboard/components'; // Assuming DashboardHeader is here
+import { LoadingProvider as DashboardLoadingProvider } from "@/features/ui/providers/loading-provider";
 
 const logger = getServerLogger('DashboardLayout');
 const getTimestampLog = () => new Date().toISOString();
@@ -67,8 +70,16 @@ export default async function DashboardLayout({
   console.log(`[${getTimestampLog()}] DashboardLayout (Server): Dehydrated state (first 500 chars):`, JSON.stringify(dehydratedState, null, 2).substring(0, 500) + '...');
 
   return (
-    <HydrationBoundary state={dehydratedState}>
-      <DashboardLayoutComponent>{children}</DashboardLayoutComponent>
-    </HydrationBoundary>
+    <SidebarProvider initialVariant="inset" initialCollapsible="offcanvas">
+      <DashboardAppSidebar />
+      <SidebarInset>
+        <DashboardLoadingProvider>
+          <DashboardHeader />
+          <HydrationBoundary state={dehydratedState}>
+            {children}
+          </HydrationBoundary>
+        </DashboardLoadingProvider>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
