@@ -19,9 +19,9 @@ import {
   UsersIcon,
 } from "lucide-react"
 
-import { NavDocuments } from '@/components/nav-documents'
-import { NavMain } from '@/components/nav-main'
-import { NavSecondary } from '@/components/nav-secondary'
+import { NavDocuments } from '@/components/nav/nav-documents'
+import { NavMain } from '@/components/nav/nav-main'
+import { NavSecondary } from '@/components/nav/nav-secondary'
 // import { NavUser } from '@/components/nav-user' // Replaced by DashboardUserMenu
 import { DashboardUserMenu } from './dashboard-user-menu' // Import DashboardUserMenu
 import {
