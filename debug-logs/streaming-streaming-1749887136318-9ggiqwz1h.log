@@ -1,0 +1,39 @@
+[2025-06-14T07:45:36.318Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:45:36.325Z] Request started with traceId: streaming-1749887136318-9ggiqwz1h
+[2025-06-14T07:45:36.553Z] Agent execution started
+[2025-06-14T07:45:36.567Z] Starting real-time streaming for step: suggested-oils
+[2025-06-14T07:45:55.878Z] Buffer content at chunk 200 (710 chars):
+[2025-06-14T07:45:56.541Z] Buffer content at chunk 400 (1476 chars):
+[2025-06-14T07:45:57.247Z] Buffer content at chunk 600 (2233 chars):
+[2025-06-14T07:45:57.747Z] Final buffer content (2822 chars):
+[2025-06-14T07:45:57.760Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:45:57.762Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:45:57.764Z] Has newItems: true
+[2025-06-14T07:45:57.779Z] Has finalOutput: true
+[2025-06-14T07:45:57.796Z] NewItems count: 7
+[2025-06-14T07:45:57.812Z] --- NEW ITEM 0 ---
+[2025-06-14T07:45:57.813Z] Type: tool_call_item
+[2025-06-14T07:45:57.847Z] Role: unknown
+[2025-06-14T07:45:57.894Z] --- NEW ITEM 1 ---
+[2025-06-14T07:45:57.896Z] Type: tool_call_output_item
+[2025-06-14T07:45:57.913Z] Role: unknown
+[2025-06-14T07:45:57.926Z] --- NEW ITEM 2 ---
+[2025-06-14T07:45:57.929Z] Type: tool_call_item
+[2025-06-14T07:45:57.945Z] Role: unknown
+[2025-06-14T07:45:57.958Z] --- NEW ITEM 3 ---
+[2025-06-14T07:45:57.976Z] Type: tool_call_item
+[2025-06-14T07:45:57.980Z] Role: unknown
+[2025-06-14T07:45:57.992Z] --- NEW ITEM 4 ---
+[2025-06-14T07:45:57.993Z] Type: tool_call_output_item
+[2025-06-14T07:45:57.995Z] Role: unknown
+[2025-06-14T07:45:58.126Z] --- NEW ITEM 5 ---
+[2025-06-14T07:45:58.192Z] Type: tool_call_output_item
+[2025-06-14T07:45:58.197Z] Role: unknown
+[2025-06-14T07:45:58.228Z] --- NEW ITEM 6 ---
+[2025-06-14T07:45:58.247Z] Type: message_output_item
+[2025-06-14T07:45:58.297Z] Role: unknown
+[2025-06-14T07:45:58.323Z] Content preview: {"meta":{"step_name":"api_call","request_id":"12345678-90ab-cdef-1234-567890abcdef","timestamp_utc":"2023-10-09T15:00:00Z","version":"1.0","user_language":"PT_BR","status":"success","message":"Consult...
+[2025-06-14T07:45:58.346Z] === FINAL OUTPUT ===
+[2025-06-14T07:45:58.359Z] Final output type: object
+[2025-06-14T07:45:58.409Z] Final output keys: meta, data, echo
+[2025-06-14T07:45:58.442Z] === STREAMING SESSION ENDED ===

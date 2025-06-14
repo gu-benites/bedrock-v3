@@ -74,17 +74,17 @@ describe('useRecipeWizardNavigation', () => {
     });
 
     it('should provide correct step information for last step', () => {
-      mockStore.currentStep = RecipeStep.OILS;
-      
+      mockStore.currentStep = RecipeStep.PROPERTIES;
+
       const { result } = renderHook(() => useRecipeWizardNavigation());
 
-      expect(result.current.stepInfo.current.key).toBe(RecipeStep.OILS);
-      expect(result.current.stepInfo.current.title).toBe('Essential Oils');
+      expect(result.current.stepInfo.current.key).toBe(RecipeStep.PROPERTIES);
+      expect(result.current.stepInfo.current.title).toBe('Therapeutic Properties');
       expect(result.current.stepInfo.isFirst).toBe(false);
       expect(result.current.stepInfo.isLast).toBe(true);
-      expect(result.current.stepInfo.previous?.key).toBe(RecipeStep.PROPERTIES);
+      expect(result.current.stepInfo.previous?.key).toBe(RecipeStep.SYMPTOMS);
       expect(result.current.stepInfo.next).toBeNull();
-      expect(result.current.stepInfo.progress).toBe(6);
+      expect(result.current.stepInfo.progress).toBe(5);
     });
   });
 

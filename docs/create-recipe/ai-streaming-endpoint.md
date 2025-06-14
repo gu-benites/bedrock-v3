@@ -2,7 +2,14 @@
 
 ## Overview
 
-The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities using Server-Sent Events (SSE) and buffer-based streaming with best-effort-json-parser. It integrates with the OpenAI Agents JS SDK to deliver progressive, complete responses for AI-powered features.
+The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities using Server-Sent Events (SSE) and buffer-based streaming with `best-effort-json-parser`. It integrates with the **OpenAI Agents JS SDK** to deliver progressive, complete responses for AI-powered features.
+
+**🎯 Key Features**:
+- **Progressive Item Display**: Individual items appear one-by-one as they're generated
+- **Real-time Streaming**: Immediate feedback during AI processing
+- **Robust Error Handling**: Comprehensive error recovery and user feedback
+- **Dynamic Data Types**: Supports both arrays and single objects automatically
+- **Nested Field Access**: Handles complex data structures with dot notation
 
 ## Endpoint Details
 
@@ -10,8 +17,10 @@ The `/api/ai/streaming` endpoint provides real-time AI streaming capabilities us
 - **Method**: `POST`
 - **Content-Type**: `application/json`
 - **Response-Type**: `text/event-stream` (SSE streaming)
-- **Streaming Method**: Buffer-based with best-effort-json-parser
-- **Data Delivery**: Complete, validated items are delivered as they become available. Partial data is also streamed for frontend progressive rendering.
+- **Streaming Method**: Buffer-based with `best-effort-json-parser` for robust JSON handling
+- **Data Delivery**: Complete, validated items delivered progressively as they become available
+- **State Management**: Supports both hook-based and store-based streaming patterns
+- **Error Recovery**: Graceful handling of network issues, timeouts, and AI service errors
 
 ## Authentication
 
@@ -59,10 +68,12 @@ data: {"type": "structured_complete", "data": {"potential_causes": [...], "meta"
 ```
 
 **Key Features:**
-- **Complete items only**: No partial or word-by-word updates
-- **Buffer-based processing**: Uses best-effort-json-parser for reliable parsing
-- **Validation**: Only sends items with substantial content (10+ chars for name, 20+ for suggestion, 30+ for explanation)
-- **Duplicate prevention**: Tracks sent items to prevent duplicates
+- **Progressive Item Display**: Individual items appear one-by-one as they're generated
+- **Buffer-based processing**: Uses `best-effort-json-parser` for reliable JSON parsing
+- **Dynamic Validation**: Configurable field requirements and minimum lengths per data type
+- **Duplicate prevention**: Tracks sent items using unique IDs to prevent duplicates
+- **Nested Field Support**: Handles complex ID paths like `therapeutic_property_context.property_id`
+- **Real-time Streaming**: Starts immediately during agent execution (not after completion)
 
 ### Text Streaming Response (SSE)
 

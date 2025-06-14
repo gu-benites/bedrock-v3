@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-06-14T07:34:39.461Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:34:39.461Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:40.886Z",
+  "data": {
+    "type": "newItems",
+    "count": 0,
+    "items": []
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:43.935Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 801,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-03T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Dores de cabeça persistentes\",\"suggestion_localized\":\"Monitorar a frequência e intensidade das dores de cabeça.\",\"explanation_localized\":\"Cefaleia crônic",
+    "bufferSuffix": "écnicas de relaxamento e alongamento.\",\"explanation_localized\":\"Estresse pode causar tensão muscular"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:45.484Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1627,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-03T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Dores de cabeça persistentes\",\"suggestion_localized\":\"Monitorar a frequência e intensidade das dores de cabeça.\",\"explanation_localized\":\"Cefaleia crônic",
+    "bufferSuffix": "ocalized\":\"A privação de sono e o estresse podem afetar a concentração.\"},{\"symptom_id\":\"symp_006\",\""
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:47.319Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2490,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-03T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Dores de cabeça persistentes\",\"suggestion_localized\":\"Monitorar a frequência e intensidade das dores de cabeça.\",\"explanation_localized\":\"Cefaleia crônic",
+    "bufferSuffix": "chronic headaches that worsen with stress and lack of sleep\",\"user_info_input\":{\"gender\":\"{{gender}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:47.527Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2644,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-03T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Dores de cabeça persistentes\",\"suggestion_localized\":\"Monitorar a frequência e intensidade das dores de cabeça.\",\"explanation_localized\":\"Cefaleia crônica, que piora com estresse e má qualidade do sono, é um sintoma comum nesta condição.\"},{\"symptom_id\":\"symp_002\",\"name_localized\":\"Tensão muscular no pescoço e ombros\",\"suggestion_localized\":\"Praticar técnicas de relaxamento e alongamento.\",\"explanation_localized\":\"Estresse pode causar tensão muscular, contribuindo para dores de cabeça.\"},{\"symptom_id\":\"symp_003\",\"name_localized\":\"Fadiga e cansaço excessivo\",\"suggestion_localized\":\"Estabelecer rotinas de sono regulares.\",\"explanation_localized\":\"A má qualidade do sono pode levar à fadiga, agravando dores de cabeça.\"},{\"symptom_id\":\"symp_004\",\"name_localized\":\"Irritabilidade e ansiedade\",\"suggestion_localized\":\"Incluir técnicas de gerenciamento de estresse na rotina.\",\"explanation_localized\":\"Estresse frequente pode aumentar a irritabilidade, relacionado ao agravamento das dores de cabeça.\"},{\"symptom_id\":\"symp_005\",\"name_localized\":\"Dificuldade de concentração\",\"suggestion_localized\":\"Manter rotinas de sono saudáveis e reduzir fatores de estresse.\",\"explanation_localized\":\"A privação de sono e o estresse podem afetar a concentração.\"},{\"symptom_id\":\"symp_006\",\"name_localized\":\"Sensibilidade à luz e ruído\",\"suggestion_localized\":\"Evitar ambientes muito iluminados ou barulhentos.\",\"explanation_localized\":\"Estresse e fadiga podem aumentar a sensibilidade, agravando dores de cabeça.\"},{\"symptom_id\":\"symp_007\",\"name_localized\":\"Alterações no humor\",\"suggestion_localized\":\"Praticar técnicas de relaxamento e procurar suporte emocional.\",\"explanation_localized\":\"Estresse e fadiga podem levar a variações de humor.\"},{\"symptom_id\":\"symp_008\",\"name_localized\":\"Problemas de sono ou insônia ocasional\",\"suggestion_localized\":\"Estabelecer rotina de sono e evitar eletrônicos antes de dormir.\",\"explanation_localized\":\"A má qualidade do sono é uma causa agravante das dores de cabeça.\"}]},\"echo\":{\"health_concern_input\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"user_info_input\":{\"gender\":\"{{gender}}\",\"age_category\":\"{{age_category}}\",\"age_specific\":\"{{age_specific}}\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"cause_1749886478720_0.7715011830508912\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:47.603Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:34:47.603Z"
+  }
+}
+---

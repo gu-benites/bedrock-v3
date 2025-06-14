@@ -1,0 +1,34 @@
+[2025-06-14T07:35:22.119Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:35:22.134Z] Request started with traceId: streaming-1749886522119-r6eyegbtp
+[2025-06-14T07:35:22.842Z] Agent execution started
+[2025-06-14T07:35:22.848Z] Tool-based step detected, waiting for completion...
+[2025-06-14T07:35:38.487Z] Agent execution fully completed
+[2025-06-14T07:35:38.494Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:35:38.498Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:35:38.503Z] Has newItems: true
+[2025-06-14T07:35:38.515Z] Has finalOutput: true
+[2025-06-14T07:35:38.518Z] NewItems count: 3
+[2025-06-14T07:35:38.519Z] --- NEW ITEM 0 ---
+[2025-06-14T07:35:38.520Z] Type: tool_call_item
+[2025-06-14T07:35:38.535Z] Role: unknown
+[2025-06-14T07:35:38.549Z] --- NEW ITEM 1 ---
+[2025-06-14T07:35:38.552Z] Type: tool_call_output_item
+[2025-06-14T07:35:38.553Z] Role: unknown
+[2025-06-14T07:35:38.568Z] --- NEW ITEM 2 ---
+[2025-06-14T07:35:38.569Z] Type: message_output_item
+[2025-06-14T07:35:38.582Z] Role: unknown
+[2025-06-14T07:35:38.585Z] Content preview: {
+  "meta": {
+    "step_name": "Suggest Relevant Essential Oils (Safety Deferred)",
+    "request_id": "12345678-1234-1234-1234-1234567890ab",
+    "timestamp_utc": "2023-10-02T10:00:00Z",
+    "version"...
+[2025-06-14T07:35:38.597Z] === FINAL OUTPUT ===
+[2025-06-14T07:35:38.651Z] Final output type: object
+[2025-06-14T07:35:38.653Z] Final output keys: meta, data, echo
+[2025-06-14T07:35:38.881Z] Buffer content at chunk 200 (608 chars):
+[2025-06-14T07:35:39.051Z] Buffer content at chunk 400 (1409 chars):
+[2025-06-14T07:35:39.253Z] Buffer content at chunk 600 (2199 chars):
+[2025-06-14T07:35:39.424Z] Buffer content at chunk 800 (3007 chars):
+[2025-06-14T07:35:39.576Z] Final buffer content (3549 chars):
+[2025-06-14T07:35:39.586Z] === STREAMING SESSION ENDED ===

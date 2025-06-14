@@ -1,0 +1,28 @@
+[2025-06-14T07:55:33.324Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:55:35.614Z] Request started with traceId: streaming-1749887733324-qmia7j73z
+[2025-06-14T07:55:39.003Z] Agent execution started
+[2025-06-14T07:55:39.418Z] Starting real-time streaming for step: suggested-oils
+[2025-06-14T07:55:49.534Z] Buffer content at chunk 200 (669 chars):
+[2025-06-14T07:55:58.702Z] Buffer content at chunk 400 (1447 chars):
+[2025-06-14T07:56:11.500Z] Buffer content at chunk 600 (2220 chars):
+[2025-06-14T07:56:21.017Z] Buffer content at chunk 800 (2940 chars):
+[2025-06-14T07:56:22.149Z] Final buffer content (2942 chars):
+[2025-06-14T07:56:24.247Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:56:24.812Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:56:26.085Z] Has newItems: true
+[2025-06-14T07:56:29.213Z] Has finalOutput: true
+[2025-06-14T07:56:29.965Z] NewItems count: 3
+[2025-06-14T07:56:31.296Z] --- NEW ITEM 0 ---
+[2025-06-14T07:56:31.699Z] Type: tool_call_item
+[2025-06-14T07:56:32.142Z] Role: unknown
+[2025-06-14T07:56:32.715Z] --- NEW ITEM 1 ---
+[2025-06-14T07:56:33.852Z] Type: tool_call_output_item
+[2025-06-14T07:56:35.148Z] Role: unknown
+[2025-06-14T07:56:36.093Z] --- NEW ITEM 2 ---
+[2025-06-14T07:56:36.983Z] Type: message_output_item
+[2025-06-14T07:56:38.824Z] Role: unknown
+[2025-06-14T07:56:39.851Z] Content preview: {"meta":{"step_name":"Call get_recommended_essential_oils","request_id":"01F4ABCD-5678-90AB-CDEF-1234567890AB","timestamp_utc":"2023-10-02T12:00:00Z","version":"1.0","user_language":"PT_BR","status":"...
+[2025-06-14T07:56:39.959Z] === FINAL OUTPUT ===
+[2025-06-14T07:56:40.016Z] Final output type: object
+[2025-06-14T07:56:40.064Z] Final output keys: meta, data, echo
+[2025-06-14T07:56:40.261Z] === STREAMING SESSION ENDED ===

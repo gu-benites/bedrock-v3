@@ -2,19 +2,95 @@
 
 ## Overview
 
-This guide helps developers troubleshoot common issues with the Create Recipe AI streaming system. The system was migrated from recipe-wizard to create-recipe with enhanced capabilities and comprehensive error handling.
+This guide helps developers troubleshoot common issues with the Create Recipe AI streaming system. Based on real implementation experiences from therapeutic properties and suggested oils features, this guide covers the most critical issues and their solutions.
 
-## Common Issues and Solutions
+**🎯 Latest Update**: Added troubleshooting for state management patterns, streaming sequence issues, and progressive display problems based on recent implementations.
+
+## 🚨 CRITICAL ISSUES - MOST COMMON PROBLEMS
+
+Based on real implementation experiences, these are the most critical issues that cause hours of debugging:
+
+### **1. Silent Form Submission Failure (CRITICAL)**
+**Symptoms**: Button click doesn't trigger AI streaming, no errors shown, no console logs
+**Root Cause**: React Hook Form + local state management conflict
+**Time Lost**: 2+ hours debugging "why button doesn't work"
+**Solution**: Remove react-hook-form entirely, use direct button `onClick`
+
+### **2. Mixed State Management Patterns (CRITICAL)**
+**Symptoms**: Modal only shows items at completion instead of progressively during streaming
+**Root Cause**: Using store-based state for modal control but hook-based state for data updates
+**Time Lost**: 1+ hour debugging progressive display
+**Solution**: Use hook-based state consistently: `<AIStreamingModal isOpen={isStreaming} />`
+
+### **3. Streaming Sequence Issues (MAJOR)**
+**Symptoms**: Backend logs show progressive items but frontend modal doesn't update until completion
+**Root Cause**: Backend waits for agent completion before starting streaming
+**Time Lost**: 30+ minutes debugging streaming sequence
+**Solution**: Start streaming immediately during agent execution
+
+### **4. Controller Premature Closure (CRITICAL)**
+**Symptoms**: "Controller is already closed" errors in backend logs
+**Root Cause**: Frontend state management causes backend controller to close early
+**Time Lost**: 2+ hours debugging backend streaming errors
+**Solution**: Use appropriate timeout (60s+) and consistent state management
 
 ## ⚠️ CRITICAL WARNINGS - READ FIRST
 
 This system uses a specific workflow pattern: **AI streams data for the NEXT step while staying on the CURRENT step.**
 
-Attempting to load data on the next step's mount instead of streaming from the previous step is a common source of errors and breaks the intended user experience flow.
-
-For thorough validation and correct implementation patterns, refer to the comprehensive checklists and guidance in [Adding New AI Streaming Steps to Create-Recipe Workflow](/docs/create-recipe/current-files/adding-new-ai-streaming-steps.md) and the [Quick Reference: Adding New AI Streaming Step](/docs/create-recipe/current-files/quick-reference-new-step.md).
+For comprehensive guidance, see:
+- [Adding New AI Streaming Steps](./adding-new-ai-streaming-steps.md)
+- [Quick Reference: New Step](./quick-reference-new-step.md)
+- [Implementation Lessons Learned](./implementation-lessons-learned.md)
  
+## Common Issues and Solutions
+
 ### 1. AI Streaming Issues
+
+#### Issue: Button Click Doesn't Trigger Streaming (CRITICAL)
+
+**Symptoms:**
+- Button appears to work but nothing happens
+- No console logs or network requests
+- Modal never opens
+- No errors shown
+
+**Root Cause:** React Hook Form + local state management conflict
+
+**Solution:**
+```typescript
+// ❌ WRONG - This combination causes silent failures
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const { handleSubmit } = useForm();
+const onSubmit = async (data: any) => { /* never called */ };
+<form onSubmit={handleSubmit(onSubmit)}>
+
+// ✅ CORRECT - Choose ONE approach consistently
+const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+const onSubmit = async () => { /* direct function */ };
+<button type="button" onClick={onSubmit}>Continue</button>
+```
+
+#### Issue: Modal Shows Items Only at Completion (CRITICAL)
+
+**Symptoms:**
+- Backend logs show progressive items (`itemsSent: 1, 2, 3, 4, 5`)
+- Frontend modal only shows items when streaming completes
+- No progressive display during streaming
+
+**Root Cause:** Mixed state management patterns
+
+**Solution:**
+```typescript
+// ❌ WRONG - Mixed patterns cause display issues
+const [isModalOpen, setIsModalOpen] = useState(false); // Local state
+const { isStreamingOils } = useRecipeStore(); // Store state
+<AIStreamingModal isOpen={isStreamingOils} /> // Using store state
+
+// ✅ CORRECT - Hook-based pattern (consistent)
+const { isStreaming } = useAIStreaming();
+<AIStreamingModal isOpen={isStreaming} />
+```
 
 #### Issue: Streaming Not Starting
 
@@ -24,11 +100,10 @@ For thorough validation and correct implementation patterns, refer to the compre
 - Component remains in loading state indefinitely
 
 **Possible Causes:**
-- **Incorrect Workflow Pattern:** Attempting to load data on component mount instead of streaming from the previous step.
+- **Prompt Configuration Errors:** Incorrect file format, location, or content in the prompt `.yaml` file
 - Missing or invalid health concern data
 - Demographics data not properly formatted
 - Network connectivity issues
-- **Prompt Configuration Errors:** Incorrect file format, location, or content in the prompt `.yaml` file.
 - API endpoint not responding
 
 **Solutions:**

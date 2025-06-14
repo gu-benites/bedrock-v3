@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document outlines the architecture of the AI streaming system that powers the Create Recipe feature. The system integrates OpenAI Agents JS SDK with a buffer-based streaming approach using best-effort-json-parser to deliver complete, validated AI responses in real-time without partial updates.
+This document outlines the architecture of the AI streaming system that powers the Create Recipe feature. The system integrates **OpenAI Agents JS SDK** with a **buffer-based streaming approach** using `best-effort-json-parser` to deliver complete, validated AI responses in real-time with progressive item display.
+
+**🎯 Key Achievement**: Progressive streaming where individual items appear one-by-one as they're generated, providing real-time feedback to users while maintaining data integrity.
 
 ## System Architecture
 
@@ -28,16 +30,25 @@ This document outlines the architecture of the AI streaming system that powers t
 #### Frontend Layer
 
 **1. React Components**
-- `AIStreamingModal`: Terminal-style streaming interface with hidden scrollbars
+- `AIStreamingModal`: Terminal-style streaming interface with progressive item display
 - `DemographicsForm`: Enhanced with streaming capabilities and modal integration
-- `CausesSelection`: Updated to handle AI-generated data with progressive display for selecting potential causes.
-- `TherapeuticPropertiesSelection`: Component for displaying and selecting AI-generated therapeutic properties.
-- `EssentialOilsSelection`: Component for displaying and selecting AI-generated essential oils.
+- `CausesSelection`: AI-generated causes with progressive streaming display
+- `SymptomsSelection`: AI-generated symptoms with progressive streaming display
+- `PropertiesDisplay`: AI-generated therapeutic properties with progressive streaming display
+- `EssentialOilsSelection`: AI-generated essential oils with progressive streaming display
+
+**🔧 Critical Pattern**: All components use consistent streaming patterns with either store-based or hook-based state management (never mixed).
 
 **2. Custom Hooks**
-- `useAIStreaming`: Core streaming functionality with buffer-based processing
-- `useAutoScroll`: Automatic scrolling for streaming content
-- `useRecipeStore`: State management with streaming support
+- `useAIStreaming`: Core streaming functionality with buffer-based processing and progressive item extraction
+- `useAutoScroll`: Automatic scrolling for streaming content with scroll-up detection
+- `useRecipeStore`: State management with streaming support and error handling
+- `useRecipeStreaming`: Specialized streaming state management for complex workflows
+
+**🎯 State Management Patterns**:
+- **Hook-based**: `isStreaming` from `useAIStreaming` (simple steps)
+- **Store-based**: `isStreamingProperties` from store (complex steps)
+- **Never mix patterns** - causes modal display issues
 
 **3. UI Components**
 - Terminal-style code block interface
@@ -48,13 +59,14 @@ This document outlines the architecture of the AI streaming system that powers t
 #### API Layer
 
 **1. Streaming Endpoint** (`/api/ai/streaming`)
-- Server-Sent Events (SSE) implementation
-- Buffer-based streaming with best-effort-json-parser
-- Complete item validation and filtering
-- Duplicate prevention and item tracking
-- Request validation and processing
-- Dynamic prompt loading
-- OpenAI SDK integration
+- Server-Sent Events (SSE) implementation with real-time progressive streaming
+- Buffer-based streaming with `best-effort-json-parser` for incomplete JSON handling
+- Complete item validation and filtering using `streaming-data-types.ts` configuration
+- Duplicate prevention and item tracking with unique ID management
+- Request validation and processing with comprehensive error handling
+- Dynamic prompt loading from YAML files with template variable substitution
+- OpenAI Agents JS SDK integration with parallel tool calls support
+- **Critical Fix**: Streaming starts immediately during agent execution (not after completion)
 
 **2. Prompt Manager** (`src/lib/ai/utils/prompt-manager.ts`)
 - YAML configuration loading
@@ -71,12 +83,14 @@ This document outlines the architecture of the AI streaming system that powers t
 - Error handling and retry logic
 
 **2. Response Processing**
-- Buffer accumulation and parsing with best-effort-json-parser
-- Complete item validation (minimum content length requirements)
-- JSON schema validation
-- Data transformation and cleaning
-- Progressive data extraction (complete items only)
-- Error recovery mechanisms
+- Buffer accumulation and parsing with `best-effort-json-parser` for robust JSON handling
+- Complete item validation using configurable field requirements and minimum lengths
+- JSON schema validation with OpenAI Structured Outputs
+- Data transformation and cleaning with nested field access support
+- Progressive data extraction (complete items only) with real-time streaming
+- Error recovery mechanisms with graceful degradation
+- **Dynamic Data Type Support**: Handles both arrays and single objects automatically
+- **Nested Field Access**: Supports complex ID paths like `therapeutic_property_context.property_id`
 
 ## Data Flow Architecture
 

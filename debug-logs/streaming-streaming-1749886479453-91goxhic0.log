@@ -1,0 +1,14 @@
+[2025-06-14T07:34:39.453Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:34:39.464Z] Request started with traceId: streaming-1749886479453-91goxhic0
+[2025-06-14T07:34:40.301Z] Agent execution started
+[2025-06-14T07:34:40.483Z] Standard step detected, proceeding with real-time streaming
+[2025-06-14T07:34:40.552Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:34:40.683Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:34:40.716Z] Has newItems: true
+[2025-06-14T07:34:40.843Z] Has finalOutput: false
+[2025-06-14T07:34:40.883Z] NewItems count: 0
+[2025-06-14T07:34:43.918Z] Buffer content at chunk 200 (801 chars):
+[2025-06-14T07:34:45.481Z] Buffer content at chunk 400 (1627 chars):
+[2025-06-14T07:34:47.300Z] Buffer content at chunk 600 (2490 chars):
+[2025-06-14T07:34:47.518Z] Final buffer content (2644 chars):
+[2025-06-14T07:34:47.587Z] === STREAMING SESSION ENDED ===

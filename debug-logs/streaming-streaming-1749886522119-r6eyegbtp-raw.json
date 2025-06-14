@@ -1,0 +1,226 @@
+{
+  "timestamp": "2025-06-14T07:35:22.126Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:35:22.126Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:38.587Z",
+  "data": {
+    "type": "newItems",
+    "count": 3,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d27ed53248199ba230da05e98edaf0319ec49a160088b",
+          "type": "function_call",
+          "callId": "call_PnJvpnsULb0AyW6PcXl4zmf6",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades Calmantes\",\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"additional_context\":\"Relevant symptoms and causes from the user's profile\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_PnJvpnsULb0AyW6PcXl4zmf6",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades calmantes para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Calmantes\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.844274044\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.84109664\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.84002465\n    },\n    {\n      \"text\": \"O mix de óleos essenciais para serenidade é uma combinação que pode ajudar a promover a tranquilidade, diminuir a tensão e ansiedade, e melhorar a qualidade do sono. Esse mix contém propriedades terapêuticas que auxiliam na redução do cortisol e proporcionam uma noite de sono repousante. Além disso, pode ser útil para lidar com preocupações diárias e promover uma sensação de bem-estar geral.\",\n      \"score\": 0.839468479\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda, camomila romana e cedro do Olíbano (Frankincense) possuem propriedades calmantes e relaxantes, sendo úteis para aliviar a ansiedade e melhorar a qualidade do sono. A lavanda é conhecida por suas propriedades terapêuticas e emocionais, enquanto a camomila romana pode ser usada em banhos de assento para acalmar a pele. O cedro do Olíbano (Frankincense) é benéfico para os cabelos, pele e pode ajudar a reduzir manchas e melhorar a aparência de rugas.\",\n      \"score\": 0.8394261\n    },\n    {\n      \"text\": \"Utilizados para auxiliar no equilíbrio emocional e relaxamento de crianças. Mix Calmer do Kit Kids e o Mix Steady, que podem ser aplicados várias vezes ao dia na coluna, nuca e sola dos pés, além de serem inalados. Para melhorar a qualidade do sono, é sugerido o uso de um difusor com lavanda e capim-limão à noite.\",\n      \"score\": 0.838604093\n    },\n    {\n      \"text\": \"Óleos essenciais como bergamota, camomila romana, Ylang Ylang, lavanda e sálvia esclareia são conhecidos por suas propriedades calmantes e relaxantes. Eles podem ser utilizados para melhorar a qualidade do sono e reduzir o estresse e a ansiedade. Uma sugestão de uso é colocar algumas gotas de Ylang Ylang no difusor antes de dormir para obter uma noite de sono tranquila. Além disso, um mix de óleos essenciais chamado serenity contém lavanda e camomila romana, que também são benéficos para promover o relaxamento e um sono reparador.\",\n      \"score\": 0.838217139\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.837296546\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades calmantes para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Calmantes\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.844274044\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.84109664\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.84002465\n    },\n    {\n      \"text\": \"O mix de óleos essenciais para serenidade é uma combinação que pode ajudar a promover a tranquilidade, diminuir a tensão e ansiedade, e melhorar a qualidade do sono. Esse mix contém propriedades terapêuticas que auxiliam na redução do cortisol e proporcionam uma noite de sono repousante. Além disso, pode ser útil para lidar com preocupações diárias e promover uma sensação de bem-estar geral.\",\n      \"score\": 0.839468479\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda, camomila romana e cedro do Olíbano (Frankincense) possuem propriedades calmantes e relaxantes, sendo úteis para aliviar a ansiedade e melhorar a qualidade do sono. A lavanda é conhecida por suas propriedades terapêuticas e emocionais, enquanto a camomila romana pode ser usada em banhos de assento para acalmar a pele. O cedro do Olíbano (Frankincense) é benéfico para os cabelos, pele e pode ajudar a reduzir manchas e melhorar a aparência de rugas.\",\n      \"score\": 0.8394261\n    },\n    {\n      \"text\": \"Utilizados para auxiliar no equilíbrio emocional e relaxamento de crianças. Mix Calmer do Kit Kids e o Mix Steady, que podem ser aplicados várias vezes ao dia na coluna, nuca e sola dos pés, além de serem inalados. Para melhorar a qualidade do sono, é sugerido o uso de um difusor com lavanda e capim-limão à noite.\",\n      \"score\": 0.838604093\n    },\n    {\n      \"text\": \"Óleos essenciais como bergamota, camomila romana, Ylang Ylang, lavanda e sálvia esclareia são conhecidos por suas propriedades calmantes e relaxantes. Eles podem ser utilizados para melhorar a qualidade do sono e reduzir o estresse e a ansiedade. Uma sugestão de uso é colocar algumas gotas de Ylang Ylang no difusor antes de dormir para obter uma noite de sono tranquila. Além disso, um mix de óleos essenciais chamado serenity contém lavanda e camomila romana, que também são benéficos para promover o relaxamento e um sono reparador.\",\n      \"score\": 0.838217139\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.837296546\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d27f0eaf88199b20bd754123a96530319ec49a160088b",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\n        \"property_name_localized\": \"Propriedades Calmantes\",\n        \"property_name_english\": \"Propriedades Calmantes\",\n        \"description_localized\": \"Auxilia na redução do estresse e da ansiedade, ajudando a aliviar a tensão muscular no pescoço e ombros causada pelo estresse.\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Possui propriedades ansiolíticas e calmantes, eficaz para reduzir o estresse, ansiedade e melhorar o sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Petigrain\",\n          \"name_botanical\": \"Citrus aurantium amara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\": \"Contém compostos sedativos, ajudando a aliviar a ansiedade e promover relaxamento, ideal para reduzir tensão muscular.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Hortelã-pimenta\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Hortelã-pimenta\",\n          \"match_rationale_localized\": \"Possui efeito calmante e analgésico, que pode ajudar a aliviar dores de cabeça e reduzir a tensão muscular.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Copaíba\",\n          \"name_botanical\": \"Copaifera officinalis\",\n          \"name_localized\": \"Copaíba\",\n          \"match_rationale_localized\": \"Tem propriedades ansiolíticas e relaxantes, que ajudam a diminuir a ansiedade e melhorar a qualidade do sono.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Camomila romana\",\n          \"name_botanical\": \"Chamaemelum nobile\",\n          \"name_localized\": \"Camomila romana\",\n          \"match_rationale_localized\": \"Propriedades relaxantes e sedativas, auxiliando na redução da ansiedade e melhora do sono.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"6\",\n          \"name_english\": \"Cedro do Olíbano\",\n          \"name_botanical\": \"Boswellia sacra\",\n          \"name_localized\": \"Cedro do Olíbano\",\n          \"match_rationale_localized\": \"Propriedades calmantes e relaxantes, úteis para ansiedade e tensão muscular, promovendo relaxamento profundo.\",\n          \"relevancy_to_property_score\": 4\n        }\n      ]\n    }\n  }\n  \n \n  , \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"60\",\n      \"age_unit\": \"years\"\n    },\n    \"selected_cause_ids\": [\"Lack of sleep\"],\n    \"selected_symptom_ids\": [\"Tensão muscular no pescoço e ombros\"],\n    \"therapeutic_property_ids\": [\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\"]\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:38.682Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Suggest Relevant Essential Oils (Safety Deferred)",
+        "request_id": "12345678-1234-1234-1234-1234567890ab",
+        "timestamp_utc": "2023-10-02T10:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a",
+            "property_name_localized": "Propriedades Calmantes",
+            "property_name_english": "Propriedades Calmantes",
+            "description_localized": "Auxilia na redução do estresse e da ansiedade, ajudando a aliviar a tensão muscular no pescoço e ombros causada pelo estresse."
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Lavanda",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Possui propriedades ansiolíticas e calmantes, eficaz para reduzir o estresse, ansiedade e melhorar o sono.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Petigrain",
+              "name_botanical": "Citrus aurantium amara",
+              "name_localized": "Petigrain",
+              "match_rationale_localized": "Contém compostos sedativos, ajudando a aliviar a ansiedade e promover relaxamento, ideal para reduzir tensão muscular.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Hortelã-pimenta",
+              "name_botanical": "Mentha piperita",
+              "name_localized": "Hortelã-pimenta",
+              "match_rationale_localized": "Possui efeito calmante e analgésico, que pode ajudar a aliviar dores de cabeça e reduzir a tensão muscular.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Copaíba",
+              "name_botanical": "Copaifera officinalis",
+              "name_localized": "Copaíba",
+              "match_rationale_localized": "Tem propriedades ansiolíticas e relaxantes, que ajudam a diminuir a ansiedade e melhorar a qualidade do sono.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Camomila romana",
+              "name_botanical": "Chamaemelum nobile",
+              "name_localized": "Camomila romana",
+              "match_rationale_localized": "Propriedades relaxantes e sedativas, auxiliando na redução da ansiedade e melhora do sono.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "6",
+              "name_english": "Cedro do Olíbano",
+              "name_botanical": "Boswellia sacra",
+              "name_localized": "Cedro do Olíbano",
+              "match_rationale_localized": "Propriedades calmantes e relaxantes, úteis para ansiedade e tensão muscular, promovendo relaxamento profundo.",
+              "relevancy_to_property_score": 4
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "I have chronic headaches that worsen with stress and lack of sleep",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "60",
+          "age_unit": "years"
+        },
+        "selected_cause_ids": [
+          "Lack of sleep"
+        ],
+        "selected_symptom_ids": [
+          "Tensão muscular no pescoço e ombros"
+        ],
+        "therapeutic_property_ids": [
+          "d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:38.883Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 608,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9",
+    "bufferSuffix": "c21b4a\",\n        \"property_name_localized\": \"Propriedades Calmantes\",\n        \"property_name_english"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:39.052Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1409,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9",
+    "bufferSuffix": "us aurantium amara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\":"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:39.266Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2199,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9",
+    "bufferSuffix": "\"name_localized\": \"Copaíba\",\n          \"match_rationale_localized\": \"Tem propriedades ansiolíticas e"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:39.429Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 3007,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9",
+    "bufferSuffix": "zed\": \"Propriedades calmantes e relaxantes, úteis para ansiedade e tensão muscular, promovendo relax"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:39.579Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3549,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"12345678-1234-1234-1234-1234567890ab\",\n    \"timestamp_utc\": \"2023-10-02T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais para propriedades calmantes obtidas com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\n        \"property_name_localized\": \"Propriedades Calmantes\",\n        \"property_name_english\": \"Propriedades Calmantes\",\n        \"description_localized\": \"Auxilia na redução do estresse e da ansiedade, ajudando a aliviar a tensão muscular no pescoço e ombros causada pelo estresse.\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Possui propriedades ansiolíticas e calmantes, eficaz para reduzir o estresse, ansiedade e melhorar o sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Petigrain\",\n          \"name_botanical\": \"Citrus aurantium amara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\": \"Contém compostos sedativos, ajudando a aliviar a ansiedade e promover relaxamento, ideal para reduzir tensão muscular.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Hortelã-pimenta\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Hortelã-pimenta\",\n          \"match_rationale_localized\": \"Possui efeito calmante e analgésico, que pode ajudar a aliviar dores de cabeça e reduzir a tensão muscular.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Copaíba\",\n          \"name_botanical\": \"Copaifera officinalis\",\n          \"name_localized\": \"Copaíba\",\n          \"match_rationale_localized\": \"Tem propriedades ansiolíticas e relaxantes, que ajudam a diminuir a ansiedade e melhorar a qualidade do sono.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Camomila romana\",\n          \"name_botanical\": \"Chamaemelum nobile\",\n          \"name_localized\": \"Camomila romana\",\n          \"match_rationale_localized\": \"Propriedades relaxantes e sedativas, auxiliando na redução da ansiedade e melhora do sono.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"6\",\n          \"name_english\": \"Cedro do Olíbano\",\n          \"name_botanical\": \"Boswellia sacra\",\n          \"name_localized\": \"Cedro do Olíbano\",\n          \"match_rationale_localized\": \"Propriedades calmantes e relaxantes, úteis para ansiedade e tensão muscular, promovendo relaxamento profundo.\",\n          \"relevancy_to_property_score\": 4\n        }\n      ]\n    }\n  }\n  \n \n  , \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"60\",\n      \"age_unit\": \"years\"\n    },\n    \"selected_cause_ids\": [\"Lack of sleep\"],\n    \"selected_symptom_ids\": [\"Tensão muscular no pescoço e ombros\"],\n    \"therapeutic_property_ids\": [\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\"]\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:39.587Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:35:39.587Z"
+  }
+}
+---

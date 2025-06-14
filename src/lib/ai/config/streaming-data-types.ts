@@ -69,14 +69,28 @@ export const STREAMING_DATA_TYPES: Record<string, DataTypeConfig> = {
 
   suggested_oils: {
     idField: 'oil_id',
-    requiredFields: ['name_english', 'name_local_language', 'oil_description'],
-    minLengths: { 
-      name_english: 3, 
-      name_local_language: 3, 
-      oil_description: 10 
+    requiredFields: ['name_english', 'name_botanical', 'name_localized', 'match_rationale_localized'],
+    minLengths: {
+      name_english: 3,
+      name_botanical: 5,
+      name_localized: 3,
+      match_rationale_localized: 20
     },
-    optionalFields: ['relevancy'],
+    optionalFields: ['relevancy_to_property_score'],
     displayName: 'Suggested Oil'
+  },
+
+  suggested_oils: {
+    idField: 'oil_id',
+    requiredFields: ['name_english', 'name_botanical', 'name_localized', 'match_rationale_localized'],
+    minLengths: {
+      'name_english': 3,
+      'name_botanical': 5,
+      'name_localized': 3,
+      'match_rationale_localized': 10
+    },
+    optionalFields: ['relevancy_to_property_score'],
+    displayName: 'Essential Oil'
   },
 
   medical_properties: {
@@ -92,16 +106,41 @@ export const STREAMING_DATA_TYPES: Record<string, DataTypeConfig> = {
 };
 
 /**
+ * Get nested value from object using dot notation (e.g., "therapeutic_property_context.property_id")
+ */
+function getNestedValue(obj: any, path: string): any {
+  return path.split('.').reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : undefined;
+  }, obj);
+}
+
+/**
  * Validate if an item is complete based on its data type configuration
  */
 export function isItemComplete(item: any, config: DataTypeConfig): boolean {
-  if (!item || typeof item !== 'object' || !item[config.idField]) {
+  if (!item || typeof item !== 'object') {
+    return false;
+  }
+
+  // Check ID field exists (handle nested paths)
+  const idValue = getNestedValue(item, config.idField);
+  if (!idValue) {
     return false;
   }
 
   // Check all required fields exist and meet minimum length requirements
   for (const field of config.requiredFields) {
-    const value = item[field];
+    const value = getNestedValue(item, field);
+
+    // For nested objects (like suggested_oils array), just check existence
+    if (field === 'suggested_oils' && Array.isArray(value)) {
+      if (value.length === 0) {
+        return false;
+      }
+      continue;
+    }
+
+    // For string fields, check content and length
     if (!value || typeof value !== 'string') {
       return false;
     }
@@ -116,23 +155,58 @@ export function isItemComplete(item: any, config: DataTypeConfig): boolean {
 }
 
 /**
+ * Set nested value in object using dot notation
+ */
+function setNestedValue(obj: any, path: string, value: any): void {
+  const keys = path.split('.');
+  const lastKey = keys.pop()!;
+  const target = keys.reduce((current, key) => {
+    if (!current[key] || typeof current[key] !== 'object') {
+      current[key] = {};
+    }
+    return current[key];
+  }, obj);
+  target[lastKey] = value;
+}
+
+/**
  * Clean item data based on its configuration, including only relevant fields
  */
 export function cleanItemData(item: any, config: DataTypeConfig): any {
   const cleanData: any = {};
 
-  // Add ID field
-  cleanData[config.idField] = item[config.idField];
-
-  // Add required fields (trimmed)
-  for (const field of config.requiredFields) {
-    cleanData[field] = item[field].trim();
+  // Add ID field (handle nested paths)
+  const idValue = getNestedValue(item, config.idField);
+  if (config.idField.includes('.')) {
+    setNestedValue(cleanData, config.idField, idValue);
+  } else {
+    cleanData[config.idField] = idValue;
   }
 
-  // Add optional fields if present
+  // Add required fields (handle nested paths)
+  for (const field of config.requiredFields) {
+    const value = getNestedValue(item, field);
+
+    if (field.includes('.')) {
+      setNestedValue(cleanData, field, value);
+    } else {
+      if (typeof value === 'string') {
+        cleanData[field] = value.trim();
+      } else {
+        cleanData[field] = value;
+      }
+    }
+  }
+
+  // Add optional fields if present (handle nested paths)
   for (const field of config.optionalFields) {
-    if (item[field] !== undefined && item[field] !== null) {
-      cleanData[field] = item[field];
+    const value = getNestedValue(item, field);
+    if (value !== undefined && value !== null) {
+      if (field.includes('.')) {
+        setNestedValue(cleanData, field, value);
+      } else {
+        cleanData[field] = value;
+      }
     }
   }
 

@@ -14,8 +14,8 @@ import { HealthConcernChatInput } from './health-concern-chat-input';
 import { DemographicsForm } from './demographics-form';
 import { CausesSelection } from './causes-selection';
 import { SymptomsSelection } from './symptoms-selection';
-import { TherapeuticPropertiesSelection } from './therapeutic-properties-selection';
-import { OilsDisplay } from './oils-display';
+import { PropertiesDisplay } from './properties-display';
+// Note: OilsDisplay removed - oils are now nested within TherapeuticPropertiesSelection
 import { MobileLayout } from './mobile-layout';
 import { DashboardLayout } from './dashboard-layout';
 import { RecipeErrorBoundary } from './error-boundary';
@@ -48,9 +48,7 @@ function StepRenderer({ step, sessionId, layout }: { step: RecipeStep; sessionId
     case RecipeStep.SYMPTOMS:
       return <SymptomsSelection key={`symptoms-${sessionId}`} />;
     case RecipeStep.PROPERTIES:
-      return <TherapeuticPropertiesSelection key={`properties-${sessionId}`} />;
-    case RecipeStep.OILS:
-      return <OilsDisplay key={`oils-${sessionId}`} />;
+      return <PropertiesDisplay key={`properties-${sessionId}`} />;
     default:
       return <div>Unknown step</div>;
   }

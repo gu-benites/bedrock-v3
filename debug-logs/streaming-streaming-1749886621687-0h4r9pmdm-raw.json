@@ -1,0 +1,219 @@
+{
+  "timestamp": "2025-06-14T07:37:01.698Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:37:01.698Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:15.788Z",
+  "data": {
+    "type": "newItems",
+    "count": 3,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d28509a38819aa76f38e23067caa90be1523d49ca697d",
+          "type": "function_call",
+          "callId": "call_HsoHi8dXGZB4a8r1aFpgb662",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades Sedativas leves\",\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"additional_context\":\"Relevant symptoms and causes from the user's profile\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_HsoHi8dXGZB4a8r1aFpgb662",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades sedativas leves para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Sedativas leves\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.845894456\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.841711402\n    },\n    {\n      \"text\": \"Os óleos essenciais podem ser utilizados para melhorar a qualidade do sono e aliviar a insônia. Algumas propriedades terapêuticas dos óleos essenciais incluem ação analgésica, antibiótica, ansiolítica e anti-séptica. Para tratar a insônia, é importante escolher óleos essenciais com propriedades relaxantes e calmantes. No entanto, o texto fornecido não apresenta informações específicas sobre receitas, protocolos de uso, cuidados com a saúde, depoimentos e resultados, compostos químicos ou quantidades relacionadas aos óleos essenciais e insônia.\",\n      \"score\": 0.841551363\n    },\n    {\n      \"text\": \"Os óleos essenciais podem ser utilizados para auxiliar no tratamento da insônia severa e como substitutos de indutores de sono sintéticos. No entanto, é importante lembrar que os óleos essenciais não funcionam como uma \\\"pílula mágica\\\" e devem ser usados ao longo do dia, pois a insônia pode ser influenciada por fatores como alimentação inadequada, estresse, consumo de álcool e tabaco.  sobre receitas, protocolos de uso, cuidados com a saúde, depoimentos e resultados, compostos químicos e propriedades terapêuticas no texto fornecido.\",\n      \"score\": 0.841026843\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.840606153\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.840075731\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.839224637\n    },\n    {\n      \"text\": \"Óleos essenciais possuem diversas propriedades terapêuticas e podem ser utilizados para aliviar dores, diminuir inchaço, reduzir o estresse e promover o equilíbrio hormonal. No texto fornecido, é mencionado o uso de uma mistura chamada \\\"serenity\\\" para auxiliar no sono. Além disso, a combinação de óleos essenciais de lavanda e serenity no difusor à noite pode ser benéfica. Outra sugestão é misturar um óleo cítrico, como o de laranja, no difusor para obter um aroma agradável e equilibrado.\",\n      \"score\": 0.837899387\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades sedativas leves para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Sedativas leves\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.845894456\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.841711402\n    },\n    {\n      \"text\": \"Os óleos essenciais podem ser utilizados para melhorar a qualidade do sono e aliviar a insônia. Algumas propriedades terapêuticas dos óleos essenciais incluem ação analgésica, antibiótica, ansiolítica e anti-séptica. Para tratar a insônia, é importante escolher óleos essenciais com propriedades relaxantes e calmantes. No entanto, o texto fornecido não apresenta informações específicas sobre receitas, protocolos de uso, cuidados com a saúde, depoimentos e resultados, compostos químicos ou quantidades relacionadas aos óleos essenciais e insônia.\",\n      \"score\": 0.841551363\n    },\n    {\n      \"text\": \"Os óleos essenciais podem ser utilizados para auxiliar no tratamento da insônia severa e como substitutos de indutores de sono sintéticos. No entanto, é importante lembrar que os óleos essenciais não funcionam como uma \\\"pílula mágica\\\" e devem ser usados ao longo do dia, pois a insônia pode ser influenciada por fatores como alimentação inadequada, estresse, consumo de álcool e tabaco.  sobre receitas, protocolos de uso, cuidados com a saúde, depoimentos e resultados, compostos químicos e propriedades terapêuticas no texto fornecido.\",\n      \"score\": 0.841026843\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.840606153\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.840075731\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.839224637\n    },\n    {\n      \"text\": \"Óleos essenciais possuem diversas propriedades terapêuticas e podem ser utilizados para aliviar dores, diminuir inchaço, reduzir o estresse e promover o equilíbrio hormonal. No texto fornecido, é mencionado o uso de uma mistura chamada \\\"serenity\\\" para auxiliar no sono. Além disso, a combinação de óleos essenciais de lavanda e serenity no difusor à noite pode ser benéfica. Outra sugestão é misturar um óleo cítrico, como o de laranja, no difusor para obter um aroma agradável e equilibrado.\",\n      \"score\": 0.837899387\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d2853cc84819a9ff17d4b070c2b9c0be1523d49ca697d",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e3d4c5-6789-0abc-def1-234567890bcd\",\n        \"property_name_localized\": \"Propriedades Sedativas leves\",\n        \"property_name_english\": \"Propriedades Sedativas leves\",\n        \"description_localized\": \"Promove um estado de relaxamento que favorece um sono mais tranquilo, contribuindo para reduzir\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Óleo essencial de lavanda possui propriedades calmantes e ansiolíticas, eficaz para promover relaxamento e melhorar a qualidade do sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Petigrain\",\n          \"name_botanical\": \"Citrus aurantium amara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\": \"Petigrain tem efeitos sedativos, ajudando a aliviar o estresse e a ansiedade que podem causar dores de cabeça e insônia.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Frankincense\",\n          \"name_botanical\": \"Boswellia carterii\",\n          \"name_localized\": \"Frankincense\",\n          \"match_rationale_localized\": \"Frankincense possui propriedades relaxantes e pode ajudar na redução do estresse e na indução de sono profundo.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Laranja\",\n          \"name_botanical\": \"Citrus sinensis\",\n          \"name_localized\": \"Laranja\",\n          \"match_rationale_localized\": \"Óleo cítrico de laranja ajuda a aliviar ansiedade e promove um ambiente relaxante.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Hortelã-pimenta\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Hortelã-pimenta\",\n          \"match_rationale_localized\": \"Complementa o efeito sedativo, ajudando na diminuição da tensão muscular e dores de cabeça.\",\n          \"relevancy_to_property_score\": 4\n        }\n      ]\n    }\n  }\n  \n  \t\t\n      \t\t\n       \n \t,\n \t\"echo\": {\n \t\t\"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n \t\t\"user_info_input\": {\n \t\t\t\"gender\": \"feminino\",\n \t\t\t\"age_category\": \"adulto\",\n \t\t\t\"age_specific\": \"60 anos\",\n \t\t\t\"age_unit\": \"anos\"\n \t\t},\n \t\t\"selected_cause_ids\": [\n \t\t\t\"Lack of sleep\",\n \t\t\t\"Estresse\"\n \t\t],\n \t\t\"selected_symptom_ids\": [\n \t\t\t\"Tensão muscular no pescoço e ombros\"\n \t\t],\n \t\t\"therapeutic_property_ids\": [\n \t\t\t\"f2e3d4c5-6789-0abc-def1-234567890bcd\"\n \t\t]\n \t}\n }"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:15.886Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Recomendação de Óleos Essenciais para Propriedades Sedativas Leves",
+        "request_id": "12345abc-6789-0def-1234-56789abcdef0",
+        "timestamp_utc": "2023-10-02T14:30:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": " sucesso",
+        "message": "Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso"
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "f2e3d4c5-6789-0abc-def1-234567890bcd",
+            "property_name_localized": "Propriedades Sedativas leves",
+            "property_name_english": "Propriedades Sedativas leves",
+            "description_localized": "Promove um estado de relaxamento que favorece um sono mais tranquilo, contribuindo para reduzir"
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Lavanda",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Óleo essencial de lavanda possui propriedades calmantes e ansiolíticas, eficaz para promover relaxamento e melhorar a qualidade do sono.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Petigrain",
+              "name_botanical": "Citrus aurantium amara",
+              "name_localized": "Petigrain",
+              "match_rationale_localized": "Petigrain tem efeitos sedativos, ajudando a aliviar o estresse e a ansiedade que podem causar dores de cabeça e insônia.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Frankincense",
+              "name_botanical": "Boswellia carterii",
+              "name_localized": "Frankincense",
+              "match_rationale_localized": "Frankincense possui propriedades relaxantes e pode ajudar na redução do estresse e na indução de sono profundo.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Laranja",
+              "name_botanical": "Citrus sinensis",
+              "name_localized": "Laranja",
+              "match_rationale_localized": "Óleo cítrico de laranja ajuda a aliviar ansiedade e promove um ambiente relaxante.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Hortelã-pimenta",
+              "name_botanical": "Mentha piperita",
+              "name_localized": "Hortelã-pimenta",
+              "match_rationale_localized": "Complementa o efeito sedativo, ajudando na diminuição da tensão muscular e dores de cabeça.",
+              "relevancy_to_property_score": 4
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "I have chronic headaches that worsen with stress and lack of sleep",
+        "user_info_input": {
+          "gender": "feminino",
+          "age_category": "adulto",
+          "age_specific": "60 anos",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "Lack of sleep",
+          "Estresse"
+        ],
+        "selected_symptom_ids": [
+          "Tensão muscular no pescoço e ombros"
+        ],
+        "therapeutic_property_ids": [
+          "f2e3d4c5-6789-0abc-def1-234567890bcd"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.167Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 633,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e",
+    "bufferSuffix": "\",\n        \"property_name_localized\": \"Propriedades Sedativas leves\",\n        \"property_name_english"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.319Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1454,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e",
+    "bufferSuffix": "ara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\": \"Petigrain tem"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.584Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2280,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e",
+    "bufferSuffix": "e_localized\": \"Óleo cítrico de laranja ajuda a aliviar ansiedade e promove um ambiente relaxante.\",\n"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.837Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 2988,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e",
+    "bufferSuffix": " \"feminino\",\n \t\t\t\"age_category\": \"adulto\",\n \t\t\t\"age_specific\": \"60 anos\",\n \t\t\t\"age_unit\": \"anos\"\n \t\t"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.954Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3224,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Recomendação de Óleos Essenciais para Propriedades Sedativas Leves\",\n    \"request_id\": \"12345abc-6789-0def-1234-56789abcdef0\",\n    \"timestamp_utc\": \"2023-10-02T14:30:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \" sucesso\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na busca vetorial concluídas com sucesso\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"f2e3d4c5-6789-0abc-def1-234567890bcd\",\n        \"property_name_localized\": \"Propriedades Sedativas leves\",\n        \"property_name_english\": \"Propriedades Sedativas leves\",\n        \"description_localized\": \"Promove um estado de relaxamento que favorece um sono mais tranquilo, contribuindo para reduzir\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Óleo essencial de lavanda possui propriedades calmantes e ansiolíticas, eficaz para promover relaxamento e melhorar a qualidade do sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Petigrain\",\n          \"name_botanical\": \"Citrus aurantium amara\",\n          \"name_localized\": \"Petigrain\",\n          \"match_rationale_localized\": \"Petigrain tem efeitos sedativos, ajudando a aliviar o estresse e a ansiedade que podem causar dores de cabeça e insônia.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Frankincense\",\n          \"name_botanical\": \"Boswellia carterii\",\n          \"name_localized\": \"Frankincense\",\n          \"match_rationale_localized\": \"Frankincense possui propriedades relaxantes e pode ajudar na redução do estresse e na indução de sono profundo.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Laranja\",\n          \"name_botanical\": \"Citrus sinensis\",\n          \"name_localized\": \"Laranja\",\n          \"match_rationale_localized\": \"Óleo cítrico de laranja ajuda a aliviar ansiedade e promove um ambiente relaxante.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Hortelã-pimenta\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Hortelã-pimenta\",\n          \"match_rationale_localized\": \"Complementa o efeito sedativo, ajudando na diminuição da tensão muscular e dores de cabeça.\",\n          \"relevancy_to_property_score\": 4\n        }\n      ]\n    }\n  }\n  \n  \t\t\n      \t\t\n       \n \t,\n \t\"echo\": {\n \t\t\"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n \t\t\"user_info_input\": {\n \t\t\t\"gender\": \"feminino\",\n \t\t\t\"age_category\": \"adulto\",\n \t\t\t\"age_specific\": \"60 anos\",\n \t\t\t\"age_unit\": \"anos\"\n \t\t},\n \t\t\"selected_cause_ids\": [\n \t\t\t\"Lack of sleep\",\n \t\t\t\"Estresse\"\n \t\t],\n \t\t\"selected_symptom_ids\": [\n \t\t\t\"Tensão muscular no pescoço e ombros\"\n \t\t],\n \t\t\"therapeutic_property_ids\": [\n \t\t\t\"f2e3d4c5-6789-0abc-def1-234567890bcd\"\n \t\t]\n \t}\n }"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:37:16.971Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:37:16.971Z"
+  }
+}
+---

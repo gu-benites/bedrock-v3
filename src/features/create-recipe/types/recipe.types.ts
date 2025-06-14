@@ -12,11 +12,11 @@
  */
 export enum RecipeStep {
   HEALTH_CONCERN = 'health-concern',
-  DEMOGRAPHICS = 'demographics', 
+  DEMOGRAPHICS = 'demographics',
   CAUSES = 'causes',
   SYMPTOMS = 'symptoms',
-  PROPERTIES = 'properties',
-  OILS = 'oils'
+  PROPERTIES = 'properties'
+  // Note: OILS step removed - oils are now nested within PROPERTIES step
 }
 
 /**
@@ -79,10 +79,16 @@ export interface TherapeuticProperty {
  * Step 6: Essential oil suggestion data
  */
 export interface EssentialOil {
+  oil_id: string;
   name_english: string;
-  name_local_language: string;
-  oil_description: string;
-  relevancy: number;
+  name_botanical: string;
+  name_localized: string;
+  match_rationale_localized: string;
+  relevancy_to_property_score: number;
+  // Legacy fields for backward compatibility
+  name_local_language?: string;
+  oil_description?: string;
+  relevancy?: number;
 }
 
 /**
@@ -225,6 +231,7 @@ export interface RecipeWizardState {
   isStreamingCauses: boolean;
   isStreamingSymptoms: boolean;
   isStreamingProperties: boolean;
+  isStreamingOils: boolean;
   streamingError: string | null;
   
   // Metadata
@@ -263,6 +270,7 @@ export interface RecipeWizardActions {
   setStreamingCauses: (isStreaming: boolean) => void;
   setStreamingSymptoms: (isStreaming: boolean) => void;
   setStreamingProperties: (isStreaming: boolean) => void;
+  setStreamingOils: (isStreaming: boolean) => void;
   setStreamingError: (error: string | null) => void;
   clearStreamingError: () => void;
 

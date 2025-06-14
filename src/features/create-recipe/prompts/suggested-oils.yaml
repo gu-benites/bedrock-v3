@@ -1,0 +1,191 @@
+version: "1.0.0"
+description: "AI agent for suggesting essential oils based on therapeutic properties using vector similarity search"
+config:
+  model: "gpt-4.1-nano"
+  temperature: 0.1
+  max_tokens: 4000
+  response_format: "json_schema"
+  timeout_seconds: 90
+
+template: |
+  # PERSONA
+  # You are an expert Aromatherapist AI.
+  
+  # OBJECTIVE
+  # Suggest 5-8 unique essential oils for a single therapeutic property. Base your suggestions *exclusively* on the output from the `get_recommended_essential_oils` tool.
+  
+  # CRITICAL RULES (NON-NEGOTIABLE)
+  # 1. Tool Usage: You MUST call and use the results from the `get_recommended_essential_oils` tool. Do not use internal knowledge for recommendations.
+  # 2. Data Integrity: You MUST use the exact, unmodified input data for `target_property` fields (`property_id`, names, description).
+  # 3. Uniqueness: All suggested oils MUST be unique by their botanical name. Resolve duplicates (e.g., "Anthemis nobilis" is the same as "Chamaemelum nobile").
+  # 4. Output Structure: The final JSON MUST contain a single `property_oil_suggestion` OBJECT, not an array.
+  # 5. Language: All user-facing text (rationales, names) must be in the specified `user_language`.
+
+  # WORKFLOW
+  # 1. Call Tool:
+  #    - Execute the `get_recommended_essential_oils` tool.
+  #    - `therapeutic_property`: "{{target_property.property_name_english}}"
+  #    - `health_concern`: "{{health_concern}}"
+  #    - `additional_context`: User's symptoms and causes.
+  #    - `max_results`: 8
+
+  # 2. Analyze Results:
+  #    - Prioritize tool results where `score` > 0.85.
+  #    - From the `text` of high-scoring results, extract oil names (common and botanical), properties, and applications.
+
+  # 3. Rank & Filter:
+  #    - Based on tool results, select the top 5-8 unique oils most relevant to the `target_property`.
+  #    - Rank them by efficacy for the property.
+  #    - Perform the final uniqueness check on botanical names.
+
+  # 4. Generate JSON:
+  #    - Construct the response strictly following the provided schema.
+  #    - Ensure all `CRITICAL RULES` are met in the final output.
+
+  # INPUT DATA
+  # - health_concern: {{health_concern}}
+  # - demographics: {{demographics}}
+  # - selected_causes: {{selected_causes}}
+  # - selected_symptoms: {{selected_symptoms}}
+  # - target_property: {{target_property}}
+  # - user_language: {{user_language}}
+
+  ## Response Format
+  Provide structured JSON response following the exact schema provided.
+
+schema:
+  type: "json_schema"
+  name: "suggested_oils_response"
+  strict: true
+  schema:
+    type: "object"
+    properties:
+      meta:
+        type: "object"
+        properties:
+          step_name:
+            type: "string"
+            description: "The name of the step in the API process"
+          request_id:
+            type: "string"
+            format: "uuid"
+            description: "The unique identifier for the request"
+          timestamp_utc:
+            type: "string"
+            format: "date-time"
+            description: "The UTC timestamp of the response"
+          version:
+            type: "string"
+            description: "Version information of the API step"
+          user_language:
+            type: "string"
+            description: "Language used by the user"
+          status:
+            type: "string"
+            description: "The status of the response"
+          message:
+            type: "string"
+            description: "A message providing additional information about the response"
+        required: ["step_name", "request_id", "timestamp_utc", "version", "user_language", "status", "message"]
+        additionalProperties: false
+      data:
+        type: "object"
+        properties:
+          property_oil_suggestion:
+            type: "object"
+            description: "Single therapeutic property with its suggested oils"
+            properties:
+              therapeutic_property_context:
+                type: "object"
+                properties:
+                  property_id:
+                    type: "string"
+                    format: "uuid"
+                    description: "Unique identifier for the therapeutic property"
+                  property_name_localized:
+                    type: "string"
+                    description: "Localized name of the therapeutic property"
+                  property_name_english:
+                    type: "string"
+                    description: "English name of the therapeutic property"
+                  description_localized:
+                    type: "string"
+                    description: "Localized description of how this property helps"
+                required: ["property_id", "property_name_localized", "property_name_english", "description_localized"]
+                additionalProperties: false
+              suggested_oils:
+                type: "array"
+                description: "List of suggested essential oils for this property"
+                minItems: 5
+                maxItems: 8
+                items:
+                  type: "object"
+                  properties:
+                    oil_id:
+                      type: "string"
+                      description: "System-level unique ID for this oil entity"
+                    name_english:
+                      type: "string"
+                      description: "English common name for the oil (plant name only)"
+                    name_botanical:
+                      type: "string"
+                      description: "Botanical name (primary identifier) for the oil"
+                    name_localized:
+                      type: "string"
+                      description: "Localized common name for the oil (plant name only)"
+                    match_rationale_localized:
+                      type: "string"
+                      description: "Localized explanation of why this oil matches the property"
+                    relevancy_to_property_score:
+                      type: "integer"
+                      minimum: 1
+                      maximum: 5
+                      description: "How well this oil matches the property (1-5, 5 being highest)"
+                  required: ["oil_id", "name_english", "name_botanical", "name_localized", "match_rationale_localized", "relevancy_to_property_score"]
+                  additionalProperties: false
+            required: ["therapeutic_property_context", "suggested_oils"]
+            additionalProperties: false
+        required: ["property_oil_suggestion"]
+        additionalProperties: false
+      echo:
+        type: "object"
+        properties:
+          health_concern_input:
+            type: "string"
+            description: "The health concern input provided by the user"
+          user_info_input:
+            type: "object"
+            properties:
+              gender:
+                type: "string"
+                description: "Gender of the user"
+              age_category:
+                type: "string"
+                description: "General age category of the user"
+              age_specific:
+                type: "string"
+                description: "Specific age of the user"
+              age_unit:
+                type: "string"
+                description: "Unit of measurement for the user's age"
+            required: ["gender", "age_category", "age_specific", "age_unit"]
+            additionalProperties: false
+          selected_cause_ids:
+            type: "array"
+            items:
+              type: "string"
+              description: "IDs of selected causes"
+          selected_symptom_ids:
+            type: "array"
+            items:
+              type: "string"
+              description: "IDs of selected symptoms"
+          therapeutic_property_ids:
+            type: "array"
+            items:
+              type: "string"
+              description: "IDs of therapeutic properties being addressed"
+        required: ["health_concern_input", "user_info_input", "selected_cause_ids", "selected_symptom_ids", "therapeutic_property_ids"]
+        additionalProperties: false
+    required: ["meta", "data", "echo"]
+    additionalProperties: false

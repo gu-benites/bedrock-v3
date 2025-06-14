@@ -90,23 +90,14 @@ export const WIZARD_STEPS = [
   {
     key: RecipeStep.PROPERTIES,
     title: 'Therapeutic Properties',
-    description: 'Review therapeutic properties',
+    description: 'Review therapeutic properties and suggested oils',
     stepNumber: 5,
     path: '/dashboard/create-recipe/properties',
     isRequired: false,
     hasForm: false,
     requiresApi: true
-  },
-  {
-    key: RecipeStep.OILS,
-    title: 'Essential Oils',
-    description: 'Discover suggested oils',
-    stepNumber: 6,
-    path: '/dashboard/create-recipe/oils',
-    isRequired: false,
-    hasForm: false,
-    requiresApi: true
   }
+  // Note: OILS step removed - oils are now nested within PROPERTIES step
 ] as const;
 
 /**

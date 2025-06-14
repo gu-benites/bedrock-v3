@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { ArrowUpIcon, Sparkles } from 'lucide-react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
+import { RecipeStep } from '../types/recipe.types';
 
 /**
  * Helper hook for auto-resizing textarea
@@ -57,8 +58,18 @@ function useAutoResizeTextarea({
  * Chat-style Health Concern Input component
  */
 export function HealthConcernChatInput() {
-  const { healthConcern, updateHealthConcern, isLoading } = useRecipeStore();
-  const { goToNext, canGoNext, markCurrentStepCompleted } = useRecipeWizardNavigation();
+  const {
+    healthConcern,
+    updateHealthConcern,
+    updateDemographics,
+    updateSelectedCauses,
+    updateSelectedSymptoms,
+    updateTherapeuticProperties,
+    setCurrentStep,
+    markStepCompleted,
+    isLoading
+  } = useRecipeStore();
+  const { goToNext, canGoNext, markCurrentStepCompleted, goToStep } = useRecipeWizardNavigation();
   
   const [inputValue, setInputValue] = useState(healthConcern?.healthConcern || '');
   const [isSaving, setIsSaving] = useState(false);
@@ -138,6 +149,8 @@ export function HealthConcernChatInput() {
     }
   };
 
+
+
   const characterCount = inputValue?.length || 0;
   const isValid = characterCount >= 3 && characterCount <= 500;
   const isNearLimit = characterCount > 450;
@@ -161,6 +174,8 @@ export function HealthConcernChatInput() {
           <p className="text-sm text-muted-foreground">
             Be as specific as possible for the best recommendations
           </p>
+
+
         </div>
 
         {/* Example Cards */}

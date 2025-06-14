@@ -1,0 +1,41 @@
+[2025-06-14T07:17:04.333Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:17:05.585Z] Request started with traceId: streaming-1749885424332-cv6zp1w98
+[2025-06-14T07:17:08.569Z] Agent execution started
+[2025-06-14T07:17:08.767Z] Tool-based step detected, waiting for completion...
+[2025-06-14T07:17:28.798Z] Agent execution fully completed
+[2025-06-14T07:17:28.801Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:17:28.817Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:17:28.911Z] Has newItems: true
+[2025-06-14T07:17:28.917Z] Has finalOutput: true
+[2025-06-14T07:17:29.103Z] NewItems count: 5
+[2025-06-14T07:17:29.283Z] --- NEW ITEM 0 ---
+[2025-06-14T07:17:29.365Z] Type: tool_call_item
+[2025-06-14T07:17:29.552Z] Role: unknown
+[2025-06-14T07:17:29.687Z] --- NEW ITEM 1 ---
+[2025-06-14T07:17:29.753Z] Type: tool_call_item
+[2025-06-14T07:17:29.953Z] Role: unknown
+[2025-06-14T07:17:30.184Z] --- NEW ITEM 2 ---
+[2025-06-14T07:17:30.353Z] Type: tool_call_output_item
+[2025-06-14T07:17:30.616Z] Role: unknown
+[2025-06-14T07:17:30.916Z] --- NEW ITEM 3 ---
+[2025-06-14T07:17:31.084Z] Type: tool_call_output_item
+[2025-06-14T07:17:31.234Z] Role: unknown
+[2025-06-14T07:17:31.653Z] --- NEW ITEM 4 ---
+[2025-06-14T07:17:31.784Z] Type: message_output_item
+[2025-06-14T07:17:31.985Z] Role: unknown
+[2025-06-14T07:17:32.303Z] Content preview: {
+  "meta": {
+    "step_name": "Output Generation",
+    "request_id": "abcd1234-ef56-7890-ab12-345cde6789fa",
+    "timestamp_utc": "2023-10-01T12:00:00Z",
+    "version": "1.0",
+    "user_language": "P...
+[2025-06-14T07:17:33.316Z] === FINAL OUTPUT ===
+[2025-06-14T07:17:33.719Z] Final output type: object
+[2025-06-14T07:17:34.185Z] Final output keys: meta, data, echo
+[2025-06-14T07:17:37.385Z] Buffer content at chunk 200 (664 chars):
+[2025-06-14T07:17:41.152Z] Buffer content at chunk 400 (1382 chars):
+[2025-06-14T07:17:45.219Z] Buffer content at chunk 600 (2114 chars):
+[2025-06-14T07:17:47.002Z] Buffer content at chunk 800 (2858 chars):
+[2025-06-14T07:17:47.619Z] Final buffer content (3211 chars):
+[2025-06-14T07:17:48.565Z] === STREAMING SESSION ENDED ===

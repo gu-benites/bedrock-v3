@@ -1,0 +1,242 @@
+{
+  "timestamp": "2025-06-14T07:55:35.340Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:55:35.340Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:55:50.698Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 669,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",",
+    "bufferSuffix": "\"},\"suggested_oils\":[{\"oil_id\":\"1\",\"name_english\":\"Laranja\",\"name_botanical\":\"Citrus sinensis\",\"name"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:00.418Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1447,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",",
+    "bufferSuffix": "iga mental.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"4\",\"name_english\":\"Hortelã verde\",\"name_bot"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:12.019Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2220,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",",
+    "bufferSuffix": "ansiedade.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"7\",\"name_english\":\"Louveira\",\"name_botanical"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:21.509Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 2940,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",",
+    "bufferSuffix": "1\"],\"selected_symptom_ids\":[\"1\"],\"therapeutic_property_ids\":[\"c4d5e6f7-8901-2b3c-d4e5-678901234567\"]"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:22.912Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2942,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",\"description_localized\":\"Favorece o foco e a clareza mental, ajudando\"},\"suggested_oils\":[{\"oil_id\":\"1\",\"name_english\":\"Laranja\",\"name_botanical\":\"Citrus sinensis\",\"name_localized\":\"Laranja\",\"match_rationale_localized\":\"Ótima para melhorar a atenção e foco mental, ajudando na clareza mental e concentração.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"2\",\"name_english\":\"Alecrim\",\"name_botanical\":\"Rosmarinus officinalis\",\"name_localized\":\"Alecrim\",\"match_rationale_localized\":\"Estimula a circulação cerebral e aumenta a energia mental, ideal para dores de cabeça relacionadas ao estresse.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"3\",\"name_english\":\"Hortelã-pimenta\",\"name_botanical\":\"Mentha piperita\",\"name_localized\":\"Hortelã-pimenta\",\"match_rationale_localized\":\"Ajuda a aumentar o alerta e a atenção, além de aliviar dores de cabeça e fadiga mental.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"4\",\"name_english\":\"Hortelã verde\",\"name_botanical\":\"Mentha spicata\",\"name_localized\":\"Hortelã verde\",\"match_rationale_localized\":\"Estimula o foco mental e fornece sensação de energia, ajudando na concentração.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"5\",\"name_english\":\"Bergamota\",\"name_botanical\":\"Citrus bergamia\",\"name_localized\":\"Bergamota\",\"match_rationale_localized\":\"Promove sensação de bem-estar e clareza mental, auxiliando no combate à fadiga mental.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"6\",\"name_english\":\"Vétiver\",\"name_botanical\":\"Vetiveria zizanioides\",\"name_localized\":\"Vetiver\",\"match_rationale_localized\":\"Contribui para o equilíbrio emocional e foco, ajudando em momentos de estresse e ansiedade.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"7\",\"name_english\":\"Louveira\",\"name_botanical\":\"Laurus nobilis\",\"name_localized\":\"Louveira\",\"match_rationale_localized\":\"Estimula a clareza mental e melhora a concentração.\",\"relevancy_to_property_score\":3},{\"oil_id\":\"8\",\"name_english\":\"Citronela\",\"name_botanical\":\"Cymbopogon citratus\",\"name_localized\":\"Citronela\",\"match_rationale_localized\":\"Tem efeito estimulante e ajuda a levantar o ânimo mental.\",\"relevancy_to_property_score\":3}]}},\"echo\":{\"health_concern_input\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"adulto\",\"age_specific\":\"60\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"1\"],\"selected_symptom_ids\":[\"1\"],\"therapeutic_property_ids\":[\"c4d5e6f7-8901-2b3c-d4e5-678901234567\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:39.946Z",
+  "data": {
+    "type": "newItems",
+    "count": 3,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2caf7950819ba1833596b5a449190e2c659d86d047d6",
+          "type": "function_call",
+          "callId": "call_TCBu97aV62IWdJmzzG721tE0",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades estimulantes cerebrais\",\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"additional_context\":\"Relevant symptoms and causes from the user's profile\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_TCBu97aV62IWdJmzzG721tE0",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades estimulantes cerebrais para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades estimulantes cerebrais\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"O óleo essencial de laranja foi utilizado para aliviar a dor de cabeça, sendo aplicado em água por 15 minutos e apresentando resultados positivos. Para crianças com hiperatividade, o Mix Thinker é mencionado como um óleo da atenção, mas pode ser necessário utilizar também o Mix Steady ou Equilíbrio para ajudar a trazer equilíbrio e aterramento.\",\n      \"score\": 0.831258774\n    },\n    {\n      \"text\": \"Óleos essenciais de copaíba, alecrim e bergamota são benéficos para a saúde cerebral e podem ser utilizados em um difusor para melhorar o ambiente de estudo ou trabalho. Além disso, o óleo essencial de alecrim e o de hortelã-pimenta podem ajudar a aumentar a energia e a disposição, sendo úteis para quem está se recuperando de covid e enfrentando sintomas como cansaço e fadiga. O hortelã-pimenta também pode auxiliar na recuperação do olfato após a infecção pelo vírus.\",\n      \"score\": 0.830719709\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diversos fins terapêuticos e de bem-estar. No caso do Transtorno de Déficit de Atenção e Hiperatividade (TDAH), uma psiquiatra recomendou o uso de óleos essenciais de vetiver, balance, copaíba e DDR. Além disso, uma combinação de DDR Prime, copaíba e cúrcuma em cápsulas foi utilizada para tratar sinusite, dor de cabeça e congestão nasal, tomando duas gotas de cada óleo três vezes ao dia. Essa mistura proporcionou alívio dos sintomas em 24 horas e recuperação completa em dois dias.\",\n      \"score\": 0.830641031\n    },\n    {\n      \"text\": \"O texto menciona o uso de um mix de óleos essenciais para promover a saúde e equilíbrio emocional. Um dos óleos essenciais citados é o 'Adaptiv', que auxilia o corpo a responder melhor em momentos de estresse. O estresse em excesso pode aumentar os níveis de cortisol, diminuir a imunidade e afetar a produção de hormônios importantes para o sono. Os óleos essenciais atuam equilibrando, limpando e sinalizando o corpo para resolver problemas de forma natural.\",\n      \"score\": 0.830402792\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para equilibrar o sono e auxiliar em momentos de estresse. O mix de óleos essenciais Adapt pode ser benéfico para prolongar o sono e é especialmente útil para crianças hiperativas ou com dificuldades de atenção. A lavanda pode ser aplicada debaixo da língua, com uma gota, para ajudar a aliviar o estresse. Para aumentar a energia e a atenção, o óleo de hortelã-pimenta pode ser aplicado nas têmporas, mas deve ser usado com moderação durante a amamentação, pois o excesso pode interferir na produção de leite. O alecrim também é útil para oxigenar o cérebro e ajudar a despertar.\",\n      \"score\": 0.829833627\n    },\n    {\n      \"text\": \"(monoterpenos) Estimulantes Fenóis Aquecedores HOO HCombinar óleos essenciais com hábitos saudáveis para ajudar a promover um senso de concentração Ao mesmo tempo que os óleos essenciais são úteis para promover uma sensação de concentração, em vista de seu poder de ação e da maneira como o aroma interage com o cérebro, é importante ter em mente que há outras práticas que também podem ajudar a melhorar a concentração. Por exemplo, proporcionar ao corpo uma nutrição adequada pode ajudar a promover a concentração. Apesar de recorrermos à cafeína ou ao açúcar para nos manter alertas no decorrer do dia, na realidade alimentar o corpo com alimentos nutritivos pode ser mais eficaz para ajudar o cérebro a funcionar de maneira adequada. Assim como nosso corpo precisa de combustível para passar o dia, o cérebro também precisa de combustível para funcionar continuamente e realizar tarefas. Ao alimentar o cérebro adequadamente com uma dieta saudável, você descobrirá que é mais fácil se concentrar e se lembrar de coisas\",\n      \"score\": 0.829651117\n    },\n    {\n      \"text\": \"Ao acordar, é possível utilizar óleos essenciais para aumentar o fluxo sanguíneo e a oxigenação no cérebro, melhorando o humor e a disposição. Uma sugestão é aplicar um pingo de óleo essencial de hortelã-pimenta (peppermint) e um pingo de tangerina na mão, inspirando profundamente para abrir as vias aéreas. Além disso, pode-se acrescentar um pouco de olíbano para estimular o cérebro e aumentar o foco no início do dia. Para aromatizar o ambiente, é possível utilizar um difusor com óleo essencial de limão.\",\n      \"score\": 0.829428732\n    },\n    {\n      \"text\": \"O óleo essencial mencionado no texto é um imunoestimulante, repelente, auxilia no sono e alivia sintomas de depressão. Além disso, tem propriedades analgésicas e anti-inflamatórias, sendo útil para pessoas com bruxismo.\",\n      \"score\": 0.828238726\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades estimulantes cerebrais para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades estimulantes cerebrais\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"O óleo essencial de laranja foi utilizado para aliviar a dor de cabeça, sendo aplicado em água por 15 minutos e apresentando resultados positivos. Para crianças com hiperatividade, o Mix Thinker é mencionado como um óleo da atenção, mas pode ser necessário utilizar também o Mix Steady ou Equilíbrio para ajudar a trazer equilíbrio e aterramento.\",\n      \"score\": 0.831258774\n    },\n    {\n      \"text\": \"Óleos essenciais de copaíba, alecrim e bergamota são benéficos para a saúde cerebral e podem ser utilizados em um difusor para melhorar o ambiente de estudo ou trabalho. Além disso, o óleo essencial de alecrim e o de hortelã-pimenta podem ajudar a aumentar a energia e a disposição, sendo úteis para quem está se recuperando de covid e enfrentando sintomas como cansaço e fadiga. O hortelã-pimenta também pode auxiliar na recuperação do olfato após a infecção pelo vírus.\",\n      \"score\": 0.830719709\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diversos fins terapêuticos e de bem-estar. No caso do Transtorno de Déficit de Atenção e Hiperatividade (TDAH), uma psiquiatra recomendou o uso de óleos essenciais de vetiver, balance, copaíba e DDR. Além disso, uma combinação de DDR Prime, copaíba e cúrcuma em cápsulas foi utilizada para tratar sinusite, dor de cabeça e congestão nasal, tomando duas gotas de cada óleo três vezes ao dia. Essa mistura proporcionou alívio dos sintomas em 24 horas e recuperação completa em dois dias.\",\n      \"score\": 0.830641031\n    },\n    {\n      \"text\": \"O texto menciona o uso de um mix de óleos essenciais para promover a saúde e equilíbrio emocional. Um dos óleos essenciais citados é o 'Adaptiv', que auxilia o corpo a responder melhor em momentos de estresse. O estresse em excesso pode aumentar os níveis de cortisol, diminuir a imunidade e afetar a produção de hormônios importantes para o sono. Os óleos essenciais atuam equilibrando, limpando e sinalizando o corpo para resolver problemas de forma natural.\",\n      \"score\": 0.830402792\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para equilibrar o sono e auxiliar em momentos de estresse. O mix de óleos essenciais Adapt pode ser benéfico para prolongar o sono e é especialmente útil para crianças hiperativas ou com dificuldades de atenção. A lavanda pode ser aplicada debaixo da língua, com uma gota, para ajudar a aliviar o estresse. Para aumentar a energia e a atenção, o óleo de hortelã-pimenta pode ser aplicado nas têmporas, mas deve ser usado com moderação durante a amamentação, pois o excesso pode interferir na produção de leite. O alecrim também é útil para oxigenar o cérebro e ajudar a despertar.\",\n      \"score\": 0.829833627\n    },\n    {\n      \"text\": \"(monoterpenos) Estimulantes Fenóis Aquecedores HOO HCombinar óleos essenciais com hábitos saudáveis para ajudar a promover um senso de concentração Ao mesmo tempo que os óleos essenciais são úteis para promover uma sensação de concentração, em vista de seu poder de ação e da maneira como o aroma interage com o cérebro, é importante ter em mente que há outras práticas que também podem ajudar a melhorar a concentração. Por exemplo, proporcionar ao corpo uma nutrição adequada pode ajudar a promover a concentração. Apesar de recorrermos à cafeína ou ao açúcar para nos manter alertas no decorrer do dia, na realidade alimentar o corpo com alimentos nutritivos pode ser mais eficaz para ajudar o cérebro a funcionar de maneira adequada. Assim como nosso corpo precisa de combustível para passar o dia, o cérebro também precisa de combustível para funcionar continuamente e realizar tarefas. Ao alimentar o cérebro adequadamente com uma dieta saudável, você descobrirá que é mais fácil se concentrar e se lembrar de coisas\",\n      \"score\": 0.829651117\n    },\n    {\n      \"text\": \"Ao acordar, é possível utilizar óleos essenciais para aumentar o fluxo sanguíneo e a oxigenação no cérebro, melhorando o humor e a disposição. Uma sugestão é aplicar um pingo de óleo essencial de hortelã-pimenta (peppermint) e um pingo de tangerina na mão, inspirando profundamente para abrir as vias aéreas. Além disso, pode-se acrescentar um pouco de olíbano para estimular o cérebro e aumentar o foco no início do dia. Para aromatizar o ambiente, é possível utilizar um difusor com óleo essencial de limão.\",\n      \"score\": 0.829428732\n    },\n    {\n      \"text\": \"O óleo essencial mencionado no texto é um imunoestimulante, repelente, auxilia no sono e alivia sintomas de depressão. Além disso, tem propriedades analgésicas e anti-inflamatórias, sendo útil para pessoas com bruxismo.\",\n      \"score\": 0.828238726\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d2cb4822c819bbfb645a5d9da90c80e2c659d86d047d6",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"Call get_recommended_essential_oils\",\"request_id\":\"01F4ABCD-5678-90AB-CDEF-1234567890AB\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Resultados obtidos com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Propriedades estimulantes cerebrais\",\"description_localized\":\"Favorece o foco e a clareza mental, ajudando\"},\"suggested_oils\":[{\"oil_id\":\"1\",\"name_english\":\"Laranja\",\"name_botanical\":\"Citrus sinensis\",\"name_localized\":\"Laranja\",\"match_rationale_localized\":\"Ótima para melhorar a atenção e foco mental, ajudando na clareza mental e concentração.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"2\",\"name_english\":\"Alecrim\",\"name_botanical\":\"Rosmarinus officinalis\",\"name_localized\":\"Alecrim\",\"match_rationale_localized\":\"Estimula a circulação cerebral e aumenta a energia mental, ideal para dores de cabeça relacionadas ao estresse.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"3\",\"name_english\":\"Hortelã-pimenta\",\"name_botanical\":\"Mentha piperita\",\"name_localized\":\"Hortelã-pimenta\",\"match_rationale_localized\":\"Ajuda a aumentar o alerta e a atenção, além de aliviar dores de cabeça e fadiga mental.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"4\",\"name_english\":\"Hortelã verde\",\"name_botanical\":\"Mentha spicata\",\"name_localized\":\"Hortelã verde\",\"match_rationale_localized\":\"Estimula o foco mental e fornece sensação de energia, ajudando na concentração.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"5\",\"name_english\":\"Bergamota\",\"name_botanical\":\"Citrus bergamia\",\"name_localized\":\"Bergamota\",\"match_rationale_localized\":\"Promove sensação de bem-estar e clareza mental, auxiliando no combate à fadiga mental.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"6\",\"name_english\":\"Vétiver\",\"name_botanical\":\"Vetiveria zizanioides\",\"name_localized\":\"Vetiver\",\"match_rationale_localized\":\"Contribui para o equilíbrio emocional e foco, ajudando em momentos de estresse e ansiedade.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"7\",\"name_english\":\"Louveira\",\"name_botanical\":\"Laurus nobilis\",\"name_localized\":\"Louveira\",\"match_rationale_localized\":\"Estimula a clareza mental e melhora a concentração.\",\"relevancy_to_property_score\":3},{\"oil_id\":\"8\",\"name_english\":\"Citronela\",\"name_botanical\":\"Cymbopogon citratus\",\"name_localized\":\"Citronela\",\"match_rationale_localized\":\"Tem efeito estimulante e ajuda a levantar o ânimo mental.\",\"relevancy_to_property_score\":3}]}},\"echo\":{\"health_concern_input\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"adulto\",\"age_specific\":\"60\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"1\"],\"selected_symptom_ids\":[\"1\"],\"therapeutic_property_ids\":[\"c4d5e6f7-8901-2b3c-d4e5-678901234567\"]}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:40.083Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Call get_recommended_essential_oils",
+        "request_id": "01F4ABCD-5678-90AB-CDEF-1234567890AB",
+        "timestamp_utc": "2023-10-02T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Resultados obtidos com sucesso."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "c4d5e6f7-8901-2b3c-d4e5-678901234567",
+            "property_name_localized": "Propriedades estimulantes cerebrais",
+            "property_name_english": "Propriedades estimulantes cerebrais",
+            "description_localized": "Favorece o foco e a clareza mental, ajudando"
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Laranja",
+              "name_botanical": "Citrus sinensis",
+              "name_localized": "Laranja",
+              "match_rationale_localized": "Ótima para melhorar a atenção e foco mental, ajudando na clareza mental e concentração.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Alecrim",
+              "name_botanical": "Rosmarinus officinalis",
+              "name_localized": "Alecrim",
+              "match_rationale_localized": "Estimula a circulação cerebral e aumenta a energia mental, ideal para dores de cabeça relacionadas ao estresse.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Hortelã-pimenta",
+              "name_botanical": "Mentha piperita",
+              "name_localized": "Hortelã-pimenta",
+              "match_rationale_localized": "Ajuda a aumentar o alerta e a atenção, além de aliviar dores de cabeça e fadiga mental.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Hortelã verde",
+              "name_botanical": "Mentha spicata",
+              "name_localized": "Hortelã verde",
+              "match_rationale_localized": "Estimula o foco mental e fornece sensação de energia, ajudando na concentração.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Bergamota",
+              "name_botanical": "Citrus bergamia",
+              "name_localized": "Bergamota",
+              "match_rationale_localized": "Promove sensação de bem-estar e clareza mental, auxiliando no combate à fadiga mental.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "6",
+              "name_english": "Vétiver",
+              "name_botanical": "Vetiveria zizanioides",
+              "name_localized": "Vetiver",
+              "match_rationale_localized": "Contribui para o equilíbrio emocional e foco, ajudando em momentos de estresse e ansiedade.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "7",
+              "name_english": "Louveira",
+              "name_botanical": "Laurus nobilis",
+              "name_localized": "Louveira",
+              "match_rationale_localized": "Estimula a clareza mental e melhora a concentração.",
+              "relevancy_to_property_score": 3
+            },
+            {
+              "oil_id": "8",
+              "name_english": "Citronela",
+              "name_botanical": "Cymbopogon citratus",
+              "name_localized": "Citronela",
+              "match_rationale_localized": "Tem efeito estimulante e ajuda a levantar o ânimo mental.",
+              "relevancy_to_property_score": 3
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "I have chronic headaches that worsen with stress and lack of sleep",
+        "user_info_input": {
+          "gender": "feminino",
+          "age_category": "adulto",
+          "age_specific": "60",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "1"
+        ],
+        "selected_symptom_ids": [
+          "1"
+        ],
+        "therapeutic_property_ids": [
+          "c4d5e6f7-8901-2b3c-d4e5-678901234567"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:56:40.291Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:56:40.291Z"
+  }
+}
+---

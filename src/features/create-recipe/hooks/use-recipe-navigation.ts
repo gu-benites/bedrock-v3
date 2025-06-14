@@ -177,8 +177,8 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
         RecipeStep.DEMOGRAPHICS,
         RecipeStep.CAUSES,
         RecipeStep.SYMPTOMS,
-        RecipeStep.PROPERTIES,
-        RecipeStep.OILS
+        RecipeStep.PROPERTIES
+        // Note: OILS step removed - oils are now nested within PROPERTIES
       ];
 
       const currentStepIndex = stepOrder.indexOf(currentStep);
@@ -356,8 +356,7 @@ export function useStepValidation() {
         break;
 
       case RecipeStep.PROPERTIES:
-      case RecipeStep.OILS:
-        // These steps are display-only, no validation needed
+        // This step displays properties and nested oils, no validation needed
         break;
 
       default:

@@ -1,8 +1,10 @@
-# Implementation Lessons Learned: Therapeutic Properties AI Streaming
+# Implementation Lessons Learned: AI Streaming Steps
 
 ## 📋 **Post-Implementation Analysis Summary**
 
-This document captures critical lessons learned from the therapeutic properties AI streaming implementation to prevent future developers from experiencing the same trial-and-error process.
+This document captures critical lessons learned from multiple AI streaming implementations (therapeutic properties, suggested oils) to prevent future developers from experiencing the same trial-and-error process.
+
+**🎯 Latest Update**: Added lessons from suggested oils implementation including state management patterns, streaming sequence fixes, and progressive display issues.
 
 ## 🚨 **Critical Implementation Mistakes & Root Causes**
 
@@ -41,15 +43,89 @@ This document captures critical lessons learned from the therapeutic properties 
 **Time Lost**: 2+ hours debugging backend streaming errors
 **Fix**: Proper connection lifecycle management with store-based state
 
+## 🚨 **Additional Critical Mistakes (Suggested Oils Implementation)**
+
+### **6. Mixed State Management Patterns (CRITICAL)**
+**What Happened**: Used store-based state (`isStreamingOils`) for modal control but hook-based state (`partialData`) for data updates
+**Impact**: Modal only showed items at completion instead of progressively during streaming
+**Root Cause**: Inconsistent state management between modal control and data updates
+**Time Lost**: 1+ hour debugging why modal wasn't showing progressive updates
+**Fix**: Use hook-based state consistently: `<AIStreamingModal isOpen={isStreamingFromHook} />`
+
+### **7. Streaming Sequence Issues (MAJOR)**
+**What Happened**: Backend waited for agent completion before starting streaming
+**Impact**: Progressive items sent after final output was logged, not during generation
+**Root Cause**: Incorrect streaming lifecycle - completion wait before streaming
+**Time Lost**: 30+ minutes debugging streaming sequence
+**Fix**: Start streaming immediately during agent execution, log final output after streaming completes
+
+### **8. Data Structure Misunderstanding (MAJOR)**
+**What Happened**: Expected property objects with nested oils but received individual oil objects directly
+**Impact**: Progressive streaming logic failed to extract individual oils for modal display
+**Root Cause**: Incorrect assumption about AI response data structure
+**Time Lost**: 45+ minutes debugging why only 1 item showed instead of 5
+**Fix**: Update data type configuration to extract individual oils from nested structure
+
 ## 📊 **Total Time Impact**
-- **Development Time**: 8+ hours of debugging instead of 1-2 hours implementation
-- **Trial-and-Error Cycles**: 5+ major debugging sessions
-- **Documentation Gaps**: Multiple critical patterns not documented
-- **Knowledge Transfer**: Lessons not captured for future developers
+- **Development Time**: 12+ hours of debugging across multiple implementations instead of 2-3 hours
+- **Trial-and-Error Cycles**: 8+ major debugging sessions across therapeutic properties and suggested oils
+- **Documentation Gaps**: Multiple critical patterns not documented initially
+- **Knowledge Transfer**: Lessons learned through painful trial-and-error process
+- **Pattern Refinement**: Multiple iterations to establish working patterns
 
-## ✅ **Successful Implementation Pattern**
+## ✅ **Successful Implementation Patterns**
 
-### **Store-Based Streaming Pattern (Recommended)**
+### **Hook-Based Streaming Pattern (Recommended for Most Cases)**
+```typescript
+// ✅ CORRECT - Hook-based pattern for consistent state management
+const {
+  partialData,
+  isStreaming,
+  isComplete,
+  finalData,
+  error,
+  startStream,
+  resetStream
+} = useAIStreaming({
+  jsonArrayPath: 'data.suggested_oils',
+  timeout: 90000, // 90s for complex analysis
+  maxRetries: 2
+});
+
+// Direct button onClick (no react-hook-form)
+const handleAnalyze = async () => {
+  resetStream(); // Clear previous data
+  await startStream('/api/ai/streaming', requestData);
+};
+
+// Hook-based modal control (consistent state management)
+<AIStreamingModal
+  isOpen={isStreaming}
+  analysisType="oils"
+/>
+
+// Progressive data updates
+useEffect(() => {
+  if (partialData && Array.isArray(partialData)) {
+    const modalItems = partialData.map(oil => ({
+      title: oil.name_localized,
+      subtitle: oil.name_botanical,
+      description: oil.match_rationale_localized
+    }));
+    setStreamingItems(modalItems);
+  }
+}, [partialData]);
+
+// Completion handling
+useEffect(() => {
+  if (isComplete && finalData) {
+    // Modal closes automatically when isStreaming becomes false
+    console.log('Analysis completed successfully');
+  }
+}, [isComplete, finalData]);
+```
+
+### **Store-Based Streaming Pattern (For Complex Workflows)**
 ```typescript
 // ✅ CORRECT - Store-based pattern for complex AI analysis
 const { 

@@ -32,14 +32,21 @@ const { handleSubmit, register } = useForm();
 // No local state management
 ```
 
-### **❌ DO NOT Use Local Modal State for Streaming**
+### **❌ DO NOT Mix State Management Patterns**
 ```typescript
-// ❌ WRONG - Causes controller closure issues
-const [isModalOpen, setIsModalOpen] = useState(false);
+// ❌ WRONG - Mixed patterns cause modal display issues
+const [isModalOpen, setIsModalOpen] = useState(false); // Local state
+const { isStreamingProperties } = useRecipeStore(); // Store state
+<AIStreamingModal isOpen={isStreamingProperties} /> // Using store state
+// But partialData updates don't trigger modal updates!
 
-// ✅ CORRECT - Use store-based streaming state
+// ✅ CORRECT Option 1: Store-based pattern (complex steps)
 const { isStreamingProperties, setStreamingProperties } = useRecipeStore();
 <AIStreamingModal isOpen={isStreamingProperties} />
+
+// ✅ CORRECT Option 2: Hook-based pattern (simple steps)
+const { isStreaming } = useAIStreaming();
+<AIStreamingModal isOpen={isStreaming} />
 ```
 
 ### **❌ DO NOT Use Default Timeouts for Complex Analysis**
@@ -264,8 +271,66 @@ export function YourStepSelection() {
 
 **⚠️ CRITICAL PATTERN CHOICE**: Choose the correct streaming pattern based on your step:
 
-#### **Pattern A: Store-Based Streaming (Recommended for Complex Steps)**
-Use when you need consistent state management and error handling:
+#### **Pattern A: Hook-Based Streaming (Recommended for Most Cases)**
+Use for consistent state management between modal control and data updates:
+
+```typescript
+// ✅ CORRECT - Hook-based pattern (like suggested oils)
+import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
+import AIStreamingModal from '@/components/ui/ai-streaming-modal';
+
+// Configure AI streaming with appropriate timeout
+const {
+  partialData,
+  isStreaming,
+  isComplete,
+  finalData,
+  error: streamingError,
+  startStream,
+  resetStream
+} = useAIStreaming({
+  jsonArrayPath: 'data.your_data_type',
+  timeout: 90000, // 90s for complex analysis
+  maxRetries: 2
+});
+
+// ✅ CRITICAL: Clear previous data before starting new analysis
+const handleAnalyze = async () => {
+  resetStream(); // Clear any previous streaming data
+  await startStream('/api/ai/streaming', requestData);
+};
+
+// ✅ CRITICAL: Use hook's streaming state for modal control
+<AIStreamingModal
+  isOpen={isStreaming}  // ← Hook state, not store state
+  analysisType="your-type"
+/>
+
+// Handle progressive data updates
+useEffect(() => {
+  if (partialData && Array.isArray(partialData) && partialData.length > 0) {
+    const modalItems = partialData.map((item: any, index: number) => ({
+      id: `item-${item.id_field || index}`,
+      title: item.name_localized,
+      subtitle: item.optional_field,
+      description: item.description_localized,
+      timestamp: new Date()
+    }));
+    setStreamingItems(modalItems);
+  }
+}, [partialData]);
+
+// Completion handling (modal closes automatically when isStreaming becomes false)
+useEffect(() => {
+  if (isComplete && finalData) {
+    console.log('Analysis completed successfully');
+    // Modal closes automatically when isStreaming becomes false
+  }
+}, [isComplete, finalData]);
+```
+
+#### **Pattern B: Store-Based Streaming (For Complex Workflows)**
+Use when you need robust error handling and state management:
 
 ```typescript
 // ✅ CORRECT - Store-based pattern (like therapeutic properties)

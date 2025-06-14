@@ -1,0 +1,39 @@
+[2025-06-14T07:44:42.633Z] === STREAMING SESSION STARTED ===
+[2025-06-14T07:44:42.698Z] Request started with traceId: streaming-1749887082633-19t8oda8g
+[2025-06-14T07:44:43.632Z] Agent execution started
+[2025-06-14T07:44:43.635Z] Starting real-time streaming for step: suggested-oils
+[2025-06-14T07:44:51.933Z] Buffer content at chunk 200 (632 chars):
+[2025-06-14T07:44:53.081Z] Buffer content at chunk 400 (1461 chars):
+[2025-06-14T07:44:54.918Z] Buffer content at chunk 600 (2247 chars):
+[2025-06-14T07:44:57.501Z] Buffer content at chunk 800 (3066 chars):
+[2025-06-14T07:44:57.950Z] Final buffer content (3268 chars):
+[2025-06-14T07:44:57.984Z] === AGENT RESULT ANALYSIS ===
+[2025-06-14T07:44:58.051Z] Result keys: state, currentTurn, maxTurns
+[2025-06-14T07:44:58.117Z] Has newItems: true
+[2025-06-14T07:44:58.169Z] Has finalOutput: true
+[2025-06-14T07:44:58.253Z] NewItems count: 5
+[2025-06-14T07:44:58.350Z] --- NEW ITEM 0 ---
+[2025-06-14T07:44:58.435Z] Type: tool_call_item
+[2025-06-14T07:44:58.482Z] Role: unknown
+[2025-06-14T07:44:58.485Z] --- NEW ITEM 1 ---
+[2025-06-14T07:44:58.568Z] Type: tool_call_item
+[2025-06-14T07:44:58.668Z] Role: unknown
+[2025-06-14T07:44:58.686Z] --- NEW ITEM 2 ---
+[2025-06-14T07:44:58.766Z] Type: tool_call_output_item
+[2025-06-14T07:44:58.818Z] Role: unknown
+[2025-06-14T07:44:58.885Z] --- NEW ITEM 3 ---
+[2025-06-14T07:44:59.002Z] Type: tool_call_output_item
+[2025-06-14T07:44:59.152Z] Role: unknown
+[2025-06-14T07:44:59.268Z] --- NEW ITEM 4 ---
+[2025-06-14T07:44:59.334Z] Type: message_output_item
+[2025-06-14T07:44:59.401Z] Role: unknown
+[2025-06-14T07:44:59.436Z] Content preview: {
+  "meta": {
+    "step_name": "Suggestion of Essential Oils for Relaxant Properties",
+    "request_id": "a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd",
+    "timestamp_utc": "2023-10-01T12:00:00Z",
+    "versi...
+[2025-06-14T07:44:59.452Z] === FINAL OUTPUT ===
+[2025-06-14T07:44:59.486Z] Final output type: object
+[2025-06-14T07:44:59.519Z] Final output keys: meta, data, echo
+[2025-06-14T07:44:59.670Z] === STREAMING SESSION ENDED ===

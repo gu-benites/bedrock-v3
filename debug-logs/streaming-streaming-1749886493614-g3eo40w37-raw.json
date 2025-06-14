@@ -1,0 +1,76 @@
+{
+  "timestamp": "2025-06-14T07:34:53.616Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:34:53.616Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:34:54.385Z",
+  "data": {
+    "type": "newItems",
+    "count": 0,
+    "items": []
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:00.831Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 702,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Identificação de propriedades terapêuticas necessárias\",\"request_id\":\"abc123xyz\",\"timestamp_utc\":\"2023-10-04T10:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"sucesso\",\"message\":\"Propriedades terapêuticas identificadas com base nos sintomas e causas fornecidos\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\"property_name_localized\":\"Propriedades Calmantes\",\"property_name_english\":\"Calming Properties\",\"description_context",
+    "bufferSuffix": " pescoço e ombros causada pelo estresse.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.628786082002"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:05.862Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1345,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Identificação de propriedades terapêuticas necessárias\",\"request_id\":\"abc123xyz\",\"timestamp_utc\":\"2023-10-04T10:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"sucesso\",\"message\":\"Propriedades terapêuticas identificadas com base nos sintomas e causas fornecidos\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\"property_name_localized\":\"Propriedades Calmantes\",\"property_name_english\":\"Calming Properties\",\"description_context",
+    "bufferSuffix": "6492928_0.49471869989506967\"],\"relevancy_score\":5},{\"property_id\":\"f2e3d4c5-6789-0abc-def1-234567890"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:09.403Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2141,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Identificação de propriedades terapêuticas necessárias\",\"request_id\":\"abc123xyz\",\"timestamp_utc\":\"2023-10-04T10:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"sucesso\",\"message\":\"Propriedades terapêuticas identificadas com base nos sintomas e causas fornecidos\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\"property_name_localized\":\"Propriedades Calmantes\",\"property_name_english\":\"Calming Properties\",\"description_context",
+    "bufferSuffix": "r as dores de cabeça relacionadas ao estresse.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.628786"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:13.718Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 2781,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Identificação de propriedades terapêuticas necessárias\",\"request_id\":\"abc123xyz\",\"timestamp_utc\":\"2023-10-04T10:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"sucesso\",\"message\":\"Propriedades terapêuticas identificadas com base nos sintomas e causas fornecidos\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\"property_name_localized\":\"Propriedades Calmantes\",\"property_name_english\":\"Calming Properties\",\"description_context",
+    "bufferSuffix": "tom_1749886492928_0.49471869989506967\"],\"relevancy_score\":3},{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:17.784Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3472,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"Identificação de propriedades terapêuticas necessárias\",\"request_id\":\"abc123xyz\",\"timestamp_utc\":\"2023-10-04T10:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"sucesso\",\"message\":\"Propriedades terapêuticas identificadas com base nos sintomas e causas fornecidos\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d3f9a2b4-5e8f-4c2a-8d9f-9ae6b6c21b4a\",\"property_name_localized\":\"Propriedades Calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Auxilia na redução do estresse e da ansiedade, ajudando a aliviar a tensão muscular no pescoço e ombros causada pelo estresse.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[\"symptom_1749886492928_0.49471869989506967\"],\"relevancy_score\":5},{\"property_id\":\"a1b2c3d4-5678-90ab-cdef-1234567890ab\",\"property_name_localized\":\"Propriedades Relaxantes Musculares\",\"property_name_english\":\"Muscle Relaxant Properties\",\"description_contextual_localized\":\"Ajuda a aliviar a tensão muscular, especialmente na região do pescoço e ombros, contribuindo para a redução da dor e do desconforto.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[\"symptom_1749886492928_0.49471869989506967\"],\"relevancy_score\":5},{\"property_id\":\"f2e3d4c5-6789-0abc-def1-234567890bcd\",\"property_name_localized\":\"Propriedades Sedativas leves\",\"property_name_english\":\"Light Sedative Properties\",\"description_contextual_localized\":\"Promove um estado de relaxamento que favorece um sono mais tranquilo, contribuindo para reduzir a falta de sono que piora as dores de cabeça.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[],\"relevancy_score\":4},{\"property_id\":\"9f8e7d6c-5432-1b0a-fedc-9876543210fe\",\"property_name_localized\":\"Propriedades Relaxantes\",\"property_name_english\":\"Relaxing Properties\",\"description_contextual_localized\":\"Auxilia na redução do estresse geral, promovendo um estado mental calmo e equilibrado que pode diminuir as dores de cabeça relacionadas ao estresse.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[\"symptom_1749886492928_0.49471869989506967\"],\"relevancy_score\":4},{\"property_id\":\"b1a2c3d4-9f8e-1234-5678-9abcde123456\",\"property_name_localized\":\"Propriedades reguladoras do humor\",\"property_name_english\":\"Mood Balancing Properties\",\"description_contextual_localized\":\"Contribui para um equilíbrio emocional que ajuda a reduzir a ansiedade e o estresse, fatores que podem intensificar as dores de cabeça.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[\"symptom_1749886492928_0.49471869989506967\"],\"relevancy_score\":3},{\"property_id\":\"c4d5e6f7-8901-2b3c-d4e5-678901234567\",\"property_name_localized\":\"Propriedades estimulantes cerebrais\",\"property_name_english\":\"Cognitive Enhancer Properties\",\"description_contextual_localized\":\"Favorece o foco e a clareza mental, ajudando a aliviar o desconforto causado por dores de cabeça persistentes e melhora a qualidade do sono.\",\"addresses_cause_ids\":[\"cause_1749886492928_0.6287860820023617\"],\"addresses_symptom_ids\":[],\"relevancy_score\":2}]},\"echo\":{\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"gender\":\"{{gender}}\",\"age_category\":\"{{age_category}}\",\"age_specific\":\"{{age_specific}}\",\"user_language\":\"PT_BR\",\"selected_causes_count\":1,\"selected_symptoms_count\":1}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:35:17.885Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:35:17.885Z"
+  }
+}
+---

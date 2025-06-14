@@ -1,0 +1,242 @@
+{
+  "timestamp": "2025-06-14T07:21:07.083Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:21:07.083Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:22.615Z",
+  "data": {
+    "type": "newItems",
+    "count": 5,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2495cab48199a72be7304a66ac9a0299a0698827734b",
+          "type": "function_call",
+          "callId": "call_XWaJehSgHM2NjgZ9Ad4TH5ha",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades fortalecedoras da pele\",\"health_concern\":\"dermatite atopica\",\"additional_context\":\"sintomas de vermelhidão na pele e irritação devido a agentes ambientais\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d249741188199b59644276283264b0299a0698827734b",
+          "type": "function_call",
+          "callId": "call_Pe0pPmO10vOaEdSgySdqU6y0",
+          "name": "check_vector_search_health",
+          "status": "completed",
+          "arguments": "{}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_XWaJehSgHM2NjgZ9Ad4TH5ha",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades fortalecedoras da pele para dermatite atopica\",\n  \"therapeutic_property\": \"Propriedades fortalecedoras da pele\",\n  \"health_concern\": \"dermatite atopica\",\n  \"results\": [\n    {\n      \"text\": \"Dermatite atópica pode ser desencadeada por alergias, fatores ambientais e emocionais. Embora não haja cura, é possível controlar a condição. Os óleos essenciais podem ser úteis no tratamento da dermatite atópica devido às suas propriedades anti-inflamatórias, antialérgicas, antipruriginosas e regenerativas da pele.\\nUma sugestão de receita para tratar a dermatite atópica inclui a mistura dos seguintes óleos essenciais em um frasco de 30 ml com conta-gotas:\\n- 10 gotas de lavanda\\n- 12 gotas de camomila romana\\n- 8 gotas de gerânio\\n- 10 gotas de patchouli\\nComplete o frasco com óleo de coco fracionado e agite suavemente. Aplique duas a três gotas da mistura na área afetada e massageie suavemente. A quantidade de gotas pode variar dependendo do tamanho da área afetada.\",\n      \"score\": 0.879426539\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados no tratamento de dermatite atópica em crianças, tanto para benefícios tópicos quanto aromáticos. Uma receita sugerida é a mistura de camomila romana, olíbano, copaíba e melaleuca, utilizando 5 gotas de cada óleo essencial em um frasco de 10 ml. Complete o frasco com óleo de coco fracionado ou óleo de rosa mosqueta, de acordo com a preferência. Aplique essa mistura na pele da criança várias vezes ao dia. Caso não possua todos os óleos essenciais mencionados, é possível utilizar apenas lavanda ou uma combinação de melaleuca e lavanda.\",\n      \"score\": 0.869160831\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita: Cuidado Suave para Dermatite Atópica\\n\\n##Método de aplicação:\\nAplicação tópica.\\n\\n##Ingredientes:\\n\\n- 8 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Lavanda\\n- 10 gotas de Manjericão\\n- Óleo de coco fracionado ou Ov de girassol\\n\\n##Frasco:\\nFrasco de vidro âmbar de 15 ml spray\\n\\n##Instruções de Preparo:\\n1. Adicione as gotas de cada óleo essencial no frasco de vidro âmbar.\\n2. Preencha o restante do frasco com o óleo de coco fracionado.\\n3. Feche bem o frasco e agite suavemente para misturar os ingredientes.\\n\\n##Protocolo para uso:\\n1. Agite o frasco antes de cada uso.\\n2. borrife a mistura na área afetada pela dermatite atópica.\\n3. Massageie suavemente a pele até que o óleo seja absorvido.\\n4. Repita o processo 2 a 3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação:\\n- Antes de usar a mistura, faça um teste de sensibilidade: aplique uma pequena quantidade da mistura diluída na pele do antebraço e aguarde 24 horas. Se ocorrer irritação, suspenda o uso.\\n- Evite o contato com os olhos e mucosas.\\n- Mantenha fora do alcance de crianças.\\n- Consulte um profissional de saúde antes de usar em crianças menores de 2 anos.\\n- Armazene em local fresco e seco, longe da luz solar direta.\\n\\nEssa receita foi especialmente formulada para tratar a dermatite atópica de forma suave e eficaz. Os óleos essenciais de Bergamota, Camomila-romana, Gerânio, Lavanda e Manjericão possuem propriedades terapêuticas que ajudam a acalmar a pele irritada, reduzir a coceira e promover a cicatrização. O óleo de coco fracionado atua como um óleo carreador, diluindo os óleos essenciais e facilitando a aplicação na pele. Lembre-se de adaptar o protocolo para uso de acordo com a rotina da criança, aplicando nos momentos mais adequados ao longo do dia.\",\n      \"score\": 0.869129419\n    },\n    {\n      \"text\": \"Uma receita para tratar dermatite e doenças de pele, incluindo manchas, pode ser feita em uma embalagem de 10 ml para uso tópico. Os óleos essenciais são compostos por diferentes componentes químicos que proporcionam propriedades terapêuticas variadas. É importante não desistir e continuar explorando os benefícios dos óleos essenciais para obter resultados positivos na saúde.\",\n      \"score\": 0.867690265\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados no tratamento de dermatite e eczema, que são processos inflamatórios de pele. Para isso, é importante buscar óleos com propriedades anti-inflamatórias, que aliviem a coceira e auxiliem na regeneração do tecido da pele. Esses óleos podem ser aplicados topicamente, ajudando a tratar erupções cutâneas, feridas e lesões de pele. Além disso, é fundamental considerar as causas emocionais que podem estar relacionadas às manifestações físicas dessas condições.\",\n      \"score\": 0.866740882\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita para Aliviar Dermatite Atópica\\n\\n##Método de aplicação\\nTópico\\n\\n##Ingredientes\\n- 10 gotas de Lavanda\\n- 12 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Patchouli\\n- óleo de coco fracionado \\n\\n##Frasco\\nFrasco de vidro âmbar de 30ml com conta-gotas.\\n\\n##Instruções de Preparo\\n1. Adicione as gotas dos óleos essenciais no frasco de vidro âmbar.\\n2. Complete o frasco com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar.\\n\\n##Protocolo para uso\\n1. Agite o frasco antes de cada uso.\\n2. Aplique 2-3 gotas da mistura na área afetada da pele.\\n3. Massageie suavemente a área com movimentos circulares até que a mistura seja absorvida pela pele.\\n4. Repita a aplicação 2-3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação\\n- Esta receita de óleos essenciais não deve ser utilizada como substituto de qualquer medicamento prescrito pelo seu médico.\\n- Não aplicar óleo essencial diretamente na pele sem diluição adequada.\\n- Mantenha fora do alcance de crianças.\\n- Esta receita é indicada para aliviar a dermatite atópica, mas pode ser utilizada para outras condições de pele, como eczema atópico, dermatite eczematoide, neurodermatite e eczema endógeno.\",\n      \"score\": 0.866443098\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita para Aliviar Dermatite Atópica\\n\\n##Método de aplicação\\nTópico\\n\\n##Ingredientes\\n- 10 gotas de Lavanda\\n- 12 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Patchouli\\n- óleo de coco fracionado \\n\\n##Frasco\\nFrasco de vidro âmbar de 30ml com conta-gotas.\\n\\n##Instruções de Preparo\\n1. Adicione as gotas dos óleos essenciais no frasco de vidro âmbar.\\n2. Complete o frasco com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar.\\n\\n##Protocolo para uso\\n1. Agite o frasco antes de cada uso.\\n2. Aplique 2-3 gotas da mistura na área afetada da pele.\\n3. Massageie suavemente a área com movimentos circulares até que a mistura seja absorvida pela pele.\\n4. Repita a aplicação 2-3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação\\n- Esta receita de óleos essenciais não deve ser utilizada como substituto de qualquer medicamento prescrito pelo seu médico.\\n- Não aplicar óleo essencial diretamente na pele sem diluição adequada.\\n- Mantenha fora do alcance de crianças.\\n- Esta receita é indicada para aliviar a dermatite atópica, mas pode ser utilizada para outras condições de pele, como eczema atópico, dermatite eczematoide, neurodermatite e eczema endógeno.\",\n      \"score\": 0.866415679\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite que pode ser conhecida como Eczema, inflamação da pele, irritação cutânea, coceira na pele, erupção cutânea, dermatite atópica.:\\n\\n### Receita: Loção Anti-Dermatite\\n\\n### Ingredientes:\\n\\n- 10 gotas de lavanda (Lavandula angustifolia)\\n- 8 gotas de melaleuca (Melaleuca alternifolia)\\n- 8 gotas de frankincense (Boswellia carterii)\\n- 6 gotas de camomila-romana (Anthemis nobilis)\\n- 4 gotas de hortelã-pimenta (Mentha piperita)\\n- Óleo de coco fracionado para preencher a embalagem.\\n\\ntipo de frasco: - Frasco de 30 ml conta-gotas\\n### Instruções de Preparo:\\n1. Adicione os óleos essenciais no frasco.\\n2. Complete com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar bem os ingredientes.\\n\\n### Protocolo de Aplicação:\\n1. Lave bem a área afetada pela dermatite e seque com cuidado.\\n2. Agite o frasco antes de cada uso.\\n3. Coloque a mistura sobre a área afetada, cobrindo toda a superfície da pele.\\n4. Massageie suavemente na pele até que seja completamente absorvida.\\n5. Repita a aplicação 2 a 3 vezes por dia, conforme necessário.\\n\\n### Precauções e Observações:\\n\\n- Mantenha fora do alcance de crianças.\\n- Evite contato com os olhos.\\n- Armazene em local fresco e seco.\",\n      \"score\": 0.866330683\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades fortalecedoras da pele para dermatite atopica\",\n  \"therapeutic_property\": \"Propriedades fortalecedoras da pele\",\n  \"health_concern\": \"dermatite atopica\",\n  \"results\": [\n    {\n      \"text\": \"Dermatite atópica pode ser desencadeada por alergias, fatores ambientais e emocionais. Embora não haja cura, é possível controlar a condição. Os óleos essenciais podem ser úteis no tratamento da dermatite atópica devido às suas propriedades anti-inflamatórias, antialérgicas, antipruriginosas e regenerativas da pele.\\nUma sugestão de receita para tratar a dermatite atópica inclui a mistura dos seguintes óleos essenciais em um frasco de 30 ml com conta-gotas:\\n- 10 gotas de lavanda\\n- 12 gotas de camomila romana\\n- 8 gotas de gerânio\\n- 10 gotas de patchouli\\nComplete o frasco com óleo de coco fracionado e agite suavemente. Aplique duas a três gotas da mistura na área afetada e massageie suavemente. A quantidade de gotas pode variar dependendo do tamanho da área afetada.\",\n      \"score\": 0.879426539\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados no tratamento de dermatite atópica em crianças, tanto para benefícios tópicos quanto aromáticos. Uma receita sugerida é a mistura de camomila romana, olíbano, copaíba e melaleuca, utilizando 5 gotas de cada óleo essencial em um frasco de 10 ml. Complete o frasco com óleo de coco fracionado ou óleo de rosa mosqueta, de acordo com a preferência. Aplique essa mistura na pele da criança várias vezes ao dia. Caso não possua todos os óleos essenciais mencionados, é possível utilizar apenas lavanda ou uma combinação de melaleuca e lavanda.\",\n      \"score\": 0.869160831\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita: Cuidado Suave para Dermatite Atópica\\n\\n##Método de aplicação:\\nAplicação tópica.\\n\\n##Ingredientes:\\n\\n- 8 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Lavanda\\n- 10 gotas de Manjericão\\n- Óleo de coco fracionado ou Ov de girassol\\n\\n##Frasco:\\nFrasco de vidro âmbar de 15 ml spray\\n\\n##Instruções de Preparo:\\n1. Adicione as gotas de cada óleo essencial no frasco de vidro âmbar.\\n2. Preencha o restante do frasco com o óleo de coco fracionado.\\n3. Feche bem o frasco e agite suavemente para misturar os ingredientes.\\n\\n##Protocolo para uso:\\n1. Agite o frasco antes de cada uso.\\n2. borrife a mistura na área afetada pela dermatite atópica.\\n3. Massageie suavemente a pele até que o óleo seja absorvido.\\n4. Repita o processo 2 a 3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação:\\n- Antes de usar a mistura, faça um teste de sensibilidade: aplique uma pequena quantidade da mistura diluída na pele do antebraço e aguarde 24 horas. Se ocorrer irritação, suspenda o uso.\\n- Evite o contato com os olhos e mucosas.\\n- Mantenha fora do alcance de crianças.\\n- Consulte um profissional de saúde antes de usar em crianças menores de 2 anos.\\n- Armazene em local fresco e seco, longe da luz solar direta.\\n\\nEssa receita foi especialmente formulada para tratar a dermatite atópica de forma suave e eficaz. Os óleos essenciais de Bergamota, Camomila-romana, Gerânio, Lavanda e Manjericão possuem propriedades terapêuticas que ajudam a acalmar a pele irritada, reduzir a coceira e promover a cicatrização. O óleo de coco fracionado atua como um óleo carreador, diluindo os óleos essenciais e facilitando a aplicação na pele. Lembre-se de adaptar o protocolo para uso de acordo com a rotina da criança, aplicando nos momentos mais adequados ao longo do dia.\",\n      \"score\": 0.869129419\n    },\n    {\n      \"text\": \"Uma receita para tratar dermatite e doenças de pele, incluindo manchas, pode ser feita em uma embalagem de 10 ml para uso tópico. Os óleos essenciais são compostos por diferentes componentes químicos que proporcionam propriedades terapêuticas variadas. É importante não desistir e continuar explorando os benefícios dos óleos essenciais para obter resultados positivos na saúde.\",\n      \"score\": 0.867690265\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados no tratamento de dermatite e eczema, que são processos inflamatórios de pele. Para isso, é importante buscar óleos com propriedades anti-inflamatórias, que aliviem a coceira e auxiliem na regeneração do tecido da pele. Esses óleos podem ser aplicados topicamente, ajudando a tratar erupções cutâneas, feridas e lesões de pele. Além disso, é fundamental considerar as causas emocionais que podem estar relacionadas às manifestações físicas dessas condições.\",\n      \"score\": 0.866740882\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita para Aliviar Dermatite Atópica\\n\\n##Método de aplicação\\nTópico\\n\\n##Ingredientes\\n- 10 gotas de Lavanda\\n- 12 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Patchouli\\n- óleo de coco fracionado \\n\\n##Frasco\\nFrasco de vidro âmbar de 30ml com conta-gotas.\\n\\n##Instruções de Preparo\\n1. Adicione as gotas dos óleos essenciais no frasco de vidro âmbar.\\n2. Complete o frasco com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar.\\n\\n##Protocolo para uso\\n1. Agite o frasco antes de cada uso.\\n2. Aplique 2-3 gotas da mistura na área afetada da pele.\\n3. Massageie suavemente a área com movimentos circulares até que a mistura seja absorvida pela pele.\\n4. Repita a aplicação 2-3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação\\n- Esta receita de óleos essenciais não deve ser utilizada como substituto de qualquer medicamento prescrito pelo seu médico.\\n- Não aplicar óleo essencial diretamente na pele sem diluição adequada.\\n- Mantenha fora do alcance de crianças.\\n- Esta receita é indicada para aliviar a dermatite atópica, mas pode ser utilizada para outras condições de pele, como eczema atópico, dermatite eczematoide, neurodermatite e eczema endógeno.\",\n      \"score\": 0.866443098\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite Atópica que pode ser conhecida como Eczema atópico, Dermatite eczematoide, Neurodermatite, Eczema endógeno.:\\n\\n#Receita para Aliviar Dermatite Atópica\\n\\n##Método de aplicação\\nTópico\\n\\n##Ingredientes\\n- 10 gotas de Lavanda\\n- 12 gotas de Camomila-romana\\n- 8 gotas de Gerânio\\n- 10 gotas de Patchouli\\n- óleo de coco fracionado \\n\\n##Frasco\\nFrasco de vidro âmbar de 30ml com conta-gotas.\\n\\n##Instruções de Preparo\\n1. Adicione as gotas dos óleos essenciais no frasco de vidro âmbar.\\n2. Complete o frasco com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar.\\n\\n##Protocolo para uso\\n1. Agite o frasco antes de cada uso.\\n2. Aplique 2-3 gotas da mistura na área afetada da pele.\\n3. Massageie suavemente a área com movimentos circulares até que a mistura seja absorvida pela pele.\\n4. Repita a aplicação 2-3 vezes ao dia, conforme necessário.\\n\\n##Precaução e observação\\n- Esta receita de óleos essenciais não deve ser utilizada como substituto de qualquer medicamento prescrito pelo seu médico.\\n- Não aplicar óleo essencial diretamente na pele sem diluição adequada.\\n- Mantenha fora do alcance de crianças.\\n- Esta receita é indicada para aliviar a dermatite atópica, mas pode ser utilizada para outras condições de pele, como eczema atópico, dermatite eczematoide, neurodermatite e eczema endógeno.\",\n      \"score\": 0.866415679\n    },\n    {\n      \"text\": \"Receita e protocolo para sintoma/doença Dermatite que pode ser conhecida como Eczema, inflamação da pele, irritação cutânea, coceira na pele, erupção cutânea, dermatite atópica.:\\n\\n### Receita: Loção Anti-Dermatite\\n\\n### Ingredientes:\\n\\n- 10 gotas de lavanda (Lavandula angustifolia)\\n- 8 gotas de melaleuca (Melaleuca alternifolia)\\n- 8 gotas de frankincense (Boswellia carterii)\\n- 6 gotas de camomila-romana (Anthemis nobilis)\\n- 4 gotas de hortelã-pimenta (Mentha piperita)\\n- Óleo de coco fracionado para preencher a embalagem.\\n\\ntipo de frasco: - Frasco de 30 ml conta-gotas\\n### Instruções de Preparo:\\n1. Adicione os óleos essenciais no frasco.\\n2. Complete com óleo de coco fracionado.\\n3. Feche o frasco e agite suavemente para misturar bem os ingredientes.\\n\\n### Protocolo de Aplicação:\\n1. Lave bem a área afetada pela dermatite e seque com cuidado.\\n2. Agite o frasco antes de cada uso.\\n3. Coloque a mistura sobre a área afetada, cobrindo toda a superfície da pele.\\n4. Massageie suavemente na pele até que seja completamente absorvida.\\n5. Repita a aplicação 2 a 3 vezes por dia, conforme necessário.\\n\\n### Precauções e Observações:\\n\\n- Mantenha fora do alcance de crianças.\\n- Evite contato com os olhos.\\n- Armazene em local fresco e seco.\",\n      \"score\": 0.866330683\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "check_vector_search_health",
+          "callId": "call_Pe0pPmO10vOaEdSgySdqU6y0",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"\",\n      \"russell\",\n      \"research_papers\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:21:12.121Z\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"\",\n      \"russell\",\n      \"research_papers\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:21:12.121Z\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d2499fd908199b60c497afdbf5f7a0299a0698827734b",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"Processar recomendações de óleos essenciais baseados na propriedade terapêutica\",\"request_id\":\"abc12345-6789-0abc-def0-1234567890ab\",\"timestamp_utc\":\"2023-10-28T00:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"d4e5f6a7-2345-6789-0b23-cdef45678901\",\"property_name_localized\":\"Propriedades fortalecedoras da pele\",\"property_name_english\":\"Propriedades fortalecedoras da pele\",\"description_localized\":\"Reforça a resistência da pele contra agentes irritantes ambientais, minimizando reações inflamatórias.\"},\"suggested_oils\":[{\"oil_id\":\"1\",\"name_english\":\"Lavanda\",\"name_botanical\":\"Lavandula angustifolia\",\"name_localized\":\"Lavanda\",\"match_rationale_localized\":\"Reconhecido por suas propriedades calmantes, regenerativas e anti-inflamatórias que fortalecem a pele.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"2\",\"name_english\":\"Camomila romana\",\"name_botanical\":\"Anthemis nobilis\",\"name_localized\":\"Camomila romana\",\"match_rationale_localized\":\"Propriedades calmantes, anti-inflamatórias e regeneradoras da pele, auxiliando na resistência a irritações.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"3\",\"name_english\":\"Gerânio\",\"name_botanical\":\"Pelargonium graveolens\",\"name_localized\":\"Gerânio\",\"match_rationale_localized\":\"Contribui para o equilíbrio da pele, promovendo sua resistência e redução de inflamações.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"4\",\"name_english\":\"Patchouli\",\"name_botanical\":\"Pogostemon cablin\",\"name_localized\":\"Patchouli\",\"match_rationale_localized\":\"Propriedades regenerativas e anti-inflamatórias que ajudam a fortalecer a barreira cutânea.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"5\",\"name_english\":\"Camomila romena\",\"name_botanical\":\"Anthemis nobilis\",\"name_localized\":\"Camomila romena\",\"match_rationale_localized\":\"Similar às anteriores, com ação calmante e de fortalecimento da pele.\",\"relevancy_to_property_score\":4}]}}  \n \t, \"echo\":{\"health_concern_input\":\"dermatite atopica\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"idosa\",\"age_specific\":\"50 anos\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"ambientais\",\"irritantes\"],\"selected_symptom_ids\":[\"vermelhidão na pele\"],\"therapeutic_property_ids\":[\"d4e5f6a7-2345-6789-0b23-cdef45678901\"]}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:22.679Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Processar recomendações de óleos essenciais baseados na propriedade terapêutica",
+        "request_id": "abc12345-6789-0abc-def0-1234567890ab",
+        "timestamp_utc": "2023-10-28T00:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "d4e5f6a7-2345-6789-0b23-cdef45678901",
+            "property_name_localized": "Propriedades fortalecedoras da pele",
+            "property_name_english": "Propriedades fortalecedoras da pele",
+            "description_localized": "Reforça a resistência da pele contra agentes irritantes ambientais, minimizando reações inflamatórias."
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Lavanda",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Reconhecido por suas propriedades calmantes, regenerativas e anti-inflamatórias que fortalecem a pele.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Camomila romana",
+              "name_botanical": "Anthemis nobilis",
+              "name_localized": "Camomila romana",
+              "match_rationale_localized": "Propriedades calmantes, anti-inflamatórias e regeneradoras da pele, auxiliando na resistência a irritações.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Gerânio",
+              "name_botanical": "Pelargonium graveolens",
+              "name_localized": "Gerânio",
+              "match_rationale_localized": "Contribui para o equilíbrio da pele, promovendo sua resistência e redução de inflamações.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Patchouli",
+              "name_botanical": "Pogostemon cablin",
+              "name_localized": "Patchouli",
+              "match_rationale_localized": "Propriedades regenerativas e anti-inflamatórias que ajudam a fortalecer a barreira cutânea.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Camomila romena",
+              "name_botanical": "Anthemis nobilis",
+              "name_localized": "Camomila romena",
+              "match_rationale_localized": "Similar às anteriores, com ação calmante e de fortalecimento da pele.",
+              "relevancy_to_property_score": 4
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "dermatite atopica",
+        "user_info_input": {
+          "gender": "feminino",
+          "age_category": "idosa",
+          "age_specific": "50 anos",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "ambientais",
+          "irritantes"
+        ],
+        "selected_symptom_ids": [
+          "vermelhidão na pele"
+        ],
+        "therapeutic_property_ids": [
+          "d4e5f6a7-2345-6789-0b23-cdef45678901"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:23.143Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 751,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Processar recomendações de óleos essenciais baseados na propriedade terapêutica\",\"request_id\":\"abc12345-6789-0abc-def0-1234567890ab\",\"timestamp_utc\":\"2023-10-28T00:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"d4e5f6a7-2345-6789-0b23-cdef45678901\",\"prope",
+    "bufferSuffix": "a a resistência da pele contra agentes irritantes ambientais, minimizando reações inflamatórias.\"},\""
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:23.497Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1519,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Processar recomendações de óleos essenciais baseados na propriedade terapêutica\",\"request_id\":\"abc12345-6789-0abc-def0-1234567890ab\",\"timestamp_utc\":\"2023-10-28T00:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"d4e5f6a7-2345-6789-0b23-cdef45678901\",\"prope",
+    "bufferSuffix": "ocalized\":\"Gerânio\",\"match_rationale_localized\":\"Contribui para o equilíbrio da pele, promovendo sua"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:23.910Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2280,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Processar recomendações de óleos essenciais baseados na propriedade terapêutica\",\"request_id\":\"abc12345-6789-0abc-def0-1234567890ab\",\"timestamp_utc\":\"2023-10-28T00:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"d4e5f6a7-2345-6789-0b23-cdef45678901\",\"prope",
+    "bufferSuffix": "t\":{\"gender\":\"feminino\",\"age_category\":\"idosa\",\"age_specific\":\"50 anos\",\"age_unit\":\"anos\"},\"selected"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:24.016Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2436,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"Processar recomendações de óleos essenciais baseados na propriedade terapêutica\",\"request_id\":\"abc12345-6789-0abc-def0-1234567890ab\",\"timestamp_utc\":\"2023-10-28T00:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Recomendações de óleos essenciais baseadas na propriedade terapêutica solicitada foram obtidas com sucesso.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"d4e5f6a7-2345-6789-0b23-cdef45678901\",\"property_name_localized\":\"Propriedades fortalecedoras da pele\",\"property_name_english\":\"Propriedades fortalecedoras da pele\",\"description_localized\":\"Reforça a resistência da pele contra agentes irritantes ambientais, minimizando reações inflamatórias.\"},\"suggested_oils\":[{\"oil_id\":\"1\",\"name_english\":\"Lavanda\",\"name_botanical\":\"Lavandula angustifolia\",\"name_localized\":\"Lavanda\",\"match_rationale_localized\":\"Reconhecido por suas propriedades calmantes, regenerativas e anti-inflamatórias que fortalecem a pele.\",\"relevancy_to_property_score\":5},{\"oil_id\":\"2\",\"name_english\":\"Camomila romana\",\"name_botanical\":\"Anthemis nobilis\",\"name_localized\":\"Camomila romana\",\"match_rationale_localized\":\"Propriedades calmantes, anti-inflamatórias e regeneradoras da pele, auxiliando na resistência a irritações.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"3\",\"name_english\":\"Gerânio\",\"name_botanical\":\"Pelargonium graveolens\",\"name_localized\":\"Gerânio\",\"match_rationale_localized\":\"Contribui para o equilíbrio da pele, promovendo sua resistência e redução de inflamações.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"4\",\"name_english\":\"Patchouli\",\"name_botanical\":\"Pogostemon cablin\",\"name_localized\":\"Patchouli\",\"match_rationale_localized\":\"Propriedades regenerativas e anti-inflamatórias que ajudam a fortalecer a barreira cutânea.\",\"relevancy_to_property_score\":4},{\"oil_id\":\"5\",\"name_english\":\"Camomila romena\",\"name_botanical\":\"Anthemis nobilis\",\"name_localized\":\"Camomila romena\",\"match_rationale_localized\":\"Similar às anteriores, com ação calmante e de fortalecimento da pele.\",\"relevancy_to_property_score\":4}]}}  \n \t, \"echo\":{\"health_concern_input\":\"dermatite atopica\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"idosa\",\"age_specific\":\"50 anos\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"ambientais\",\"irritantes\"],\"selected_symptom_ids\":[\"vermelhidão na pele\"],\"therapeutic_property_ids\":[\"d4e5f6a7-2345-6789-0b23-cdef45678901\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:21:24.131Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:21:24.131Z"
+  }
+}
+---

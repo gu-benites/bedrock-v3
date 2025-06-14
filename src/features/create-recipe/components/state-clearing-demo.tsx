@@ -67,7 +67,6 @@ export function StateClearingDemo() {
    * Test clearing steps after a specific step
    */
   const testClearStepsAfter = (step: RecipeStep) => {
-    console.log(`Testing clearStepsAfter(${step})`);
     clearStepsAfter(step);
   };
 
@@ -75,7 +74,6 @@ export function StateClearingDemo() {
    * Test clearing specific step data
    */
   const testClearStepData = (step: RecipeStep) => {
-    console.log(`Testing clearStepData(${step})`);
     clearStepData(step);
   };
 
@@ -83,7 +81,6 @@ export function StateClearingDemo() {
    * Test navigation with automatic clearing
    */
   const testNavigationClearing = async (targetStep: RecipeStep) => {
-    console.log(`Testing navigation to ${targetStep} with automatic clearing`);
     await goToStep(targetStep);
   };
 
@@ -259,7 +256,7 @@ export function StateClearingDemo() {
           <li>Test "Clear Steps After" buttons to see how data is cleared for subsequent steps</li>
           <li>Test "Clear Specific Step" buttons to clear individual step data</li>
           <li>Test "Navigation with Auto-Clearing" to see automatic clearing during backwards navigation</li>
-          <li>Check the browser console for detailed logging of clearing operations</li>
+          <li>Monitor the state display to see how data is cleared</li>
         </ol>
       </div>
     </div>

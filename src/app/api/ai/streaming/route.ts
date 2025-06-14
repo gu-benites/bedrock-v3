@@ -14,9 +14,10 @@ import {
   STREAMING_DATA_TYPES,
   isItemComplete,
   cleanItemData,
-  detectDataTypes,
   getPrimaryDisplayField
 } from '@/lib/ai/config/streaming-data-types';
+import { vectorSearchTools } from '@/lib/ai/tools/vector-search-tool';
+import { StreamingLogger } from '@/lib/debug/streaming-logger';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -73,9 +74,16 @@ function prepareTemplateVariables(feature: string, data: any): Record<string, an
     };
   }
 
-  // For create-recipe feature - pass data as-is since it's already in the correct format
+  // For create-recipe feature - properly structure template variables
   if (feature === 'create-recipe') {
-    return data;
+    return {
+      health_concern: data.health_concern || '',
+      demographics: data.demographics || {},
+      selected_causes: data.selected_causes || [],
+      selected_symptoms: data.selected_symptoms || [],
+      target_property: data.target_property || {},
+      user_language: data.user_language || 'PT_BR'
+    };
   }
 
   // Default: return data as-is for other features
@@ -95,7 +103,8 @@ function prepareTemplateVariables(feature: string, data: any): Record<string, an
 async function handleStructuredOnlyStreaming(
   result: any,
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder
+  encoder: TextEncoder,
+  logger?: StreamingLogger
 ): Promise<void> {
   console.log('[Structured-Only Streaming] Starting buffer-based structured processing');
 
@@ -120,10 +129,27 @@ async function handleStructuredOnlyStreaming(
 
     // Dynamically detect and process all supported data types
     for (const [dataType, config] of Object.entries(STREAMING_DATA_TYPES)) {
-      const items = parsedData.data[dataType];
+      let items: any[] = [];
 
-      if (!Array.isArray(items)) {
-        continue; // Skip if this data type is not present
+      // Handle special case for suggested_oils (nested in property_oil_suggestion)
+      if (dataType === 'suggested_oils') {
+        const propertyOilSuggestion = parsedData.data['property_oil_suggestion'];
+        if (propertyOilSuggestion && propertyOilSuggestion.suggested_oils) {
+          items = Array.isArray(propertyOilSuggestion.suggested_oils)
+            ? propertyOilSuggestion.suggested_oils
+            : [propertyOilSuggestion.suggested_oils];
+        }
+      } else {
+        // Handle standard data types
+        const data = parsedData.data[dataType];
+        if (!data) {
+          continue; // Skip if this data type is not present
+        }
+        items = Array.isArray(data) ? data : [data];
+      }
+
+      if (items.length === 0) {
+        continue; // Skip if no items found
       }
 
       const lastSentCount = lastSentCounts.get(dataType) || 0;
@@ -132,7 +158,15 @@ async function handleStructuredOnlyStreaming(
         const item = items[i];
 
         if (isItemComplete(item, config)) {
-          const itemKey = `${dataType}-${i}-${item[config.idField]}`;
+          // Use nested value access for ID field (handles paths like 'therapeutic_property_context.property_id')
+          const getNestedValue = (obj: any, path: string): any => {
+            return path.split('.').reduce((current, key) => {
+              return current && current[key] !== undefined ? current[key] : undefined;
+            }, obj);
+          };
+
+          const itemId = getNestedValue(item, config.idField) || 'unknown';
+          const itemKey = `${dataType}-${i}-${itemId}`;
 
           if (!sentItems.has(itemKey)) {
             const cleanData = cleanItemData(item, config);
@@ -176,6 +210,20 @@ async function handleStructuredOnlyStreaming(
     }
   };
 
+  // Log buffer content for debugging
+  const logBufferContent = (chunkCount: number) => {
+    if (logger) {
+      logger.writeLog(`Buffer content at chunk ${chunkCount} (${buffer.length} chars):`);
+      logger.writeRawData({
+        type: 'bufferSnapshot',
+        chunkCount,
+        bufferLength: buffer.length,
+        bufferPreview: buffer.substring(0, 500),
+        bufferSuffix: buffer.length > 500 ? buffer.substring(buffer.length - 100) : null
+      });
+    }
+  };
+
   try {
     // Use toTextStream() to get character-by-character updates (like reference code)
     const textStream = result.toTextStream();
@@ -196,6 +244,9 @@ async function handleStructuredOnlyStreaming(
           chunksProcessed: totalChunksProcessed,
           itemsSent: totalItemsSent
         });
+
+        // Log buffer content for debugging
+        logBufferContent(totalChunksProcessed);
       }
     }
 
@@ -203,6 +254,16 @@ async function handleStructuredOnlyStreaming(
     processBuffer();
 
     console.log('[Structured-Only Streaming] Text streaming completed, waiting for final result');
+
+    // Log final buffer content for debugging
+    if (logger) {
+      logger.writeLog(`Final buffer content (${buffer.length} chars):`);
+      logger.writeRawData({
+        type: 'finalBuffer',
+        bufferLength: buffer.length,
+        fullBuffer: buffer
+      });
+    }
 
     // Wait for completion and send final structured data
     await result.completed;
@@ -237,12 +298,19 @@ async function handleStructuredOnlyStreaming(
         // Don't throw here - we want to complete gracefully
       }
     }
+
+    // Log agent result AFTER streaming completes (not before)
+    if (logger) {
+      logger.logAgentResult(result);
+    }
   } catch (error) {
     console.error('[Structured-Only Streaming] ❌ Error processing final output:', error);
     // Don't try to send error events here - the controller might be closed
     // The error will be handled by the outer try-catch in the stream handler
   }
 }
+
+// Note: Manual extraction function removed since AI agent now provides complete structured output
 
 /**
  * Handle traditional text streaming
@@ -280,122 +348,21 @@ async function handleTextStreaming(
   controller.enqueue(encoder.encode(completionEvent));
 }
 
-/**
- * Extract progressive data from accumulated JSON text using best-effort-json-parser
- * This is bulletproof and works with any JSON structure
- */
-/**
- * Extract progressive data from accumulated JSON text using best-effort-json-parser
- * This ensures we only send complete items with all required fields
- */
-function extractProgressiveData(accumulatedText: string, lastSentLength: number): {
-  newItems: Array<{ index: number; data: any }>;
-  totalSent: number;
-} {
-  const newItems: Array<{ index: number; data: any }> = [];
-  
-  try {
-    // Use best-effort-json-parser to parse the accumulated text
-    const parsed = parse(accumulatedText);
-    if (!parsed || typeof parsed !== 'object') {
-      return { newItems, totalSent: lastSentLength };
-    }
-
-    // Check if we have a valid structure with potential_causes
-    if (parsed.data?.potential_causes && Array.isArray(parsed.data.potential_causes)) {
-      const causes = parsed.data.potential_causes;
-      let highestCompleteIndex = -1;
-      let hasIncompleteCauses = false;
-
-      // Process all causes, but only return new ones
-      for (let i = 0; i < causes.length; i++) {
-        const cause = causes[i];
-
-        // Check if this cause has all required fields and meaningful content
-        if (cause && typeof cause === 'object' && cause.cause_id) {
-          const hasName = cause.name_localized?.length > 0;
-          const hasSuggestion = cause.suggestion_localized?.length > 0;
-          const hasExplanation = cause.explanation_localized?.length > 0;
-          
-          // We need all three fields to be present to consider it complete
-          const isComplete = hasName && hasSuggestion && hasExplanation;
-          
-          if (isComplete) {
-            // Only process new causes we haven't sent yet
-            if (i >= lastSentLength) {
-              // Create a clean data object with all required fields
-              const cleanData = {
-                cause_id: cause.cause_id,
-                name_localized: cause.name_localized,
-                suggestion_localized: cause.suggestion_localized,
-                explanation_localized: cause.explanation_localized,
-                // Include any additional fields
-                ...(cause.confidence && { confidence: cause.confidence }),
-                ...(cause.tags && { tags: cause.tags })
-              };
-
-              console.log('[Progressive Data] ✅ Complete cause found:', {
-                index: i,
-                name: cleanData.name_localized,
-                suggestionLength: cleanData.suggestion_localized.length,
-                explanationLength: cleanData.explanation_localized.length
-              });
-
-              newItems.push({
-                index: i,
-                data: cleanData
-              });
-            }
-            highestCompleteIndex = i;
-          } else {
-            hasIncompleteCauses = true;
-            if (i >= lastSentLength) {
-              console.log('[Progressive Data] ⏳ Incomplete cause:', {
-                index: i,
-                hasName,
-                hasSuggestion,
-                hasExplanation,
-                name: cause.name_localized || 'Unnamed',
-                suggestionLength: cause.suggestion_localized?.length || 0,
-                explanationLength: cause.explanation_localized?.length || 0
-              });
-            }
-          }
-        }
-      }
-
-
-      // If we found any complete items, return them
-      if (newItems.length > 0) {
-        return { 
-          newItems, 
-          totalSent: Math.max(lastSentLength, highestCompleteIndex + 1)
-        };
-      }
-      
-      // If we have incomplete causes but no new complete ones, update the count
-      // This helps with cases where we're still streaming in the data
-      if (hasIncompleteCauses && causes.length > lastSentLength) {
-        return { newItems, totalSent: causes.length };
-      }
-    }
-  } catch (error) {
-    console.log('[Progressive Data] Parse attempt failed, waiting for more data');
-  }
-  
-  // If we get here, no new complete items were found
-  return { newItems, totalSent: lastSentLength };
-}
+// Note: Progressive data extraction function removed since AI agent now provides complete structured output
 
 /**
  * POST handler for streaming requests
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const requestStartTime = Date.now();
-  const traceId = `streaming-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const traceId = `streaming-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+
+  // Initialize debug logger for this session
+  const logger = new StreamingLogger(traceId);
 
   try {
     console.log('[Streaming API] Request started', { traceId });
+    logger.writeLog(`Request started with traceId: ${traceId}`);
 
     // Validate API key
     if (!process.env['OPENAI_API_KEY']) {
@@ -447,13 +414,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Create AI agent with structured output
     console.log('[Streaming API] Creating AI agent with JSON schema');
+
+    // Configure tools based on the step
+    let agentTools: any[] = [];
+    if (step === 'suggested-oils') {
+      agentTools = vectorSearchTools;
+      console.log('[Streaming API] Adding vector search tools for suggested-oils step');
+    }
+
     const agent = new Agent({
       name: `${feature}-${step}-agent`,
       instructions: prompt,
       model: config.config.model || 'gpt-4o-mini',
-      outputType: config.schema as any // Use the JSON schema from YAML
+      outputType: config.schema as any, // Use the JSON schema from YAML
+      tools: agentTools.length > 0 ? agentTools : undefined
     });
-    console.log('[Streaming API] Agent created with structured output');
+    console.log('[Streaming API] Agent created with structured output and', agentTools.length, 'tools');
 
     // Run agent with streaming enabled
     console.log('[Streaming API] Starting agent execution with streaming');
@@ -467,7 +443,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     let result: any;
     try {
       result = await Promise.race([agentPromise, timeoutPromise]);
-      console.log('[Streaming API] Agent execution completed');
+      console.log('[Streaming API] Agent execution started');
+      logger.writeLog('Agent execution started');
+
+      // All steps now use real-time streaming (including tool-based steps)
+      console.log('[Streaming API] Starting real-time streaming for step:', step);
+      logger.writeLog(`Starting real-time streaming for step: ${step}`);
+
     } catch (error) {
       console.log('[Streaming API] Agent execution failed', error);
       if (error instanceof Error && error.message.includes('timeout')) {
@@ -498,11 +480,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         let streamingMode = 'unknown';
 
         try {
-          // Determine and execute the appropriate streaming mode
+          // Use structured streaming for all steps with structured output
           if (finalStreamingMode === 'structured' && hasStructuredOutput) {
             streamingMode = 'structured';
             console.log('[Streaming API] 🚀 Starting structured streaming');
-            await handleStructuredOnlyStreaming(result, controller, encoder);
+            await handleStructuredOnlyStreaming(result, controller, encoder, logger);
           } else {
             // Fall back to text mode if structured output is not available or text mode is explicitly requested
             streamingMode = 'text';
@@ -545,6 +527,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           try {
             controller.close();
             console.log('[Streaming API] 🔒 Stream controller closed');
+            logger.close();
           } catch (closeError) {
             console.error('[Streaming API] ❌ Error closing stream controller:', closeError);
           }

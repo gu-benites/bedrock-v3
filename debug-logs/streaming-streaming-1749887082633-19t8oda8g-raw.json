@@ -1,0 +1,252 @@
+{
+  "timestamp": "2025-06-14T07:44:42.679Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:44:42.678Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:51.934Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 632,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_conte",
+    "bufferSuffix": "f8e7d6c-5432-1b0a-fedc-9876543210fe\",\n        \"property_name_localized\": \"Propriedades Relaxantes\",\n"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:53.086Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1461,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_conte",
+    "bufferSuffix": "us\",\n          \"name_botanical\": \"Citrus sinensis\",\n          \"name_localized\": \"Laranja\",\n         "
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:54.929Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2247,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_conte",
+    "bufferSuffix": "carterii\",\n          \"name_localized\": \"Frankincense\",\n          \"match_rationale_localized\": \"Ajuda"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:57.502Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 3066,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_conte",
+    "bufferSuffix": "gory\": \"adult\",\n      \"age_specific\": \"60\",\n      \"age_unit\": \"years\"\n    },\n    \"selected_cause_ids"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:57.951Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3268,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"9f8e7d6c-5432-1b0a-fedc-9876543210fe\",\n        \"property_name_localized\": \"Propriedades Relaxantes\",\n        \"property_name_english\": \"Propriedades Relaxantes\",\n        \"description_localized\": \"Auxilia na redução do estresse geral, promovendo um estado mental calmo e equilibrado que pode diminuir as dores de cabeça relacionadas ao estresse.\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavandula\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Possui propriedades calmantes e ansiolíticas comprovadas, ajudando a aliviar a tensão muscular e promover o relaxamento.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Citrus\",\n          \"name_botanical\": \"Citrus sinensis\",\n          \"name_localized\": \"Laranja\",\n          \"match_rationale_localized\": \"Tem efeito relaxante e ajuda a reduzir o estresse, apoiando o sono e aliviando dores de cabeça causadas por ansiedade.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Pelargonium\",\n          \"name_botanical\": \"Pelargonium graveolens\",\n          \"name_localized\": \"Gerânio\",\n          \"match_rationale_localized\": \"Propriedades calmantes e de melhora do humor, ajudando a relaxar a mente e reduzir a tensão muscular.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Boswellia\",\n          \"name_botanical\": \"Boswellia carterii\",\n          \"name_localized\": \"Frankincense\",\n          \"match_rationale_localized\": \"Ajuda a reduzir a ansiedade e promove um estado de calma mental, auxiliando no relaxamento profundo.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Melissa\",\n          \"name_botanical\": \"Melissa officinalis\",\n          \"name_localized\": \"Lítsea\",\n          \"match_rationale_localized\": \"Possui propriedades ansiolíticas e relaxantes, frequentemente usada para aliviar estresse e melhorar o sono.\",\n          \"relevancy_to_property_score\": 3\n        }\n      ]\n    }\n  }\n  \n\n  ,\n  \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"60\",\n      \"age_unit\": \"years\"\n    },\n    \"selected_cause_ids\": [\n      \"InsufficientSleep\"\n    ],\n    \"selected_symptom_ids\": [\n      \"MuscularTensionNeckShoulders\"\n    ],\n    \"therapeutic_property_ids\": [\n      \"9f8e7d6c-5432-1b0a-fedc-9876543210fe\"\n    ]\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:59.451Z",
+  "data": {
+    "type": "newItems",
+    "count": 5,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2a1e5dc48199914db67ea7c753590a067e966c55f82e",
+          "type": "function_call",
+          "callId": "call_M4dczKCDPNJSKDNmgaabSHCW",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades Relaxantes\",\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"additional_context\":\"Dor de cabeça crônica agravada por estresse e falta de sono, com tensão muscular no pescoço e ombros\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2a1ed56081999753a184f29305090a067e966c55f82e",
+          "type": "function_call",
+          "callId": "call_Jyi6wRJluugvvNsFsnkJrN0n",
+          "name": "check_vector_search_health",
+          "status": "completed",
+          "arguments": "{}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_M4dczKCDPNJSKDNmgaabSHCW",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades relaxantes para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Relaxantes\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Para aliviar a tensão muscular e relaxar, pode-se utilizar uma bolinha de massagem para realizar a liberação miofascial em pontos estratégicos. No caso de ansiedade e dificuldade para dormir, é possível utilizar um difusor com óleos essenciais como lavanda, laranja e capim-limão. Outra opção é o mix de óleos essenciais chamado \\\"Peste\\\", que pode ser usado para aliviar tensão na nuca e dor de cabeça, embora seu aroma possa não ser agradável para todos.\",\n      \"score\": 0.851125717\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.847972751\n    },\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.846261\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.845491\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.84418577\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.844006717\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda, camomila romana e cedro do Olíbano (Frankincense) possuem propriedades calmantes e relaxantes, sendo úteis para aliviar a ansiedade e melhorar a qualidade do sono. A lavanda é conhecida por suas propriedades terapêuticas e emocionais, enquanto a camomila romana pode ser usada em banhos de assento para acalmar a pele. O cedro do Olíbano (Frankincense) é benéfico para os cabelos, pele e pode ajudar a reduzir manchas e melhorar a aparência de rugas.\",\n      \"score\": 0.842679083\n    },\n    {\n      \"text\": \"Óleos essenciais como hortelã-pimenta, olíbano, coentro, laranja, camomila romana, manjerona, manjericão e alecrim possuem propriedades terapêuticas diversas. Alguns deles podem ser utilizados para aliviar dores de cabeça, enxaquecas e tensões musculares. Cada óleo essencial possui propriedades químicas específicas que atuam como analgésicos, atenuando a dor. É importante conhecer as características de cada óleo e utilizá-los de forma adequada para obter os benefícios desejados.\",\n      \"score\": 0.842105389\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades relaxantes para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Relaxantes\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Para aliviar a tensão muscular e relaxar, pode-se utilizar uma bolinha de massagem para realizar a liberação miofascial em pontos estratégicos. No caso de ansiedade e dificuldade para dormir, é possível utilizar um difusor com óleos essenciais como lavanda, laranja e capim-limão. Outra opção é o mix de óleos essenciais chamado \\\"Peste\\\", que pode ser usado para aliviar tensão na nuca e dor de cabeça, embora seu aroma possa não ser agradável para todos.\",\n      \"score\": 0.851125717\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.847972751\n    },\n    {\n      \"text\": \"Óleos essenciais, como lavanda e petigrain, possuem propriedades calmantes e relaxantes, sendo úteis para melhorar a qualidade do sono. Algumas pessoas podem não se adaptar ao uso da lavanda, e o petigrain surge como uma alternativa, já que contém compostos como acetato de linalila e linalol, que proporcionam efeitos sedativos.\\nPara potencializar os efeitos relaxantes, é possível misturar o óleo essencial de petigrain com laranja, que também auxilia no combate à ansiedade e insônia. Ao utilizar um difusor, a quantidade recomendada é de uma a duas gotas para cada 100ml de água, e três a quatro gotas para difusores de 150ml.\",\n      \"score\": 0.846261\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.845491\n    },\n    {\n      \"text\": \"Uma receita mencionada no texto para aliviar a dor de cabeça é a combinação de lavanda e hortelã-pimenta. Além disso, para auxiliar no sono e reduzir a ansiedade, é sugerido o uso de lavanda e um óleo cítrico. Os óleos essenciais também podem ser utilizados em momentos de crise de pânico e ansiedade, conforme relatado no texto. Para aplicação, recomenda-se o uso de um difusor, que libera as moléculas dos óleos essenciais de forma gradual.\",\n      \"score\": 0.84418577\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.844006717\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda, camomila romana e cedro do Olíbano (Frankincense) possuem propriedades calmantes e relaxantes, sendo úteis para aliviar a ansiedade e melhorar a qualidade do sono. A lavanda é conhecida por suas propriedades terapêuticas e emocionais, enquanto a camomila romana pode ser usada em banhos de assento para acalmar a pele. O cedro do Olíbano (Frankincense) é benéfico para os cabelos, pele e pode ajudar a reduzir manchas e melhorar a aparência de rugas.\",\n      \"score\": 0.842679083\n    },\n    {\n      \"text\": \"Óleos essenciais como hortelã-pimenta, olíbano, coentro, laranja, camomila romana, manjerona, manjericão e alecrim possuem propriedades terapêuticas diversas. Alguns deles podem ser utilizados para aliviar dores de cabeça, enxaquecas e tensões musculares. Cada óleo essencial possui propriedades químicas específicas que atuam como analgésicos, atenuando a dor. É importante conhecer as características de cada óleo e utilizá-los de forma adequada para obter os benefícios desejados.\",\n      \"score\": 0.842105389\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "check_vector_search_health",
+          "callId": "call_Jyi6wRJluugvvNsFsnkJrN0n",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"russell\",\n      \"research_papers\",\n      \"\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:44:48.642Z\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"russell\",\n      \"research_papers\",\n      \"\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:44:48.642Z\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d2a22cad8819997cbaf2352bdafda0a067e966c55f82e",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Suggestion of Essential Oils for Relaxant Properties\",\n    \"request_id\": \"a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"9f8e7d6c-5432-1b0a-fedc-9876543210fe\",\n        \"property_name_localized\": \"Propriedades Relaxantes\",\n        \"property_name_english\": \"Propriedades Relaxantes\",\n        \"description_localized\": \"Auxilia na redução do estresse geral, promovendo um estado mental calmo e equilibrado que pode diminuir as dores de cabeça relacionadas ao estresse.\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavandula\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Possui propriedades calmantes e ansiolíticas comprovadas, ajudando a aliviar a tensão muscular e promover o relaxamento.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Citrus\",\n          \"name_botanical\": \"Citrus sinensis\",\n          \"name_localized\": \"Laranja\",\n          \"match_rationale_localized\": \"Tem efeito relaxante e ajuda a reduzir o estresse, apoiando o sono e aliviando dores de cabeça causadas por ansiedade.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Pelargonium\",\n          \"name_botanical\": \"Pelargonium graveolens\",\n          \"name_localized\": \"Gerânio\",\n          \"match_rationale_localized\": \"Propriedades calmantes e de melhora do humor, ajudando a relaxar a mente e reduzir a tensão muscular.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Boswellia\",\n          \"name_botanical\": \"Boswellia carterii\",\n          \"name_localized\": \"Frankincense\",\n          \"match_rationale_localized\": \"Ajuda a reduzir a ansiedade e promove um estado de calma mental, auxiliando no relaxamento profundo.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Melissa\",\n          \"name_botanical\": \"Melissa officinalis\",\n          \"name_localized\": \"Lítsea\",\n          \"match_rationale_localized\": \"Possui propriedades ansiolíticas e relaxantes, frequentemente usada para aliviar estresse e melhorar o sono.\",\n          \"relevancy_to_property_score\": 3\n        }\n      ]\n    }\n  }\n  \n\n  ,\n  \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"60\",\n      \"age_unit\": \"years\"\n    },\n    \"selected_cause_ids\": [\n      \"InsufficientSleep\"\n    ],\n    \"selected_symptom_ids\": [\n      \"MuscularTensionNeckShoulders\"\n    ],\n    \"therapeutic_property_ids\": [\n      \"9f8e7d6c-5432-1b0a-fedc-9876543210fe\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:59.585Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Suggestion of Essential Oils for Relaxant Properties",
+        "request_id": "a1b2c3d4-e5f6-7890-ab12-cd34ef56abcd",
+        "timestamp_utc": "2023-10-01T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Recomendações de óleos essenciais baseadas na propriedade relaxante para aliviar dores de cabeça relacionadas ao estresse e insônia."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "9f8e7d6c-5432-1b0a-fedc-9876543210fe",
+            "property_name_localized": "Propriedades Relaxantes",
+            "property_name_english": "Propriedades Relaxantes",
+            "description_localized": "Auxilia na redução do estresse geral, promovendo um estado mental calmo e equilibrado que pode diminuir as dores de cabeça relacionadas ao estresse."
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Lavandula",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Possui propriedades calmantes e ansiolíticas comprovadas, ajudando a aliviar a tensão muscular e promover o relaxamento.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Citrus",
+              "name_botanical": "Citrus sinensis",
+              "name_localized": "Laranja",
+              "match_rationale_localized": "Tem efeito relaxante e ajuda a reduzir o estresse, apoiando o sono e aliviando dores de cabeça causadas por ansiedade.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Pelargonium",
+              "name_botanical": "Pelargonium graveolens",
+              "name_localized": "Gerânio",
+              "match_rationale_localized": "Propriedades calmantes e de melhora do humor, ajudando a relaxar a mente e reduzir a tensão muscular.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Boswellia",
+              "name_botanical": "Boswellia carterii",
+              "name_localized": "Frankincense",
+              "match_rationale_localized": "Ajuda a reduzir a ansiedade e promove um estado de calma mental, auxiliando no relaxamento profundo.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Melissa",
+              "name_botanical": "Melissa officinalis",
+              "name_localized": "Lítsea",
+              "match_rationale_localized": "Possui propriedades ansiolíticas e relaxantes, frequentemente usada para aliviar estresse e melhorar o sono.",
+              "relevancy_to_property_score": 3
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "I have chronic headaches that worsen with stress and lack of sleep",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "60",
+          "age_unit": "years"
+        },
+        "selected_cause_ids": [
+          "InsufficientSleep"
+        ],
+        "selected_symptom_ids": [
+          "MuscularTensionNeckShoulders"
+        ],
+        "therapeutic_property_ids": [
+          "9f8e7d6c-5432-1b0a-fedc-9876543210fe"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:44:59.752Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:44:59.752Z"
+  }
+}
+---

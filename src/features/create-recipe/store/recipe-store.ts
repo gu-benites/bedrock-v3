@@ -70,6 +70,7 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
   isStreamingCauses: false,
   isStreamingSymptoms: false,
   isStreamingProperties: false,
+  isStreamingOils: false,
   streamingError: null,
   
   // Metadata
@@ -122,12 +123,8 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
           case RecipeStep.SYMPTOMS:
             return !!state.healthConcern && !!state.demographics && state.selectedCauses.length > 0;
           case RecipeStep.PROPERTIES:
-            return !!state.healthConcern && !!state.demographics && 
+            return !!state.healthConcern && !!state.demographics &&
                    state.selectedCauses.length > 0 && state.selectedSymptoms.length > 0;
-          case RecipeStep.OILS:
-            return !!state.healthConcern && !!state.demographics && 
-                   state.selectedCauses.length > 0 && state.selectedSymptoms.length > 0 &&
-                   state.therapeuticProperties.length > 0;
           default:
             return false;
         }
@@ -249,12 +246,21 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
         }));
       },
 
+      setStreamingOils: (isStreaming: boolean) => {
+        set((state) => ({
+          isStreamingOils: isStreaming,
+          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+          lastUpdated: new Date()
+        }));
+      },
+
       setStreamingError: (error: string | null) => {
         set((state) => ({
           streamingError: error,
           isStreamingCauses: false, // Stop streaming on error
           isStreamingSymptoms: false, // Stop streaming on error
           isStreamingProperties: false, // Stop streaming on error
+          isStreamingOils: false, // Stop streaming on error
           lastUpdated: new Date()
         }));
       },
@@ -284,8 +290,8 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
             RecipeStep.DEMOGRAPHICS,
             RecipeStep.CAUSES,
             RecipeStep.SYMPTOMS,
-            RecipeStep.PROPERTIES,
-            RecipeStep.OILS
+            RecipeStep.PROPERTIES
+            // Note: OILS step removed - oils are now nested within PROPERTIES
           ];
 
           const currentStepIndex = stepOrder.indexOf(currentStep);
@@ -333,12 +339,8 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
               break;
 
             case RecipeStep.PROPERTIES:
-              // Clear only oils
-              updates.suggestedOils = [];
-              break;
-
-            case RecipeStep.OILS:
-              // Nothing to clear - this is the last step
+              // This is now the final step - nothing to clear after it
+              // (oils are nested within properties, not a separate step)
               break;
           }
 
@@ -384,9 +386,7 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
               break;
             case RecipeStep.PROPERTIES:
               updates.therapeuticProperties = [];
-              break;
-            case RecipeStep.OILS:
-              updates.suggestedOils = [];
+              updates.suggestedOils = []; // Clear oils too since they're nested within properties
               break;
           }
 
@@ -405,6 +405,7 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
           isStreamingCauses: false, // Clear streaming states
           isStreamingSymptoms: false,
           isStreamingProperties: false,
+          isStreamingOils: false,
           streamingError: null,
           sessionId: generateUUID(), // Generate new session ID
           lastUpdated: new Date()
@@ -453,10 +454,12 @@ export const useRecipeStreaming = () => useRecipeStore((state) => ({
   isStreamingCauses: state.isStreamingCauses,
   isStreamingSymptoms: state.isStreamingSymptoms,
   isStreamingProperties: state.isStreamingProperties,
+  isStreamingOils: state.isStreamingOils,
   streamingError: state.streamingError,
   setStreamingCauses: state.setStreamingCauses,
   setStreamingSymptoms: state.setStreamingSymptoms,
   setStreamingProperties: state.setStreamingProperties,
+  setStreamingOils: state.setStreamingOils,
   setStreamingError: state.setStreamingError,
   clearStreamingError: state.clearStreamingError
 }));

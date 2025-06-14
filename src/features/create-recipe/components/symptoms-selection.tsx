@@ -385,7 +385,6 @@ export function SymptomsSelection() {
         }
       };
 
-      console.log('🚀 Starting therapeutic properties analysis with data:', requestData);
       await startPropertiesStream('/api/ai/streaming', requestData);
 
     } catch (error) {

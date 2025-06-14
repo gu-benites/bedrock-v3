@@ -48,6 +48,18 @@ Symptoms → Click Continue → AI streams properties → Modal shows → Naviga
 **Root Cause**: No explanation of frontend-backend streaming lifecycle
 **Fix**: Proper connection lifecycle management with store-based state
 
+#### **6. Mixed State Management Patterns (CRITICAL)**
+**Mistake**: Used store-based state (`isStreamingOils`) for modal control but hook-based state (`partialData`) for data updates
+**Impact**: Modal only shows items at completion instead of progressively
+**Root Cause**: Inconsistent state management between modal control and data updates
+**Fix**: Use hook-based state consistently: `<AIStreamingModal isOpen={isStreamingFromHook} />`
+
+#### **7. Streaming Sequence Issues (MAJOR)**
+**Mistake**: Backend waited for agent completion before starting streaming
+**Impact**: Progressive items sent after final output was logged, not during generation
+**Root Cause**: Incorrect streaming lifecycle - completion wait before streaming
+**Fix**: Start streaming immediately during agent execution, log final output after streaming completes
+
 ## Table of Contents
 1. [Implementation Pattern Decision Tree](#implementation-pattern-decision-tree)
 2. [Architecture Overview](#architecture-overview)
@@ -85,21 +97,28 @@ Symptoms → Click Continue → AI streams properties → Modal shows → Naviga
 **Examples**: Quick symptom analysis, simple data transformations
 
 **Key Characteristics:**
-- Uses local `isModalOpen` state
-- Modal controlled locally: `<AIStreamingModal isOpen={isModalOpen} />`
+- Uses hook's own streaming state: `isStreaming` from `useAIStreaming`
+- Modal controlled by hook: `<AIStreamingModal isOpen={isStreaming} />`
 - Default timeout usually sufficient
 - Simpler setup but less robust
 
+**⚠️ CRITICAL**: Always use hook's state consistently - don't mix with store state!
+
 ### **⚠️ CRITICAL: Never Mix Patterns**
 ```typescript
-// ❌ WRONG - Mixed patterns cause controller closure
+// ❌ WRONG - Mixed patterns cause modal display issues
 const [isModalOpen, setIsModalOpen] = useState(false); // Local state
 const { isStreamingProperties } = useRecipeStore(); // Store state
-// Don't use both!
+<AIStreamingModal isOpen={isStreamingProperties} /> // Using store state
+// But partialData updates don't trigger modal updates!
 
-// ✅ CORRECT - Choose one pattern consistently
+// ✅ CORRECT Option 1: Store-based pattern (complex steps)
 const { isStreamingProperties, setStreamingProperties } = useRecipeStore();
 <AIStreamingModal isOpen={isStreamingProperties} />
+
+// ✅ CORRECT Option 2: Hook-based pattern (simple steps)
+const { isStreaming } = useAIStreaming();
+<AIStreamingModal isOpen={isStreaming} />
 ```
 
 ## Architecture Overview

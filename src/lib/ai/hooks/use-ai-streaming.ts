@@ -164,26 +164,35 @@ export function useAIStreaming<T = any>(config: StreamConfig = {}): StreamState<
 
         case 'structured_data':
           if (streamEvent.data) {
-            console.log('📦 Received complete structured item:', {
+            console.log('📦 HOOK DEBUG - Received complete structured item:', {
               index: (streamEvent as any).index,
               dataType: (streamEvent as any).field,
-              itemKeys: Object.keys(streamEvent.data)
+              itemKeys: Object.keys(streamEvent.data),
+              itemData: streamEvent.data
             });
 
             setPartialData(prev => {
               const prevArray = Array.isArray(prev) ? prev : [];
+              console.log('🔍 HOOK DEBUG - Current partialData before update:', prevArray.length, 'items');
 
               // Generic validation - check if item has meaningful string content
               const hasRequiredContent = Object.values(streamEvent.data).some(
                 value => typeof value === 'string' && value.length > 3 && !value.endsWith('...')
               );
 
+              console.log('🔍 HOOK DEBUG - Content validation:', {
+                hasRequiredContent,
+                itemValues: Object.values(streamEvent.data),
+                stringValues: Object.values(streamEvent.data).filter(v => typeof v === 'string')
+              });
+
               if (hasRequiredContent) {
                 const newArray = [...prevArray, streamEvent.data];
-                console.log('✅ Added complete item, total items:', newArray.length);
+                console.log('✅ HOOK DEBUG - Added complete item, total items:', newArray.length);
+                console.log('✅ HOOK DEBUG - New array content:', newArray);
                 return newArray as T;
               } else {
-                console.log('⏳ Skipping incomplete item - insufficient content');
+                console.log('⏳ HOOK DEBUG - Skipping incomplete item - insufficient content');
                 return prevArray as T;
               }
             });

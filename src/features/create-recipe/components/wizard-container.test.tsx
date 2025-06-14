@@ -151,18 +151,7 @@ describe('WizardContainer', () => {
       expect(screen.getByTestId('therapeutic-properties')).toBeInTheDocument();
     });
 
-    it('should render oils display when on oils step', () => {
-      mockStore.currentStep = RecipeStep.OILS;
-      mockNavigation.stepInfo.current = { 
-        key: RecipeStep.OILS, 
-        title: 'Essential Oils', 
-        stepNumber: 6 
-      };
-      
-      render(<WizardContainer />);
-      
-      expect(screen.getByTestId('oils-display')).toBeInTheDocument();
-    });
+    // Note: OILS step test removed - oils are now nested within properties step
   });
 
   describe('Navigation', () => {

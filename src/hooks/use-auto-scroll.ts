@@ -93,26 +93,34 @@ export const useAutoScroll = <T extends HTMLElement = HTMLDivElement>(
     if (!scrollRef.current) return;
 
     const currentScrollTop = scrollRef.current.scrollTop;
-    
+
     // Detect if user is manually scrolling
     if (Math.abs(currentScrollTop - lastScrollTopRef.current) > 5) {
       setIsUserScrolling(true);
-      
+
       // Clear existing timeout
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
-      
+
       // Reset user scrolling flag after delay
       scrollTimeoutRef.current = setTimeout(() => {
         setIsUserScrolling(false);
       }, 1000);
     }
-    
+
     lastScrollTopRef.current = currentScrollTop;
-    
+
     // Update auto-scroll permission based on position
     setShouldAutoScroll(isNearBottom());
+  };
+
+  /**
+   * Handle touch start to disable auto-scroll (mobile support)
+   */
+  const handleTouchStart = () => {
+    setIsUserScrolling(true);
+    setShouldAutoScroll(false);
   };
 
   /**
@@ -131,16 +139,18 @@ export const useAutoScroll = <T extends HTMLElement = HTMLDivElement>(
   }, [...dependencies, shouldAutoScroll, isUserScrolling, enabled]);
 
   /**
-   * Set up scroll event listener
+   * Set up scroll and touch event listeners
    */
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
 
     element.addEventListener('scroll', handleScroll, { passive: true });
-    
+    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+
     return () => {
       element.removeEventListener('scroll', handleScroll);
+      element.removeEventListener('touchstart', handleTouchStart);
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
@@ -162,6 +172,7 @@ export const useAutoScroll = <T extends HTMLElement = HTMLDivElement>(
     },
     enableAutoScroll: () => setShouldAutoScroll(true),
     disableAutoScroll: () => setShouldAutoScroll(false),
+    handleTouchStart, // Export for manual use if needed
     isNearBottom,
     isUserScrolling,
     shouldAutoScroll

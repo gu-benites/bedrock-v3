@@ -1,0 +1,252 @@
+{
+  "timestamp": "2025-06-14T07:36:14.033Z",
+  "data": {
+    "sessionStart": "2025-06-14T07:36:14.033Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:28.893Z",
+  "data": {
+    "type": "newItems",
+    "count": 5,
+    "items": [
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2821530c8199abd9052238e2b6a60df78979d2cf9e24",
+          "type": "function_call",
+          "callId": "call_tQHufP5LaB8WftWnF2Fndl1p",
+          "name": "get_recommended_essential_oils",
+          "status": "completed",
+          "arguments": "{\"therapeutic_property\":\"Propriedades Relaxantes Musculares\",\"health_concern\":\"I have chronic headaches that worsen with stress and lack of sleep\",\"additional_context\":\"Relevant symptoms and causes from the user's profile\",\"max_results\":8}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_item",
+        "rawItem": {
+          "providerData": {
+            "type": "function_call"
+          },
+          "id": "fc_684d2821de9c81998babbc17d73be44d0df78979d2cf9e24",
+          "type": "function_call",
+          "callId": "call_o0IRVWsGNJLpsFFJ08ZXkJTM",
+          "name": "check_vector_search_health",
+          "status": "completed",
+          "arguments": "{}"
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "get_recommended_essential_oils",
+          "callId": "call_tQHufP5LaB8WftWnF2Fndl1p",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"search_query\": \"propriedades propriedades relaxantes musculares para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Relaxantes Musculares\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Para aliviar a tensão muscular e relaxar, pode-se utilizar uma bolinha de massagem para realizar a liberação miofascial em pontos estratégicos. No caso de ansiedade e dificuldade para dormir, é possível utilizar um difusor com óleos essenciais como lavanda, laranja e capim-limão. Outra opção é o mix de óleos essenciais chamado \\\"Peste\\\", que pode ser usado para aliviar tensão na nuca e dor de cabeça, embora seu aroma possa não ser agradável para todos.\",\n      \"score\": 0.857963443\n    },\n    {\n      \"text\": \"Óleos essenciais de lavanda e peppermint podem ser utilizados para aliviar a tensão muscular e dores de cabeça. Uma receita simples consiste em misturar 20 gotas de óleo essencial de lavanda e 20 gotas de óleo essencial de peppermint com óleo de coco. Aplique a mistura nas áreas afetadas, como a nuca, ombros e lombar, para ajudar a relaxar a musculatura e aliviar a dor. Além disso, pode-se aplicar a mistura atrás das orelhas e nas têmporas em caso de dor de cabeça. Outra opção para aliviar dores musculares e tensão é utilizar um creme ou mix específico de óleos essenciais, como o mencionado no texto.\",\n      \"score\": 0.850003302\n    },\n    {\n      \"text\": \"No texto, é mencionado um mix de óleos essenciais com propriedades calmantes para a pele e músculos, além de serem analgésicos e anti-inflamatórios. Essa mistura pode ser útil para aliviar tensões no pescoço e na cervical, e até mesmo dores de cabeça. Para facilitar o uso, sugere-se misturar os óleos essenciais em um frasco conta-gotas, permitindo a aplicação de três a quatro gotas diretamente na área afetada.\",\n      \"score\": 0.849680245\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.849517465\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.84617722\n    },\n    {\n      \"text\": \"Para utilizar óleos essenciais com o objetivo de melhorar o sono e aliviar tensões musculares, uma sugestão é preparar uma mistura com 20 gotas de serenity em uma embalagem de 10ml e completar com óleo de coco fracionado. Além disso, pode-se adicionar algumas gotas de Balance ou, caso não possua, utilizar lavanda. A aplicação dessa mistura pode ser feita na região do pescoço e nos pulsos antes de dormir, ajudando a acalmar e relaxar a musculatura.\",\n      \"score\": 0.845815778\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.843511939\n    },\n    {\n      \"text\": \"Óleos essenciais como copaíba, cúrcuma, manjerona, alecrim, bergamota e capim-limão podem ser utilizados para aliviar dores e tensões musculares. Para isso, é recomendado fazer uma diluição dos óleos escolhidos e aplicar massagens três vezes ao dia. Além disso, é possível incluir óleos essenciais na rotina, ingerindo duas gotinhas pela manhã e duas gotinhas à noite, para potencializar os benefícios. Outros óleos essenciais, como o mix deep blue e o mix pé sense, também são indicados para aliviar tensões musculares.\",\n      \"score\": 0.843331516\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"search_query\": \"propriedades propriedades relaxantes musculares para I have chronic headaches that worsen with stress and lack of sleep\",\n  \"therapeutic_property\": \"Propriedades Relaxantes Musculares\",\n  \"health_concern\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n  \"results\": [\n    {\n      \"text\": \"Para aliviar a tensão muscular e relaxar, pode-se utilizar uma bolinha de massagem para realizar a liberação miofascial em pontos estratégicos. No caso de ansiedade e dificuldade para dormir, é possível utilizar um difusor com óleos essenciais como lavanda, laranja e capim-limão. Outra opção é o mix de óleos essenciais chamado \\\"Peste\\\", que pode ser usado para aliviar tensão na nuca e dor de cabeça, embora seu aroma possa não ser agradável para todos.\",\n      \"score\": 0.857963443\n    },\n    {\n      \"text\": \"Óleos essenciais de lavanda e peppermint podem ser utilizados para aliviar a tensão muscular e dores de cabeça. Uma receita simples consiste em misturar 20 gotas de óleo essencial de lavanda e 20 gotas de óleo essencial de peppermint com óleo de coco. Aplique a mistura nas áreas afetadas, como a nuca, ombros e lombar, para ajudar a relaxar a musculatura e aliviar a dor. Além disso, pode-se aplicar a mistura atrás das orelhas e nas têmporas em caso de dor de cabeça. Outra opção para aliviar dores musculares e tensão é utilizar um creme ou mix específico de óleos essenciais, como o mencionado no texto.\",\n      \"score\": 0.850003302\n    },\n    {\n      \"text\": \"No texto, é mencionado um mix de óleos essenciais com propriedades calmantes para a pele e músculos, além de serem analgésicos e anti-inflamatórios. Essa mistura pode ser útil para aliviar tensões no pescoço e na cervical, e até mesmo dores de cabeça. Para facilitar o uso, sugere-se misturar os óleos essenciais em um frasco conta-gotas, permitindo a aplicação de três a quatro gotas diretamente na área afetada.\",\n      \"score\": 0.849680245\n    },\n    {\n      \"text\": \"Óleos essenciais podem ser utilizados para diminuir o estresse, melhorar o sono, reduzir a ansiedade e promover relaxamento. Alguns óleos essenciais analgésicos incluem copaíba, lavanda, hortelã-pimenta e alecrim. É recomendado usar os óleos essenciais várias vezes ao dia, em diferentes situações, e não apenas quando os sintomas já estão presentes.\\nPara utilizar os óleos essenciais, é possível colocá-los no difusor, pingar na roupa, no travesseiro ou nas mãos. Uma sugestão é fazer uma massagem na região da mandíbula com lavanda antes de dormir, o que pode ajudar a liberar a tensão muscular e melhorar a qualidade do sono.\",\n      \"score\": 0.849517465\n    },\n    {\n      \"text\": \"Óleos essenciais como lavanda e copaíba podem ser utilizados para melhorar a qualidade do sono. A lavanda possui propriedades ansiolíticas e calmantes, enquanto a copaíba atua como anti-inflamatório e auxilia no alívio de dores musculares e sentimentos ansiosos. A ideia é incorporar os óleos essenciais na rotina, não apenas na hora de dormir, para obter melhores resultados. Além disso, pessoas com problemas digestivos e refluxo podem se beneficiar do uso desses óleos essenciais.\",\n      \"score\": 0.84617722\n    },\n    {\n      \"text\": \"Para utilizar óleos essenciais com o objetivo de melhorar o sono e aliviar tensões musculares, uma sugestão é preparar uma mistura com 20 gotas de serenity em uma embalagem de 10ml e completar com óleo de coco fracionado. Além disso, pode-se adicionar algumas gotas de Balance ou, caso não possua, utilizar lavanda. A aplicação dessa mistura pode ser feita na região do pescoço e nos pulsos antes de dormir, ajudando a acalmar e relaxar a musculatura.\",\n      \"score\": 0.845815778\n    },\n    {\n      \"text\": \"No relato, a pessoa menciona o uso de óleo de copaíba aplicado sublingualmente e óleo de frankincense para aliviar dores e melhorar a qualidade do sono. Esses óleos essenciais parecem ter proporcionado alívio significativo das dores e contribuído para uma noite de sono tranquila.\",\n      \"score\": 0.843511939\n    },\n    {\n      \"text\": \"Óleos essenciais como copaíba, cúrcuma, manjerona, alecrim, bergamota e capim-limão podem ser utilizados para aliviar dores e tensões musculares. Para isso, é recomendado fazer uma diluição dos óleos escolhidos e aplicar massagens três vezes ao dia. Além disso, é possível incluir óleos essenciais na rotina, ingerindo duas gotinhas pela manhã e duas gotinhas à noite, para potencializar os benefícios. Outros óleos essenciais, como o mix deep blue e o mix pé sense, também são indicados para aliviar tensões musculares.\",\n      \"score\": 0.843331516\n    }\n  ],\n  \"total_results\": 8,\n  \"source\": \"pinecone\"\n}"
+      },
+      {
+        "type": "tool_call_output_item",
+        "rawItem": {
+          "type": "function_call_result",
+          "name": "check_vector_search_health",
+          "callId": "call_o0IRVWsGNJLpsFFJ08ZXkJTM",
+          "status": "completed",
+          "output": {
+            "type": "text",
+            "text": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"\",\n      \"russell\",\n      \"research_papers\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:36:18.434Z\"\n}"
+          }
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        },
+        "output": "{\n  \"overall_status\": \"healthy\",\n  \"services\": {\n    \"pinecone\": \"healthy\",\n    \"openai_embeddings\": \"healthy\"\n  },\n  \"index_stats\": {\n    \"total_vectors\": 66128,\n    \"dimensions\": 1536,\n    \"namespaces\": [\n      \"\",\n      \"russell\",\n      \"research_papers\"\n    ]\n  },\n  \"timestamp\": \"2025-06-14T07:36:18.434Z\"\n}"
+      },
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684d28250110819980d46e0266d24f840df78979d2cf9e24",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"a1b2c3d4-5678-90ab-cdef-1234567890ab\",\n        \"property_name_localized\": \"Propriedades Relaxantes Musculares\",\n        \"property_name_english\": \"Propriedades Relaxantes Musculares\",\n        \"description_localized\": \"Ajuda a aliviar a tensão muscular, especialmente\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Óleo essencial de lavanda possui propriedades calmantes e relaxantes, eficaz para aliviar tensão muscular e melhorar o sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Peppermint\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Peppermint\",\n          \"match_rationale_localized\": \"Óleo essencial de hortelã-pimenta é conhecido por seu efeito revigorante e relaxante da musculatura, além de aliviar dores de cabeça.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Copaíba\",\n          \"name_botanical\": \"Copaifera officinalis\",\n          \"name_localized\": \"Copaíba\",\n          \"match_rationale_localized\": \"Óleo útil na redução de inflamação e tensões musculares, contribuindo para o relaxamento e alívio do desconforto.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Manjerona\",\n          \"name_botanical\": \"Origanum marjorana\",\n          \"name_localized\": \"Manjerona\",\n          \"match_rationale_localized\": \"Óleo conhecido por suas propriedades relaxantes e ansiolíticas, ajudando na redução do estresse muscular.\",\n          \"relevancy_to_property_score\": 3\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Bergamota\",\n          \"name_botanical\": \"Citrus bergamia\",\n          \"name_localized\": \"Bergamota\",\n          \"match_rationale_localized\": \"Óleo com efeito relaxante, especialmente útil para ansiedade e melhorar o sono, contribuindo para o relaxamento muscular.\",\n          \"relevancy_to_property_score\": 3\n        }\n      ]\n    }\n  }\n  \n  ,\n  \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"feminino\",\n      \"age_category\": \"adulto\",\n      \"age_specific\": \"60 anos\",\n      \"age_unit\": \"anos\"\n    },\n    \"selected_cause_ids\": [\n      \"Insuficiência de sono\"\n    ],\n    \"selected_symptom_ids\": [\n      \"Tensão muscular no pescoço e ombros\"\n    ],\n    \"therapeutic_property_ids\": [\n      \"a1b2c3d4-5678-90ab-cdef-1234567890ab\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:28.918Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Suggest Relevant Essential Oils (Safety Deferred)",
+        "request_id": "abcdef12-3456-7890-abcd-ef1234567890",
+        "timestamp_utc": "2023-10-06T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "sucesso",
+        "message": "O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+            "property_name_localized": "Propriedades Relaxantes Musculares",
+            "property_name_english": "Propriedades Relaxantes Musculares",
+            "description_localized": "Ajuda a aliviar a tensão muscular, especialmente"
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "1",
+              "name_english": "Lavanda",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Óleo essencial de lavanda possui propriedades calmantes e relaxantes, eficaz para aliviar tensão muscular e melhorar o sono.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "2",
+              "name_english": "Peppermint",
+              "name_botanical": "Mentha piperita",
+              "name_localized": "Peppermint",
+              "match_rationale_localized": "Óleo essencial de hortelã-pimenta é conhecido por seu efeito revigorante e relaxante da musculatura, além de aliviar dores de cabeça.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "3",
+              "name_english": "Copaíba",
+              "name_botanical": "Copaifera officinalis",
+              "name_localized": "Copaíba",
+              "match_rationale_localized": "Óleo útil na redução de inflamação e tensões musculares, contribuindo para o relaxamento e alívio do desconforto.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "4",
+              "name_english": "Manjerona",
+              "name_botanical": "Origanum marjorana",
+              "name_localized": "Manjerona",
+              "match_rationale_localized": "Óleo conhecido por suas propriedades relaxantes e ansiolíticas, ajudando na redução do estresse muscular.",
+              "relevancy_to_property_score": 3
+            },
+            {
+              "oil_id": "5",
+              "name_english": "Bergamota",
+              "name_botanical": "Citrus bergamia",
+              "name_localized": "Bergamota",
+              "match_rationale_localized": "Óleo com efeito relaxante, especialmente útil para ansiedade e melhorar o sono, contribuindo para o relaxamento muscular.",
+              "relevancy_to_property_score": 3
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "I have chronic headaches that worsen with stress and lack of sleep",
+        "user_info_input": {
+          "gender": "feminino",
+          "age_category": "adulto",
+          "age_specific": "60 anos",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "Insuficiência de sono"
+        ],
+        "selected_symptom_ids": [
+          "Tensão muscular no pescoço e ombros"
+        ],
+        "therapeutic_property_ids": [
+          "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.128Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 675,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\":",
+    "bufferSuffix": " \"Propriedades Relaxantes Musculares\",\n        \"property_name_english\": \"Propriedades Relaxantes Mus"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.368Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1502,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\":",
+    "bufferSuffix": "encial de hortelã-pimenta é conhecido por seu efeito revigorante e relaxante da musculatura, além de"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.584Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2291,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\":",
+    "bufferSuffix": "riedades relaxantes e ansiolíticas, ajudando na redução do estresse muscular.\",\n          \"relevancy"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.883Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 3054,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\":",
+    "bufferSuffix": "\",\n      \"age_unit\": \"anos\"\n    },\n    \"selected_cause_ids\": [\n      \"Insuficiência de sono\"\n    ],\n"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.931Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3225,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Suggest Relevant Essential Oils (Safety Deferred)\",\n    \"request_id\": \"abcdef12-3456-7890-abcd-ef1234567890\",\n    \"timestamp_utc\": \"2023-10-06T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"sucesso\",\n    \"message\": \"O processo de busca de óleos essenciais para propriedades relaxantes musculares foi concluído com sucesso.\"\n  },\n  \"data\": {\n    \"property_oil_suggestion\": {\n      \"therapeutic_property_context\": {\n        \"property_id\": \"a1b2c3d4-5678-90ab-cdef-1234567890ab\",\n        \"property_name_localized\": \"Propriedades Relaxantes Musculares\",\n        \"property_name_english\": \"Propriedades Relaxantes Musculares\",\n        \"description_localized\": \"Ajuda a aliviar a tensão muscular, especialmente\"\n      },\n      \"suggested_oils\": [\n        {\n          \"oil_id\": \"1\",\n          \"name_english\": \"Lavanda\",\n          \"name_botanical\": \"Lavandula angustifolia\",\n          \"name_localized\": \"Lavanda\",\n          \"match_rationale_localized\": \"Óleo essencial de lavanda possui propriedades calmantes e relaxantes, eficaz para aliviar tensão muscular e melhorar o sono.\",\n          \"relevancy_to_property_score\": 5\n        },\n        {\n          \"oil_id\": \"2\",\n          \"name_english\": \"Peppermint\",\n          \"name_botanical\": \"Mentha piperita\",\n          \"name_localized\": \"Peppermint\",\n          \"match_rationale_localized\": \"Óleo essencial de hortelã-pimenta é conhecido por seu efeito revigorante e relaxante da musculatura, além de aliviar dores de cabeça.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"3\",\n          \"name_english\": \"Copaíba\",\n          \"name_botanical\": \"Copaifera officinalis\",\n          \"name_localized\": \"Copaíba\",\n          \"match_rationale_localized\": \"Óleo útil na redução de inflamação e tensões musculares, contribuindo para o relaxamento e alívio do desconforto.\",\n          \"relevancy_to_property_score\": 4\n        },\n        {\n          \"oil_id\": \"4\",\n          \"name_english\": \"Manjerona\",\n          \"name_botanical\": \"Origanum marjorana\",\n          \"name_localized\": \"Manjerona\",\n          \"match_rationale_localized\": \"Óleo conhecido por suas propriedades relaxantes e ansiolíticas, ajudando na redução do estresse muscular.\",\n          \"relevancy_to_property_score\": 3\n        },\n        {\n          \"oil_id\": \"5\",\n          \"name_english\": \"Bergamota\",\n          \"name_botanical\": \"Citrus bergamia\",\n          \"name_localized\": \"Bergamota\",\n          \"match_rationale_localized\": \"Óleo com efeito relaxante, especialmente útil para ansiedade e melhorar o sono, contribuindo para o relaxamento muscular.\",\n          \"relevancy_to_property_score\": 3\n        }\n      ]\n    }\n  }\n  \n  ,\n  \"echo\": {\n    \"health_concern_input\": \"I have chronic headaches that worsen with stress and lack of sleep\",\n    \"user_info_input\": {\n      \"gender\": \"feminino\",\n      \"age_category\": \"adulto\",\n      \"age_specific\": \"60 anos\",\n      \"age_unit\": \"anos\"\n    },\n    \"selected_cause_ids\": [\n      \"Insuficiência de sono\"\n    ],\n    \"selected_symptom_ids\": [\n      \"Tensão muscular no pescoço e ombros\"\n    ],\n    \"therapeutic_property_ids\": [\n      \"a1b2c3d4-5678-90ab-cdef-1234567890ab\"\n    ]\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-14T07:36:29.966Z",
+  "data": {
+    "sessionEnd": "2025-06-14T07:36:29.966Z"
+  }
+}
+---

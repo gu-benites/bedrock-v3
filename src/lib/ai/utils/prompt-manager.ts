@@ -124,18 +124,53 @@ export class PromptManager {
   }
 
   /**
+   * Get nested value from object using dot notation (e.g., "demographics.gender")
+   */
+  private getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  }
+
+  /**
    * Process template with variable substitution
    */
   public processTemplate(template: string, variables: TemplateVariables): string {
     try {
       let processedTemplate = template;
 
-      // Handle Handlebars-style {{variable}} substitution
-      processedTemplate = processedTemplate.replace(/\{\{(\w+)\}\}/g, (match, variableName) => {
-        if (variables.hasOwnProperty(variableName)) {
-          return String(variables[variableName]);
+      // Handle Handlebars-style {{variable}} and {{object.property}} substitution
+      processedTemplate = processedTemplate.replace(/\{\{([\w.]+)\}\}/g, (match, variablePath) => {
+        try {
+          // Handle nested object paths like demographics.gender
+          const value = this.getNestedValue(variables, variablePath);
+          if (value !== undefined) {
+            // Handle objects and arrays by converting to string representation
+            if (typeof value === 'object' && value !== null) {
+              if (Array.isArray(value)) {
+                // For arrays, create a readable list
+                return value.map(item => {
+                  if (typeof item === 'object' && item !== null) {
+                    // For object arrays, show key properties
+                    const name = item.name_localized || item.name || item.cause_name || item.symptom_name || item.property_name || 'Item';
+                    const explanation = item.explanation_localized || item.explanation || item.description || '';
+                    return explanation ? `${name}: ${explanation}` : name;
+                  }
+                  return String(item);
+                }).join('\n- ');
+              } else {
+                // For objects, show key-value pairs
+                return Object.entries(value)
+                  .map(([key, val]) => `${key}: ${val}`)
+                  .join(', ');
+              }
+            }
+            return String(value);
+          }
+        } catch (error) {
+          console.warn(`Template variable substitution failed for ${variablePath}:`, error);
         }
-        return match; // Keep original if variable not found
+        return match; // Keep original if variable not found or error occurred
       });
 
       // Handle Handlebars-style {{#each array}} loops
