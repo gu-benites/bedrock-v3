@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Brain,
   Loader2,
   Sparkles
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAutoScroll } from '@/hooks/use-auto-scroll';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface StreamingItem {
   id?: string;
@@ -160,55 +166,30 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
   }, [items.length]);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget && onClose) {
-              onClose();
-            }
-          }}
-        >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className={cn("w-full max-w-2xl mx-auto", className)}
-          >
-            <Card className="shadow-2xl border-0 bg-background/95 backdrop-blur">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Brain className="h-6 w-6 text-primary" />
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full"
-                      />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1">{description}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary" className="text-sm font-medium">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      {items.length} found
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn("w-full max-w-2xl mx-auto", className)}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-3">
+            <div className="relative">
+              <Brain className="h-6 w-6 text-primary" />
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full"
+              />
+            </div>
+            <span>{title}</span>
+            <Badge variant="secondary" className="text-sm font-medium ml-auto">
+              <Sparkles className="h-3 w-3 mr-1" />
+              {items.length} found
+            </Badge>
+          </DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
 
-              <CardContent className="pt-0">
+        <div className="pt-0">
+          <div className="relative">
+
                 <div className="relative">
                   {/* Terminal-like code block */}
                   <div className="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
@@ -334,13 +315,10 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                       }
                     </span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -70,16 +70,24 @@ export default async function DashboardLayout({
   console.log(`[${getTimestampLog()}] DashboardLayout (Server): Dehydrated state (first 500 chars):`, JSON.stringify(dehydratedState, null, 2).substring(0, 500) + '...');
 
   return (
-    <SidebarProvider initialVariant="inset" initialCollapsible="offcanvas">
-      <DashboardAppSidebar />
-      <SidebarInset>
-        <DashboardLoadingProvider>
+    <DashboardLoadingProvider>
+      <SidebarProvider initialVariant="inset" initialCollapsible="offcanvas">
+        <DashboardAppSidebar />
+        <SidebarInset>
           <DashboardHeader />
-          <HydrationBoundary state={dehydratedState}>
-            {children}
-          </HydrationBoundary>
-        </DashboardLoadingProvider>
-      </SidebarInset>
-    </SidebarProvider>
+          <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col gap-2">
+              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                <div className="px-4 lg:px-6">
+                  <HydrationBoundary state={dehydratedState}>
+                    {children}
+                  </HydrationBoundary>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </DashboardLoadingProvider>
   );
 }

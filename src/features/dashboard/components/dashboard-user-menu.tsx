@@ -2,23 +2,18 @@
 // src/features/dashboard/components/dashboard-user-menu.tsx
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React, { useState } from "react";
 import {
   LogOut,
   Settings,
   Headphones,
   FileText,
   UserCircle2,
-  ChevronsUpDown,
-  ChevronsDownUp,
+  MoreVertical,
   Loader2,
-  User as UserIcon 
+  User as UserIcon
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks";
@@ -34,6 +29,21 @@ import {
   AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
 
 type UserMenuItemType = {
@@ -50,86 +60,40 @@ const userMenuItems: UserMenuItemType[] = [
   },
   {
     title: "Settings",
-    href: "/settings",
+    href: "/dashboard/settings",
     icon: <Settings className="h-5 w-5" />,
   },
   {
-    title: "Documentation",
-    href: "/docs",
-    icon: <FileText className="h-5 w-5" />,
-  },
-  {
     title: "Support",
-    href: "/support",
+    href: "/help",
     icon: <Headphones className="h-5 w-5" />,
   },
 ];
 
-interface DashboardUserMenuProps {
-  collapsed: boolean;
-  notificationCount?: number;
-  onRequestSidebarExpand?: () => void;
-}
-
-export function DashboardUserMenu({
-  collapsed,
-  notificationCount = 0,
-  onRequestSidebarExpand,
-}: DashboardUserMenuProps) {
-  const [expanded, setExpanded] = useState(false);
+export function DashboardUserMenu() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
+  const { isMobile } = useSidebar();
 
   const { user, profile, isLoading } = useAuth();
   const { isSigningOut, setIsSigningOut } = useDashboardLoading(); // Only for sign-out optimistic UI
   const showSkeletons = isLoading;
-  
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) && expanded) {
-        setExpanded(false);
-      }
-    };
-    if (expanded) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [expanded]);
-
-  useEffect(() => {
-    if (collapsed) {
-      setExpanded(false);
-    }
-  }, [collapsed]);
-
-  const toggleExpanded = () => {
-    if (collapsed) {
-      onRequestSidebarExpand?.();
-      return;
-    }
-    setExpanded(!expanded);
-  };
-
   const getDisplayName = () => {
     if (profile?.firstName) return profile.firstName;
     const userMetaFirstName = user?.user_metadata?.first_name as string | undefined;
     if (userMetaFirstName) return userMetaFirstName;
     if (user?.email) return user.email.split('@')[0];
-    return "User"; 
+    return "User";
   };
 
   const getEmailDisplay = () => {
     return profile?.email || user?.email || "No email available";
   };
-  
+
   const getInitials = (baseUser = user, baseProfile = profile) => {
     const first = baseProfile?.firstName || (baseUser?.user_metadata?.first_name as string)?.[0] || '';
     const last = baseProfile?.lastName || (baseUser?.user_metadata?.last_name as string)?.[0] || '';
     const initials = `${first}${last}`.toUpperCase();
-    return initials || <UserCircle2 size={18} />;
+    return initials || "CN";
   };
 
   // Compute timestamped avatar URL directly in render logic if profile and avatarUrl exist
@@ -144,122 +108,105 @@ export function DashboardUserMenu({
     await signOutUserAction();
   };
 
+  if (showSkeletons) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <Skeleton className="ml-auto h-4 w-4" />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  if (!user) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <Avatar className="h-8 w-8 rounded-lg grayscale">
+              <AvatarFallback className="rounded-lg bg-muted text-muted-foreground">
+                <UserCircle2 size={18} />
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium text-muted-foreground">Not Logged In</span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <>
-      <div className="mt-auto border-t p-4 relative" ref={menuRef}>
-        <div
-          className={cn(
-            "flex items-center gap-3 cursor-pointer",
-            collapsed && "justify-center"
-          )}
-          onClick={toggleExpanded}
-          role="button"
-          aria-expanded={expanded}
-          aria-label={collapsed ? "Expand sidebar and open user menu" : (expanded ? "Collapse user menu" : "Expand user menu")}
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleExpanded();}}
-        >
-          <div className="relative">
-           {showSkeletons ? (
-             <Skeleton className="h-9 w-9 rounded-full" />
-           ) : user ? ( 
-            <Avatar className="h-9 w-9 text-sm">
-                {timestampedAvatarUrl && <AvatarImage src={timestampedAvatarUrl} alt={getDisplayName()} />}
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {getInitials()}
-                </AvatarFallback>
-            </Avatar>
-           ) : ( 
-            <Avatar className="h-9 w-9 text-sm">
-                <AvatarFallback className="bg-muted text-muted-foreground">
-                    <UserCircle2 size={18} />
-                </AvatarFallback>
-            </Avatar>
-           )}
-            {notificationCount > 0 && !collapsed && !showSkeletons && user && (
-              <span className={cn(
-                "absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground",
-                expanded && "opacity-0" 
-              )}>
-                {notificationCount}
-              </span>
-            )}
-          </div>
-
-          {!collapsed && (
-            <>
-              <div className="flex-1 overflow-hidden">
-                {showSkeletons ? (
-                  <>
-                    <Skeleton className="h-4 w-24 mb-1" />
-                    <Skeleton className="h-3 w-32" />
-                  </>
-                ) : user ? ( 
-                  <>
-                    <div className="font-medium truncate">{getDisplayName()}</div>
-                    <div className="truncate text-xs text-muted-foreground">
-                      {getEmailDisplay()}
-                    </div>
-                  </>
-                ) : ( 
-                  <div className="font-medium truncate text-muted-foreground">Not Logged In</div>
-                )}
-              </div>
-              <span className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md">
-                {showSkeletons ? <Loader2 className="h-4 w-4 animate-spin" /> : 
-                  (expanded ? <ChevronsDownUp className="h-4 w-4" /> : <ChevronsUpDown className="h-4 w-4" />)
-                }
-              </span>
-            </>
-          )}
-        </div>
-
-        <AnimatePresence>
-          {!collapsed && expanded && !showSkeletons && user && ( 
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale:0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale:0.95, transition: { duration: 0.15 } }}
-              transition={{ type: "spring", stiffness: 400, damping: 25, duration: 0.2 }}
-              className="absolute bottom-full left-2 right-2 mb-2 z-20 bg-popover text-popover-foreground border border-border rounded-md shadow-xl p-2"
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <Avatar className="h-8 w-8 rounded-lg grayscale">
+                  {timestampedAvatarUrl && <AvatarImage src={timestampedAvatarUrl} alt={getDisplayName()} />}
+                  <AvatarFallback className="rounded-lg">{getInitials()}</AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{getDisplayName()}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {getEmailDisplay()}
+                  </span>
+                </div>
+                <MoreVertical className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
             >
-              <div className="space-y-1">
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    {timestampedAvatarUrl && <AvatarImage src={timestampedAvatarUrl} alt={getDisplayName()} />}
+                    <AvatarFallback className="rounded-lg">{getInitials()}</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{getDisplayName()}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {getEmailDisplay()}
+                    </span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
                 {userMenuItems.map((item) => (
-                  <Link
-                    key={item.title}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                      pathname === item.href
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent hover:text-accent-foreground"
-                    )}
-                    onClick={() => setExpanded(false)}
-                  >
-                    {item.icon}
-                    <span>{item.title}</span>
-                  </Link>
+                  <DropdownMenuItem key={item.title} asChild>
+                    <a href={item.href}>
+                      {item.icon}
+                      {item.title}
+                    </a>
+                  </DropdownMenuItem>
                 ))}
-                <Separator className="my-1" />
-                <button
-                  type="button"
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 justify-start"
-                  )}
-                  onClick={() => {
-                    setExpanded(false);
-                    setShowLogoutConfirm(true);
-                  }}
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Log out</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
+                <LogOut />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
 
       <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <AlertDialogContent>

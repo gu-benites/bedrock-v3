@@ -2,10 +2,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Menu, Settings } from "lucide-react"; // Replaced MoreHorizontal with Settings
+import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DashboardSettings } from "./dashboard-settings"; // Adjusted path as needed
+import { DashboardSettings } from "./dashboard-settings";
 
 const getPageTitleFromPathname = (pathname: string | null): string => {
   if (!pathname) return "Dashboard";
@@ -42,31 +42,35 @@ export function DashboardHeader() {
   const pageTitle = getPageTitleFromPathname(pathname);
 
   return (
-    <header className="flex h-14 items-center justify-between border-b px-4 md:px-6 sticky top-0 bg-background/95 backdrop-blur-sm z-10">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger className="h-7 w-7 md:flex" /> {/* SidebarTrigger added, md:flex to ensure it's visible on desktop if needed by design */}
-        <h1 className="text-xl font-semibold">{pageTitle}</h1>
-      </div>
-      <div className="flex items-center gap-3">
-        <ThemeToggle />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label="Sidebar Settings"
-            >
-              <Settings className="h-5 w-5" />
-              <span className="sr-only">Sidebar Settings</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DashboardSettings />
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <header className="group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
+      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mx-2 data-[orientation=vertical]:h-4"
+        />
+        <h1 className="text-base font-medium">{pageTitle}</h1>
+        <div className="ml-auto flex items-center gap-3">
+          <ThemeToggle />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                aria-label="Sidebar Settings"
+              >
+                <Settings className="h-5 w-5" />
+                <span className="sr-only">Sidebar Settings</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DashboardSettings />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );
