@@ -188,24 +188,139 @@ const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
         </DialogHeader>
 
         <div className="pt-0">
-          <div className="relative">
-                  {/* Terminal-like code block */}
-                  <div className="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
+          {/* Terminal-like code block */}
+          <div className="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
+            {/* Terminal header */}
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+              <span className="text-slate-400 text-sm font-mono">
+                streaming{streamingEllipsis}
+              </span>
+            </div>
+
+            {/* Terminal content */}
+            <div
+              ref={scrollRef}
+              className="h-80 w-full overflow-y-auto scroll-smooth scrollbar-hide"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+            >
+
+              <div className="p-2 font-mono text-xs leading-tight">
+                {displayItems.length === 0 ? (
+                  <div className="flex items-center justify-center h-24">
+                    <div className="text-center">
+                      <div className="text-green-400 mb-1">$ {finalLoadingMessage}</div>
+                      <div className="flex items-center justify-center space-x-1">
+                        <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                        <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
                     {/* Terminal header */}
-                    <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
-                      <span className="text-slate-400 text-sm font-mono">
-                        streaming{streamingEllipsis}
-                      </span>
+                    <div className="text-cyan-400 mb-2">
+                      <div className="text-sm font-bold"># {finalTerminalTitle}</div>
+                      <div className="text-slate-400 text-xs">{finalTerminalSubtitle}</div>
                     </div>
 
-                    {/* Terminal content */}
-                    <div
-                      ref={scrollRef}
-                      className="h-80 w-full overflow-y-auto scroll-smooth scrollbar-hide"
-                      style={{
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none'
-                      }}
+                    {/* Progressive Item Reveal */}
+                    {displayItems.map((item, index) => {
+                      const stableKey = `item-${index}-${item.title?.slice(0, 20)}`;
+
+                      return (
+                        <div
+                          key={stableKey}
+                          className="mb-3 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                        >
+                          {/* Cause title */}
+                          <div className="text-yellow-400 font-bold mb-1">
+                            ## {item.title}
+                          </div>
+
+                          {/* Cause suggestion */}
+                          {item.subtitle && (
+                            <div className="text-blue-300 mb-1 leading-tight">
+                              {item.subtitle}
+                            </div>
+                          )}
+
+                          {/* Cause explanation */}
+                          {item.description && (
+                            <div className="text-slate-300 leading-tight mb-2">
+                              {item.description}
+                            </div>
+                          )}
+
+                          {/* Separator line */}
+                          {index < displayItems.length - 1 && (
+                            <div className="border-t border-slate-700 my-2"></div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {/* Terminal cursor */}
+                    <div className="flex items-center text-green-400 mt-1">
+                      <span className="mr-1">$</span>
+                      <div className="w-1 h-3 bg-green-400 animate-pulse"></div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* "Analyzing more..." indicator in footer */}
+          {isOpen && items.length > 0 && (
+            <div className="mt-4 pt-3 border-t">
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-center space-x-3 p-3 rounded-lg bg-primary/5 border border-primary/20"
+              >
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <div className="text-center">
+                  <p className="text-sm font-medium text-primary">
+                    {finalProgressMessage}
+                  </p>
+                  <p className="text-xs text-primary/70">
+                    AI is processing your information to find additional insights
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          )}
+
+          {/* Status footer */}
+          <div className="mt-3 pt-3 border-t">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span>Live analysis in progress{footerEllipsis}</span>
+              </div>
+              <span>
+                {items.length > maxVisibleItems &&
+                  `Showing latest ${maxVisibleItems} of ${items.length}`
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Export both named and default
+export { AIStreamingModal };
+export default AIStreamingModal;
+
+
                     >
 
                       <div className="p-2 font-mono text-xs leading-tight">
