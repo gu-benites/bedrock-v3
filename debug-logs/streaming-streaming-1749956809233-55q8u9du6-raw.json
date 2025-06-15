@@ -1,0 +1,173 @@
+{
+  "timestamp": "2025-06-15T03:06:49.255Z",
+  "data": {
+    "sessionStart": "2025-06-15T03:06:49.255Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:50.867Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 720,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas v",
+    "bufferSuffix": "vezes agravado por hábitos alimentares inadequados e padrões de sono irregulares em crianças.\"\n     "
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:51.621Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1554,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas v",
+    "bufferSuffix": " pelo padrão de sono e hábitos nutricionais desfavoráveis.\"\n      },\n      {\n        \"symptom_id\": \""
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:52.323Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2380,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas v",
+    "bufferSuffix": "\"\n      },\n      {\n        \"symptom_id\": \"symp_006\",\n        \"name_localized\": \"Manchas descoloridas"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:53.234Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 3221,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas v",
+    "bufferSuffix": "  \"user_info_input\": {\n      \"gender\": \"{{gender}}\",\n      \"age_category\": \"{{age_category}}\",\n     "
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:53.465Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3424,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas vermelhas com escamas prateadas na pele.\",\n        \"explanation_localized\": \"Este é um sintoma comum da psoríase, muitas vezes agravado por hábitos alimentares inadequados e padrões de sono irregulares em crianças.\"\n      },\n      {\n        \"symptom_id\": \"symp_002\",\n        \"name_localized\": \"Coceira intensa na pele\",\n        \"suggestion_localized\": \"Procure por áreas com coceira que podem piorar à noite ou após certas refeições.\",\n        \"explanation_localized\": \"A coceira frequente pode estar relacionada ao impacto das causas selecionadas na saúde da pele, especialmente em relação à alimentação e sono.\"\n      },\n      {\n        \"symptom_id\": \"symp_003\",\n        \"name_localized\": \"Cortes ou rachaduras na pele\",\n        \"suggestion_localized\": \"Fique atento a áreas que possam rachar ou sangrar facilmente, especialmente em áreas afetadas pela psoríase.\",\n        \"explanation_localized\": \"A secura e o risco de rachaduras podem ser exacerbados pelo padrão de sono e hábitos nutricionais desfavoráveis.\"\n      },\n      {\n        \"symptom_id\": \"symp_004\",\n        \"name_localized\": \"Irritabilidade e fadiga\",\n        \"suggestion_localized\": \"Observe alterações no humor e níveis de energia, especialmente após noites de sono irregular.\",\n        \"explanation_localized\": \"Distúrbios do sono e má alimentação podem contribuir para alterações emocionais e cansaço em crianças com psoríase.\"\n      },\n      {\n        \"symptom_id\": \"symp_005\",\n        \"name_localized\": \"Sensação de ardor ou queimação na pele\",\n        \"suggestion_localized\": \"Note qualquer sensação de queimação ou desconforto nas áreas afetadas.\",\n        \"explanation_localized\": \"Este sintoma pode estar relacionado ao processo inflamatório da psoríase, agravado por fatores como alimentação inadequada.\"\n      },\n      {\n        \"symptom_id\": \"symp_006\",\n        \"name_localized\": \"Manchas descoloridas na pele após lesões\",\n        \"suggestion_localized\": \"Observe quaisquer mudanças na coloração da pele ao redor das lesões psoriásicas.\",\n        \"explanation_localized\": \"Alterações na pigmentação podem ocorrer devido a fatores de saúde relacionados à nutrição e padrão de sono.\"\n      },\n      {\n        \"symptom_id\": \"symp_007\",\n        \"name_localized\": \"Alterações no humor ou ansiedade\",\n        \"suggestion_localized\": \"Fique atento a sinais de ansiedade ou alterações emocionais associadas ao desconforto da psoríase.\",\n        \"explanation_localized\": \"O desconforto físico e fatores de estilo de vida podem contribuir para sintomas emocionais em crianças.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"psoriase\",\n    \"user_info_input\": {\n      \"gender\": \"{{gender}}\",\n      \"age_category\": \"{{age_category}}\",\n      \"age_specific\": \"{{age_specific}}\",\n      \"age_unit\": \"anos\"\n    },\n    \"selected_cause_ids\": [\n      \"cause_1749956808980_0.4897439031756555\",\n      \"cause_1749956808980_0.6445960207645857\"\n    ]\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:53.488Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684e3a7a92d481988b0744a49ddf38540b0fd732b5999be1",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Identify Potential Symptoms\",\n    \"request_id\": \"abc123xyz\",\n    \"timestamp_utc\": \"2023-10-04T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"PT_BR\",\n    \"status\": \"success\",\n    \"message\": \"Lista de sintomas potenciais gerada com sucesso.\"\n  },\n  \"data\": {\n    \"potential_symptoms\": [\n      {\n        \"symptom_id\": \"symp_001\",\n        \"name_localized\": \"Lesões cutâneas escamosas e inflamadas\",\n        \"suggestion_localized\": \"Observe a presença de manchas vermelhas com escamas prateadas na pele.\",\n        \"explanation_localized\": \"Este é um sintoma comum da psoríase, muitas vezes agravado por hábitos alimentares inadequados e padrões de sono irregulares em crianças.\"\n      },\n      {\n        \"symptom_id\": \"symp_002\",\n        \"name_localized\": \"Coceira intensa na pele\",\n        \"suggestion_localized\": \"Procure por áreas com coceira que podem piorar à noite ou após certas refeições.\",\n        \"explanation_localized\": \"A coceira frequente pode estar relacionada ao impacto das causas selecionadas na saúde da pele, especialmente em relação à alimentação e sono.\"\n      },\n      {\n        \"symptom_id\": \"symp_003\",\n        \"name_localized\": \"Cortes ou rachaduras na pele\",\n        \"suggestion_localized\": \"Fique atento a áreas que possam rachar ou sangrar facilmente, especialmente em áreas afetadas pela psoríase.\",\n        \"explanation_localized\": \"A secura e o risco de rachaduras podem ser exacerbados pelo padrão de sono e hábitos nutricionais desfavoráveis.\"\n      },\n      {\n        \"symptom_id\": \"symp_004\",\n        \"name_localized\": \"Irritabilidade e fadiga\",\n        \"suggestion_localized\": \"Observe alterações no humor e níveis de energia, especialmente após noites de sono irregular.\",\n        \"explanation_localized\": \"Distúrbios do sono e má alimentação podem contribuir para alterações emocionais e cansaço em crianças com psoríase.\"\n      },\n      {\n        \"symptom_id\": \"symp_005\",\n        \"name_localized\": \"Sensação de ardor ou queimação na pele\",\n        \"suggestion_localized\": \"Note qualquer sensação de queimação ou desconforto nas áreas afetadas.\",\n        \"explanation_localized\": \"Este sintoma pode estar relacionado ao processo inflamatório da psoríase, agravado por fatores como alimentação inadequada.\"\n      },\n      {\n        \"symptom_id\": \"symp_006\",\n        \"name_localized\": \"Manchas descoloridas na pele após lesões\",\n        \"suggestion_localized\": \"Observe quaisquer mudanças na coloração da pele ao redor das lesões psoriásicas.\",\n        \"explanation_localized\": \"Alterações na pigmentação podem ocorrer devido a fatores de saúde relacionados à nutrição e padrão de sono.\"\n      },\n      {\n        \"symptom_id\": \"symp_007\",\n        \"name_localized\": \"Alterações no humor ou ansiedade\",\n        \"suggestion_localized\": \"Fique atento a sinais de ansiedade ou alterações emocionais associadas ao desconforto da psoríase.\",\n        \"explanation_localized\": \"O desconforto físico e fatores de estilo de vida podem contribuir para sintomas emocionais em crianças.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"psoriase\",\n    \"user_info_input\": {\n      \"gender\": \"{{gender}}\",\n      \"age_category\": \"{{age_category}}\",\n      \"age_specific\": \"{{age_specific}}\",\n      \"age_unit\": \"anos\"\n    },\n    \"selected_cause_ids\": [\n      \"cause_1749956808980_0.4897439031756555\",\n      \"cause_1749956808980_0.6445960207645857\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-potential-symptoms-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:53.498Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Identify Potential Symptoms",
+        "request_id": "abc123xyz",
+        "timestamp_utc": "2023-10-04T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Lista de sintomas potenciais gerada com sucesso."
+      },
+      "data": {
+        "potential_symptoms": [
+          {
+            "symptom_id": "symp_001",
+            "name_localized": "Lesões cutâneas escamosas e inflamadas",
+            "suggestion_localized": "Observe a presença de manchas vermelhas com escamas prateadas na pele.",
+            "explanation_localized": "Este é um sintoma comum da psoríase, muitas vezes agravado por hábitos alimentares inadequados e padrões de sono irregulares em crianças."
+          },
+          {
+            "symptom_id": "symp_002",
+            "name_localized": "Coceira intensa na pele",
+            "suggestion_localized": "Procure por áreas com coceira que podem piorar à noite ou após certas refeições.",
+            "explanation_localized": "A coceira frequente pode estar relacionada ao impacto das causas selecionadas na saúde da pele, especialmente em relação à alimentação e sono."
+          },
+          {
+            "symptom_id": "symp_003",
+            "name_localized": "Cortes ou rachaduras na pele",
+            "suggestion_localized": "Fique atento a áreas que possam rachar ou sangrar facilmente, especialmente em áreas afetadas pela psoríase.",
+            "explanation_localized": "A secura e o risco de rachaduras podem ser exacerbados pelo padrão de sono e hábitos nutricionais desfavoráveis."
+          },
+          {
+            "symptom_id": "symp_004",
+            "name_localized": "Irritabilidade e fadiga",
+            "suggestion_localized": "Observe alterações no humor e níveis de energia, especialmente após noites de sono irregular.",
+            "explanation_localized": "Distúrbios do sono e má alimentação podem contribuir para alterações emocionais e cansaço em crianças com psoríase."
+          },
+          {
+            "symptom_id": "symp_005",
+            "name_localized": "Sensação de ardor ou queimação na pele",
+            "suggestion_localized": "Note qualquer sensação de queimação ou desconforto nas áreas afetadas.",
+            "explanation_localized": "Este sintoma pode estar relacionado ao processo inflamatório da psoríase, agravado por fatores como alimentação inadequada."
+          },
+          {
+            "symptom_id": "symp_006",
+            "name_localized": "Manchas descoloridas na pele após lesões",
+            "suggestion_localized": "Observe quaisquer mudanças na coloração da pele ao redor das lesões psoriásicas.",
+            "explanation_localized": "Alterações na pigmentação podem ocorrer devido a fatores de saúde relacionados à nutrição e padrão de sono."
+          },
+          {
+            "symptom_id": "symp_007",
+            "name_localized": "Alterações no humor ou ansiedade",
+            "suggestion_localized": "Fique atento a sinais de ansiedade ou alterações emocionais associadas ao desconforto da psoríase.",
+            "explanation_localized": "O desconforto físico e fatores de estilo de vida podem contribuir para sintomas emocionais em crianças."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "psoriase",
+        "user_info_input": {
+          "gender": "{{gender}}",
+          "age_category": "{{age_category}}",
+          "age_specific": "{{age_specific}}",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "cause_1749956808980_0.4897439031756555",
+          "cause_1749956808980_0.6445960207645857"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T03:06:53.502Z",
+  "data": {
+    "sessionEnd": "2025-06-15T03:06:53.502Z"
+  }
+}
+---

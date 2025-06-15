@@ -1,0 +1,20 @@
+[2025-06-15T01:54:34.954Z] === STREAMING SESSION STARTED ===
+[2025-06-15T01:54:35.255Z] Request started with traceId: streaming-1749952474954-t5stk4o6n
+[2025-06-15T01:54:36.552Z] Agent execution started
+[2025-06-15T01:54:36.556Z] Starting real-time streaming for step: potential-causes
+[2025-06-15T01:54:39.644Z] Buffer content at chunk 200 (960 chars):
+[2025-06-15T01:54:41.679Z] Buffer content at chunk 400 (2004 chars):
+[2025-06-15T01:54:42.065Z] Final buffer content (2382 chars):
+[2025-06-15T01:54:42.111Z] === AGENT RESULT ANALYSIS ===
+[2025-06-15T01:54:42.115Z] Result keys: state, currentTurn, maxTurns
+[2025-06-15T01:54:42.130Z] Has newItems: true
+[2025-06-15T01:54:42.163Z] Has finalOutput: true
+[2025-06-15T01:54:42.177Z] NewItems count: 1
+[2025-06-15T01:54:42.182Z] --- NEW ITEM 0 ---
+[2025-06-15T01:54:42.195Z] Type: message_output_item
+[2025-06-15T01:54:42.211Z] Role: unknown
+[2025-06-15T01:54:42.214Z] Content preview: {"meta":{"step_name":"generate_potential_causes","request_id":"abc123","timestamp_utc":"2023-10-12T14:30:00Z","version":"1.0","user_language":"en","status":"success","message":"Potential causes genera...
+[2025-06-15T01:54:42.230Z] === FINAL OUTPUT ===
+[2025-06-15T01:54:42.233Z] Final output type: object
+[2025-06-15T01:54:42.263Z] Final output keys: meta, data, echo
+[2025-06-15T01:54:42.295Z] === STREAMING SESSION ENDED ===

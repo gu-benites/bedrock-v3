@@ -163,9 +163,12 @@ const onSubmit = async () => {
 useEffect(() => {
   if (isComplete && finalData) {
     setStreamingProperties(false);
-    setTimeout(() => goToNext(), 100);
+    // Navigate immediately after state updates (no setTimeout delay)
+    if (canGoNext()) {
+      goToNext();
+    }
   }
-}, [isComplete, finalData]);
+}, [isComplete, finalData, canGoNext, goToNext]);
 ```
 
 ## 🎯 **Key Success Factors**

@@ -1,0 +1,147 @@
+{
+  "timestamp": "2025-06-15T01:54:34.955Z",
+  "data": {
+    "sessionStart": "2025-06-15T01:54:34.955Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:39.749Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 960,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-12T14:30:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"1\",\"name_localized\":\"Stress and Emotional Factors\",\"suggestion_localized\":\"Manage stress through relaxation techniques and mindfulness.\",\"explanation_localized\":\"Stress and emotional tension can impact immune function and skin health, pote",
+    "bufferSuffix": "rns and Quality\",\"suggestion_localized\":\"Improve sleep hygiene and aim for consistent, restful sleep"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:41.764Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 2004,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-12T14:30:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"1\",\"name_localized\":\"Stress and Emotional Factors\",\"suggestion_localized\":\"Manage stress through relaxation techniques and mindfulness.\",\"explanation_localized\":\"Stress and emotional tension can impact immune function and skin health, pote",
+    "bufferSuffix": "n, can influence immune responses and skin health.\"},{\"cause_id\":\"7\",\"name_localized\":\"Skin Care and"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:42.098Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2382,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-12T14:30:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"1\",\"name_localized\":\"Stress and Emotional Factors\",\"suggestion_localized\":\"Manage stress through relaxation techniques and mindfulness.\",\"explanation_localized\":\"Stress and emotional tension can impact immune function and skin health, potentially contributing to psoriasis flare-ups.\"},{\"cause_id\":\"2\",\"name_localized\":\"Diet and Nutritional Factors\",\"suggestion_localized\":\"Maintain a balanced diet rich in anti-inflammatory foods.\",\"explanation_localized\":\"Diet plays a role in inflammation levels in the body, which can influence psoriasis symptoms.\"},{\"cause_id\":\"3\",\"name_localized\":\"Sleep Patterns and Quality\",\"suggestion_localized\":\"Improve sleep hygiene and aim for consistent, restful sleep.\",\"explanation_localized\":\"Poor sleep can affect immune regulation and skin healing, possibly exacerbating psoriatic symptoms.\"},{\"cause_id\":\"4\",\"name_localized\":\"Physical Stress and Posture\",\"suggestion_localized\":\"Practice good posture and gentle physical activity to reduce muscle tension.\",\"explanation_localized\":\"Physical tension and muscle strain may trigger or worsen skin conditions, including psoriasis.\"},{\"cause_id\":\"5\",\"name_localized\":\"Environmental Triggers\",\"suggestion_localized\":\"Avoid known environmental irritants and maintain a comfortable living environment.\",\"explanation_localized\":\"Environmental factors such as dry air, pollution, or allergens can aggravate skin conditions.\"},{\"cause_id\":\"6\",\"name_localized\":\"Hormonal Fluctuations and Lifestyle Changes\",\"suggestion_localized\":\"Monitor hormonal health and manage lifestyle changes mindfully.\",\"explanation_localized\":\"Hormonal fluctuations, especially in young women, can influence immune responses and skin health.\"},{\"cause_id\":\"7\",\"name_localized\":\"Skin Care and External Irritants\",\"suggestion_localized\":\"Use gentle, fragrance-free skin care products and avoid known irritants.\",\"explanation_localized\":\"Harsh skincare products and irritants can exacerbate psoriasis by irritating the skin.\"}]},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"adult\",\"age_specific\":\"22\",\"age_unit\":\"years\"}}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:42.229Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684e298f2cdc8198878971d7e89949730e13669d05113e3d",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"abc123\",\"timestamp_utc\":\"2023-10-12T14:30:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"1\",\"name_localized\":\"Stress and Emotional Factors\",\"suggestion_localized\":\"Manage stress through relaxation techniques and mindfulness.\",\"explanation_localized\":\"Stress and emotional tension can impact immune function and skin health, potentially contributing to psoriasis flare-ups.\"},{\"cause_id\":\"2\",\"name_localized\":\"Diet and Nutritional Factors\",\"suggestion_localized\":\"Maintain a balanced diet rich in anti-inflammatory foods.\",\"explanation_localized\":\"Diet plays a role in inflammation levels in the body, which can influence psoriasis symptoms.\"},{\"cause_id\":\"3\",\"name_localized\":\"Sleep Patterns and Quality\",\"suggestion_localized\":\"Improve sleep hygiene and aim for consistent, restful sleep.\",\"explanation_localized\":\"Poor sleep can affect immune regulation and skin healing, possibly exacerbating psoriatic symptoms.\"},{\"cause_id\":\"4\",\"name_localized\":\"Physical Stress and Posture\",\"suggestion_localized\":\"Practice good posture and gentle physical activity to reduce muscle tension.\",\"explanation_localized\":\"Physical tension and muscle strain may trigger or worsen skin conditions, including psoriasis.\"},{\"cause_id\":\"5\",\"name_localized\":\"Environmental Triggers\",\"suggestion_localized\":\"Avoid known environmental irritants and maintain a comfortable living environment.\",\"explanation_localized\":\"Environmental factors such as dry air, pollution, or allergens can aggravate skin conditions.\"},{\"cause_id\":\"6\",\"name_localized\":\"Hormonal Fluctuations and Lifestyle Changes\",\"suggestion_localized\":\"Monitor hormonal health and manage lifestyle changes mindfully.\",\"explanation_localized\":\"Hormonal fluctuations, especially in young women, can influence immune responses and skin health.\"},{\"cause_id\":\"7\",\"name_localized\":\"Skin Care and External Irritants\",\"suggestion_localized\":\"Use gentle, fragrance-free skin care products and avoid known irritants.\",\"explanation_localized\":\"Harsh skincare products and irritants can exacerbate psoriasis by irritating the skin.\"}]},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"adult\",\"age_specific\":\"22\",\"age_unit\":\"years\"}}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:42.267Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "generate_potential_causes",
+        "request_id": "abc123",
+        "timestamp_utc": "2023-10-12T14:30:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Potential causes generated successfully."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "1",
+            "name_localized": "Stress and Emotional Factors",
+            "suggestion_localized": "Manage stress through relaxation techniques and mindfulness.",
+            "explanation_localized": "Stress and emotional tension can impact immune function and skin health, potentially contributing to psoriasis flare-ups."
+          },
+          {
+            "cause_id": "2",
+            "name_localized": "Diet and Nutritional Factors",
+            "suggestion_localized": "Maintain a balanced diet rich in anti-inflammatory foods.",
+            "explanation_localized": "Diet plays a role in inflammation levels in the body, which can influence psoriasis symptoms."
+          },
+          {
+            "cause_id": "3",
+            "name_localized": "Sleep Patterns and Quality",
+            "suggestion_localized": "Improve sleep hygiene and aim for consistent, restful sleep.",
+            "explanation_localized": "Poor sleep can affect immune regulation and skin healing, possibly exacerbating psoriatic symptoms."
+          },
+          {
+            "cause_id": "4",
+            "name_localized": "Physical Stress and Posture",
+            "suggestion_localized": "Practice good posture and gentle physical activity to reduce muscle tension.",
+            "explanation_localized": "Physical tension and muscle strain may trigger or worsen skin conditions, including psoriasis."
+          },
+          {
+            "cause_id": "5",
+            "name_localized": "Environmental Triggers",
+            "suggestion_localized": "Avoid known environmental irritants and maintain a comfortable living environment.",
+            "explanation_localized": "Environmental factors such as dry air, pollution, or allergens can aggravate skin conditions."
+          },
+          {
+            "cause_id": "6",
+            "name_localized": "Hormonal Fluctuations and Lifestyle Changes",
+            "suggestion_localized": "Monitor hormonal health and manage lifestyle changes mindfully.",
+            "explanation_localized": "Hormonal fluctuations, especially in young women, can influence immune responses and skin health."
+          },
+          {
+            "cause_id": "7",
+            "name_localized": "Skin Care and External Irritants",
+            "suggestion_localized": "Use gentle, fragrance-free skin care products and avoid known irritants.",
+            "explanation_localized": "Harsh skincare products and irritants can exacerbate psoriasis by irritating the skin."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "psoriase",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "22",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:54:42.300Z",
+  "data": {
+    "sessionEnd": "2025-06-15T01:54:42.300Z"
+  }
+}
+---

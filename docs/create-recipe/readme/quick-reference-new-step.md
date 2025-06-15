@@ -398,12 +398,11 @@ useEffect(() => {
     // Stop streaming state
     setStreamingYourStep(false);
 
-    // Navigate to your step after short delay to ensure state is updated
-    setTimeout(() => {
-      if (canGoNext()) {
-        goToNext();
-      }
-    }, 100);
+    // Navigate immediately after state updates (no setTimeout delay)
+    // The state updates above are synchronous, so navigation can happen immediately
+    if (canGoNext()) {
+      goToNext();
+    }
   }
 }, [isYourStepComplete, yourStepFinalData, canGoNext, goToNext, setStreamingYourStep]);
 

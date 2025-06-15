@@ -1,0 +1,168 @@
+{
+  "timestamp": "2025-06-15T01:55:48.995Z",
+  "data": {
+    "sessionStart": "2025-06-15T01:55:48.995Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:52.216Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 789,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"123456789\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Peles escamosas e avermelhadas\",\"suggestion_localized\":\"Preste atenção a manchas na pele que podem coçar ou queimar.\",\"explanation_localized\":\"A psorí",
+    "bufferSuffix": "002\",\"name_localized\":\"Coceira intensa na pele\",\"suggestion_localized\":\"Observe áreas de pele que co"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:53.110Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1657,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"123456789\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Peles escamosas e avermelhadas\",\"suggestion_localized\":\"Preste atenção a manchas na pele que podem coçar ou queimar.\",\"explanation_localized\":\"A psorí",
+    "bufferSuffix": "o muscular devido ao estresse físico pode agravar o desconforto e o aparecimento de lesões cutâneas,"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:53.994Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2455,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"123456789\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Peles escamosas e avermelhadas\",\"suggestion_localized\":\"Preste atenção a manchas na pele que podem coçar ou queimar.\",\"explanation_localized\":\"A psorí",
+    "bufferSuffix": "{\"symptom_id\":\"symp_007\",\"name_localized\":\"Mudanças no estado de humor\",\"suggestion_localized\":\"Este"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:55.283Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3248,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"123456789\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Peles escamosas e avermelhadas\",\"suggestion_localized\":\"Preste atenção a manchas na pele que podem coçar ou queimar.\",\"explanation_localized\":\"A psoríase geralmente se manifesta com manchas escamosas, vermelhas e inflamadas na pele, especialmente quando há estímulos como uma dieta desequilibrada ou tensão muscular.\"},{\"symptom_id\":\"symp_002\",\"name_localized\":\"Coceira intensa na pele\",\"suggestion_localized\":\"Observe áreas de pele que coçam de forma persistente.\",\"explanation_localized\":\"A coceira é um sintoma comum, que pode piorar com fatores como estresse físico ou alterações na dieta que aumentam a inflamação.\"},{\"symptom_id\":\"symp_003\",\"name_localized\":\"Aumento da irritabilidade ou ansiedade\",\"suggestion_localized\":\"Fique atento ao seu estado emocional, que pode se intensificar com o desconforto cutâneo.\",\"explanation_localized\":\"O desconforto cutâneo e a ansiedade relacionada podem estar associados à experiência de sintomas físicos da psoríase e ao estresse causado pelos fatores de estilo de vida.\"},{\"symptom_id\":\"symp_004\",\"name_localized\":\"Tensão muscular ou rigidez\",\"suggestion_localized\":\"Pratique alongamentos suaves e mantenha uma postura adequada.\",\"explanation_localized\":\"Tensão muscular devido ao estresse físico pode agravar o desconforto e o aparecimento de lesões cutâneas, afetando a condição psoriásica.\"},{\"symptom_id\":\"symp_005\",\"name_localized\":\"Lesões cutâneas agravadas após estresse físico ou emocional\",\"suggestion_localized\":\"Controle o estresse e pratique técnicas de relaxamento.\",\"explanation_localized\":\"Situações de estresse físico ou emocional podem desencadear ou agravar as lesões da psoríase devido à resposta inflamatória aumentada.\"},{\"symptom_id\":\"symp_006\",\"name_localized\":\"Lascas ou descamação da pele\",\"suggestion_localized\":\"Observe áreas de descamação ou escamas de pele seca.\",\"explanation_localized\":\"A descamação é um sintoma característico da psoríase, potencialmente agravada por fatores de estilo de vida que influenciam a inflamação.\"},{\"symptom_id\":\"symp_007\",\"name_localized\":\"Mudanças no estado de humor\",\"suggestion_localized\":\"Esteja atento a mudanças rápidas no humor ou sinais de depressão.\",\"explanation_localized\":\"Mudanças emocionais podem estar relacionadas à persistência dos sintomas e ao impacto na qualidade de vida de quem tem psoríase.\"},{\"symptom_id\":\"symp_008\",\"name_localized\":\"Ressecamento da pele\",\"suggestion_localized\":\"Hidrate a pele regularmente com produtos adequados.\",\"explanation_localized\":\"A pele seca é uma característica comum na psoríase, muitas vezes agravada por fatores como alimentação inadequada e estresse.\"}]},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"{{gender}}\",\"age_category\":\"{{age_category}}\",\"age_specific\":\"{{age_specific}}\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"cause_1749952547757_0.6040463408985677\",\"cause_1749952547757_0.27309726721625094\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:55.601Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684e29d7ba748198a27d1eb6e2be24770a42f2ac958bcad3",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"123456789\",\"timestamp_utc\":\"2023-10-02T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"symp_001\",\"name_localized\":\"Peles escamosas e avermelhadas\",\"suggestion_localized\":\"Preste atenção a manchas na pele que podem coçar ou queimar.\",\"explanation_localized\":\"A psoríase geralmente se manifesta com manchas escamosas, vermelhas e inflamadas na pele, especialmente quando há estímulos como uma dieta desequilibrada ou tensão muscular.\"},{\"symptom_id\":\"symp_002\",\"name_localized\":\"Coceira intensa na pele\",\"suggestion_localized\":\"Observe áreas de pele que coçam de forma persistente.\",\"explanation_localized\":\"A coceira é um sintoma comum, que pode piorar com fatores como estresse físico ou alterações na dieta que aumentam a inflamação.\"},{\"symptom_id\":\"symp_003\",\"name_localized\":\"Aumento da irritabilidade ou ansiedade\",\"suggestion_localized\":\"Fique atento ao seu estado emocional, que pode se intensificar com o desconforto cutâneo.\",\"explanation_localized\":\"O desconforto cutâneo e a ansiedade relacionada podem estar associados à experiência de sintomas físicos da psoríase e ao estresse causado pelos fatores de estilo de vida.\"},{\"symptom_id\":\"symp_004\",\"name_localized\":\"Tensão muscular ou rigidez\",\"suggestion_localized\":\"Pratique alongamentos suaves e mantenha uma postura adequada.\",\"explanation_localized\":\"Tensão muscular devido ao estresse físico pode agravar o desconforto e o aparecimento de lesões cutâneas, afetando a condição psoriásica.\"},{\"symptom_id\":\"symp_005\",\"name_localized\":\"Lesões cutâneas agravadas após estresse físico ou emocional\",\"suggestion_localized\":\"Controle o estresse e pratique técnicas de relaxamento.\",\"explanation_localized\":\"Situações de estresse físico ou emocional podem desencadear ou agravar as lesões da psoríase devido à resposta inflamatória aumentada.\"},{\"symptom_id\":\"symp_006\",\"name_localized\":\"Lascas ou descamação da pele\",\"suggestion_localized\":\"Observe áreas de descamação ou escamas de pele seca.\",\"explanation_localized\":\"A descamação é um sintoma característico da psoríase, potencialmente agravada por fatores de estilo de vida que influenciam a inflamação.\"},{\"symptom_id\":\"symp_007\",\"name_localized\":\"Mudanças no estado de humor\",\"suggestion_localized\":\"Esteja atento a mudanças rápidas no humor ou sinais de depressão.\",\"explanation_localized\":\"Mudanças emocionais podem estar relacionadas à persistência dos sintomas e ao impacto na qualidade de vida de quem tem psoríase.\"},{\"symptom_id\":\"symp_008\",\"name_localized\":\"Ressecamento da pele\",\"suggestion_localized\":\"Hidrate a pele regularmente com produtos adequados.\",\"explanation_localized\":\"A pele seca é uma característica comum na psoríase, muitas vezes agravada por fatores como alimentação inadequada e estresse.\"}]},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"{{gender}}\",\"age_category\":\"{{age_category}}\",\"age_specific\":\"{{age_specific}}\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"cause_1749952547757_0.6040463408985677\",\"cause_1749952547757_0.27309726721625094\"]}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-potential-symptoms-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:55.613Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "identify_potential_symptoms",
+        "request_id": "123456789",
+        "timestamp_utc": "2023-10-02T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Síntomas potenciais identificados com base na preocupação de saúde e causas selecionadas."
+      },
+      "data": {
+        "potential_symptoms": [
+          {
+            "symptom_id": "symp_001",
+            "name_localized": "Peles escamosas e avermelhadas",
+            "suggestion_localized": "Preste atenção a manchas na pele que podem coçar ou queimar.",
+            "explanation_localized": "A psoríase geralmente se manifesta com manchas escamosas, vermelhas e inflamadas na pele, especialmente quando há estímulos como uma dieta desequilibrada ou tensão muscular."
+          },
+          {
+            "symptom_id": "symp_002",
+            "name_localized": "Coceira intensa na pele",
+            "suggestion_localized": "Observe áreas de pele que coçam de forma persistente.",
+            "explanation_localized": "A coceira é um sintoma comum, que pode piorar com fatores como estresse físico ou alterações na dieta que aumentam a inflamação."
+          },
+          {
+            "symptom_id": "symp_003",
+            "name_localized": "Aumento da irritabilidade ou ansiedade",
+            "suggestion_localized": "Fique atento ao seu estado emocional, que pode se intensificar com o desconforto cutâneo.",
+            "explanation_localized": "O desconforto cutâneo e a ansiedade relacionada podem estar associados à experiência de sintomas físicos da psoríase e ao estresse causado pelos fatores de estilo de vida."
+          },
+          {
+            "symptom_id": "symp_004",
+            "name_localized": "Tensão muscular ou rigidez",
+            "suggestion_localized": "Pratique alongamentos suaves e mantenha uma postura adequada.",
+            "explanation_localized": "Tensão muscular devido ao estresse físico pode agravar o desconforto e o aparecimento de lesões cutâneas, afetando a condição psoriásica."
+          },
+          {
+            "symptom_id": "symp_005",
+            "name_localized": "Lesões cutâneas agravadas após estresse físico ou emocional",
+            "suggestion_localized": "Controle o estresse e pratique técnicas de relaxamento.",
+            "explanation_localized": "Situações de estresse físico ou emocional podem desencadear ou agravar as lesões da psoríase devido à resposta inflamatória aumentada."
+          },
+          {
+            "symptom_id": "symp_006",
+            "name_localized": "Lascas ou descamação da pele",
+            "suggestion_localized": "Observe áreas de descamação ou escamas de pele seca.",
+            "explanation_localized": "A descamação é um sintoma característico da psoríase, potencialmente agravada por fatores de estilo de vida que influenciam a inflamação."
+          },
+          {
+            "symptom_id": "symp_007",
+            "name_localized": "Mudanças no estado de humor",
+            "suggestion_localized": "Esteja atento a mudanças rápidas no humor ou sinais de depressão.",
+            "explanation_localized": "Mudanças emocionais podem estar relacionadas à persistência dos sintomas e ao impacto na qualidade de vida de quem tem psoríase."
+          },
+          {
+            "symptom_id": "symp_008",
+            "name_localized": "Ressecamento da pele",
+            "suggestion_localized": "Hidrate a pele regularmente com produtos adequados.",
+            "explanation_localized": "A pele seca é uma característica comum na psoríase, muitas vezes agravada por fatores como alimentação inadequada e estresse."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "psoriase",
+        "user_info_input": {
+          "gender": "{{gender}}",
+          "age_category": "{{age_category}}",
+          "age_specific": "{{age_specific}}",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "cause_1749952547757_0.6040463408985677",
+          "cause_1749952547757_0.27309726721625094"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:55:55.623Z",
+  "data": {
+    "sessionEnd": "2025-06-15T01:55:55.623Z"
+  }
+}
+---

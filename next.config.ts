@@ -19,6 +19,34 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Development performance optimizations
+  ...(process.env.NODE_ENV === 'development' && {
+    turbopack: {
+      // Enable Turbopack for faster development builds
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+    // Optimize webpack for development
+    webpack: (config: any, { dev, isServer }: any) => {
+      if (dev && !isServer) {
+        // Reduce bundle analysis overhead in development
+        config.optimization = {
+          ...config.optimization,
+          removeAvailableModules: false,
+          removeEmptyChunks: false,
+          splitChunks: false,
+        };
+
+        // Faster source maps for development
+        config.devtool = 'eval-cheap-module-source-map';
+      }
+      return config;
+    },
+  }),
 };
 
 // Sentry webpack plugin options, configured by the Sentry wizard
@@ -54,10 +82,7 @@ const sentryWebpackPluginOptions = {
 
 // Make sure to wrap your `nextConfig` with `withSentryConfig` only once.
 // The wizard might have wrapped it multiple times if run more than once.
-export default withSentryConfig(
-  nextConfig,
-  sentryWebpackPluginOptions
-  // Note: The third argument for module options (like hideSourceMaps) is part of the `sentryWebpackPluginOptions` object itself in recent @sentry/nextjs versions.
-  // The wizard likely configured `hideSourceMaps` (implicitly true by default) and other module options within `withSentryConfig`'s internal handling.
-  // The `sentryWebpackPluginOptions` object now covers most of what used to be separate module options.
-);
+// Only enable Sentry in production to improve development performance
+export default process.env.NODE_ENV === 'production'
+  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+  : nextConfig;

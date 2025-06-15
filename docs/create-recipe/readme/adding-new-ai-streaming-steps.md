@@ -1045,10 +1045,10 @@ const {
 useEffect(() => {
   if (isComplete && finalData) {
     setStreamingProperties(false);  // ← Stop store streaming state
-    // Navigate after short delay
-    setTimeout(() => {
-      if (canGoNext()) goToNext();
-    }, 100);
+    // Navigate immediately after state updates (no setTimeout delay)
+    if (canGoNext()) {
+      goToNext();
+    }
   }
 }, [isComplete, finalData, setStreamingProperties]);
 ```

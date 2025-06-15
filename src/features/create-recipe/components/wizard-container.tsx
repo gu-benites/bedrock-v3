@@ -70,12 +70,21 @@ export function WizardContainer({
   // Use prop or store current step
   const activeStep = currentStep || storeCurrentStep;
 
-  // Sync URL step with store state
+  // Sync URL step with store state - but only when necessary to prevent loops
   useEffect(() => {
-    if (currentStep && currentStep !== stepInfo.current.key) {
+    // Only sync if the URL step is different from store AND we're not already navigating
+    // This prevents the synchronization loop that causes multiple re-renders
+    if (currentStep && currentStep !== storeCurrentStep && !isLoading) {
+      if (process.env.NODE_ENV === 'development') {
+        const timestamp = new Date().toISOString();
+        console.log(`🔄 [${timestamp}] WizardContainer: Syncing URL step with store:`, {
+          urlStep: currentStep,
+          storeStep: storeCurrentStep
+        });
+      }
       setCurrentStep(currentStep);
     }
-  }, [currentStep, stepInfo.current.key, setCurrentStep]);
+  }, [currentStep, storeCurrentStep, setCurrentStep, isLoading]);
 
   // Progress indicator
   const progressPercentage = getCompletionPercentage();

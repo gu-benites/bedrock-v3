@@ -1,0 +1,158 @@
+{
+  "timestamp": "2025-06-15T01:53:32.551Z",
+  "data": {
+    "sessionStart": "2025-06-15T01:53:32.551Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:34.750Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 838,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"req_001\",\n    \"timestamp_utc\": \"2023-10-02T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"1\",\n        \"name_localized\": \"Stress and Emotional Factors\",\n        \"suggestion_localized\": ",
+    "bufferSuffix": "      {\n        \"cause_id\": \"2\",\n        \"name_localized\": \"Diet and Nutrition\",\n        \"suggestion"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:36.951Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1818,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"req_001\",\n    \"timestamp_utc\": \"2023-10-02T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"1\",\n        \"name_localized\": \"Stress and Emotional Factors\",\n        \"suggestion_localized\": ",
+    "bufferSuffix": "an contribute to psoriasis flare-ups.\"\n      },\n      {\n        \"cause_id\": \"5\",\n        \"name_local"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:37.710Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2823,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"req_001\",\n    \"timestamp_utc\": \"2023-10-02T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"1\",\n        \"name_localized\": \"Stress and Emotional Factors\",\n        \"suggestion_localized\": ",
+    "bufferSuffix": "system activity are known to influence psoriasis severity and frequency.\"\n      }\n    ]\n  },\n  \"echo"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:37.903Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3015,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"req_001\",\n    \"timestamp_utc\": \"2023-10-02T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"1\",\n        \"name_localized\": \"Stress and Emotional Factors\",\n        \"suggestion_localized\": \"Consider managing stress and emotional wellbeing.\",\n        \"explanation_localized\": \"Stress can trigger or worsen psoriasis outbreaks, especially in young adults who often experience active lifestyle and emotional challenges.\"\n      },\n      {\n        \"cause_id\": \"2\",\n        \"name_localized\": \"Diet and Nutrition\",\n        \"suggestion_localized\": \"Evaluate and improve your diet to support skin health.\",\n        \"explanation_localized\": \"Dietary choices, such as high processed foods or food sensitivities, may influence inflammation and skin conditions like psoriasis.\"\n      },\n      {\n        \"cause_id\": \"3\",\n        \"name_localized\": \"Sleep Patterns and Quality\",\n        \"suggestion_localized\": \"Aim for consistent, restorative sleep to help manage psoriasis symptoms.\",\n        \"explanation_localized\": \"Poor sleep quality and irregular sleep schedules can affect immune function and skin health, potentially aggravating psoriasis.\"\n      },\n      {\n        \"cause_id\": \"4\",\n        \"name_localized\": \"Skin Care and Physical Factors\",\n        \"suggestion_localized\": \"Use moisturizers and avoid skin irritants.\",\n        \"explanation_localized\": \"Physical skin irritation, dryness, or harsh skin products can contribute to psoriasis flare-ups.\"\n      },\n      {\n        \"cause_id\": \"5\",\n        \"name_localized\": \"Lifestyle and Activity Levels\",\n        \"suggestion_localized\": \"Incorporate gentle physical activity to reduce stress and improve circulation.\",\n        \"explanation_localized\": \"Sedentary lifestyle and physical inactivity may influence immune regulation and skin health.\"\n      },\n      {\n        \"cause_id\": \"6\",\n        \"name_localized\": \"Environmental Triggers\",\n        \"suggestion_localized\": \"Monitor and minimize exposure to environmental irritants and weather changes.\",\n        \"explanation_localized\": \"Factors like cold, dry air or pollutants can trigger skin conditions such as psoriasis in sensitive individuals.\"\n      },\n      {\n        \"cause_id\": \"7\",\n        \"name_localized\": \"Hormonal and Immune System Factors\",\n        \"suggestion_localized\": \"Manage overall health and stress to support immune balance.\",\n        \"explanation_localized\": \"Hormonal fluctuations and immune system activity are known to influence psoriasis severity and frequency.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"psoriase\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"22\",\n      \"age_unit\": \"years\"\n    }\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:37.945Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_684e294e4130819bbf592a3a23a6a0540f932de2a721a1d5",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"req_001\",\n    \"timestamp_utc\": \"2023-10-02T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"1\",\n        \"name_localized\": \"Stress and Emotional Factors\",\n        \"suggestion_localized\": \"Consider managing stress and emotional wellbeing.\",\n        \"explanation_localized\": \"Stress can trigger or worsen psoriasis outbreaks, especially in young adults who often experience active lifestyle and emotional challenges.\"\n      },\n      {\n        \"cause_id\": \"2\",\n        \"name_localized\": \"Diet and Nutrition\",\n        \"suggestion_localized\": \"Evaluate and improve your diet to support skin health.\",\n        \"explanation_localized\": \"Dietary choices, such as high processed foods or food sensitivities, may influence inflammation and skin conditions like psoriasis.\"\n      },\n      {\n        \"cause_id\": \"3\",\n        \"name_localized\": \"Sleep Patterns and Quality\",\n        \"suggestion_localized\": \"Aim for consistent, restorative sleep to help manage psoriasis symptoms.\",\n        \"explanation_localized\": \"Poor sleep quality and irregular sleep schedules can affect immune function and skin health, potentially aggravating psoriasis.\"\n      },\n      {\n        \"cause_id\": \"4\",\n        \"name_localized\": \"Skin Care and Physical Factors\",\n        \"suggestion_localized\": \"Use moisturizers and avoid skin irritants.\",\n        \"explanation_localized\": \"Physical skin irritation, dryness, or harsh skin products can contribute to psoriasis flare-ups.\"\n      },\n      {\n        \"cause_id\": \"5\",\n        \"name_localized\": \"Lifestyle and Activity Levels\",\n        \"suggestion_localized\": \"Incorporate gentle physical activity to reduce stress and improve circulation.\",\n        \"explanation_localized\": \"Sedentary lifestyle and physical inactivity may influence immune regulation and skin health.\"\n      },\n      {\n        \"cause_id\": \"6\",\n        \"name_localized\": \"Environmental Triggers\",\n        \"suggestion_localized\": \"Monitor and minimize exposure to environmental irritants and weather changes.\",\n        \"explanation_localized\": \"Factors like cold, dry air or pollutants can trigger skin conditions such as psoriasis in sensitive individuals.\"\n      },\n      {\n        \"cause_id\": \"7\",\n        \"name_localized\": \"Hormonal and Immune System Factors\",\n        \"suggestion_localized\": \"Manage overall health and stress to support immune balance.\",\n        \"explanation_localized\": \"Hormonal fluctuations and immune system activity are known to influence psoriasis severity and frequency.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"psoriase\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"22\",\n      \"age_unit\": \"years\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:37.965Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Potential Causes Analysis",
+        "request_id": "req_001",
+        "timestamp_utc": "2023-10-02T12:00:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Personalized list of potential causes for psoriasis based on user profile and evidence-based considerations."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "1",
+            "name_localized": "Stress and Emotional Factors",
+            "suggestion_localized": "Consider managing stress and emotional wellbeing.",
+            "explanation_localized": "Stress can trigger or worsen psoriasis outbreaks, especially in young adults who often experience active lifestyle and emotional challenges."
+          },
+          {
+            "cause_id": "2",
+            "name_localized": "Diet and Nutrition",
+            "suggestion_localized": "Evaluate and improve your diet to support skin health.",
+            "explanation_localized": "Dietary choices, such as high processed foods or food sensitivities, may influence inflammation and skin conditions like psoriasis."
+          },
+          {
+            "cause_id": "3",
+            "name_localized": "Sleep Patterns and Quality",
+            "suggestion_localized": "Aim for consistent, restorative sleep to help manage psoriasis symptoms.",
+            "explanation_localized": "Poor sleep quality and irregular sleep schedules can affect immune function and skin health, potentially aggravating psoriasis."
+          },
+          {
+            "cause_id": "4",
+            "name_localized": "Skin Care and Physical Factors",
+            "suggestion_localized": "Use moisturizers and avoid skin irritants.",
+            "explanation_localized": "Physical skin irritation, dryness, or harsh skin products can contribute to psoriasis flare-ups."
+          },
+          {
+            "cause_id": "5",
+            "name_localized": "Lifestyle and Activity Levels",
+            "suggestion_localized": "Incorporate gentle physical activity to reduce stress and improve circulation.",
+            "explanation_localized": "Sedentary lifestyle and physical inactivity may influence immune regulation and skin health."
+          },
+          {
+            "cause_id": "6",
+            "name_localized": "Environmental Triggers",
+            "suggestion_localized": "Monitor and minimize exposure to environmental irritants and weather changes.",
+            "explanation_localized": "Factors like cold, dry air or pollutants can trigger skin conditions such as psoriasis in sensitive individuals."
+          },
+          {
+            "cause_id": "7",
+            "name_localized": "Hormonal and Immune System Factors",
+            "suggestion_localized": "Manage overall health and stress to support immune balance.",
+            "explanation_localized": "Hormonal fluctuations and immune system activity are known to influence psoriasis severity and frequency."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "psoriase",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "22",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-15T01:53:37.981Z",
+  "data": {
+    "sessionEnd": "2025-06-15T01:53:37.981Z"
+  }
+}
+---

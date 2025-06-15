@@ -191,12 +191,24 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
         clearStepsAfter(step);
       }
 
-      // Update store state
+      // Update store state first for immediate UI feedback
+      const timestamp = new Date().toISOString();
+      console.log(`🚀 [${timestamp}] Navigation: Setting current step in store:`, step);
       setCurrentStep(step);
 
-      // Navigate to the step URL
+      // Navigate to the step URL with prefetch for better performance
       const url = getStepUrl(step);
-      router.push(url);
+      console.log(`🌐 [${timestamp}] Navigation: Pushing to URL:`, url);
+
+      // Prefetch the route for faster navigation
+      router.prefetch(url);
+
+      // Use replace instead of push for smoother navigation in development
+      if (process.env.NODE_ENV === 'development') {
+        router.replace(url);
+      } else {
+        router.push(url);
+      }
 
       return {
         success: true,
@@ -216,7 +228,15 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
    * Navigates to the next step
    */
   const goToNext = useCallback(async (): Promise<NavigationResult> => {
+    const timestamp = new Date().toISOString();
+    console.log(`🎯 [${timestamp}] goToNext called:`, {
+      currentStep,
+      nextStep: stepInfo.next?.key,
+      hasNext: !!stepInfo.next
+    });
+
     if (!stepInfo.next) {
+      console.log(`❌ [${timestamp}] goToNext: No next step available`);
       return {
         success: false,
         error: 'No next step available'
@@ -224,10 +244,12 @@ export function useRecipeWizardNavigation(): UseRecipeNavigationReturn {
     }
 
     // Mark current step as completed before moving to next
+    console.log(`✅ [${timestamp}] goToNext: Marking current step completed:`, currentStep);
     markCurrentStepCompleted();
 
+    console.log(`🚀 [${timestamp}] goToNext: Calling goToStep with:`, stepInfo.next.key);
     return goToStep(stepInfo.next.key);
-  }, [stepInfo.next, markCurrentStepCompleted, goToStep]);
+  }, [stepInfo.next, markCurrentStepCompleted, goToStep, currentStep]);
 
   /**
    * Navigates to the previous step

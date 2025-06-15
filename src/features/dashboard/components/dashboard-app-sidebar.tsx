@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  ArrowUpCircleIcon,
   BarChartIcon,
   MessageCircleIcon,
   FlaskConicalIcon,
@@ -24,7 +23,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  useSidebar, // Import useSidebar to get collapse state
 } from '@/components/ui/sidebar'
 
 const data = {
@@ -86,12 +84,9 @@ const data = {
 }
 
 export function DashboardAppSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { state, setOpen } = useSidebar(); // Get sidebar state and setOpen function
-  const isCollapsed = state === "collapsed";
-
   // variant and collapsible are now controlled by SidebarProvider through context
   return (
-    <Sidebar collapsible="offcanvas" className={className} {...props}>
+    <Sidebar className={className} {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

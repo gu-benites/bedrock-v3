@@ -233,7 +233,7 @@ export function DemographicsForm() {
    */
   React.useEffect(() => {
     if (isComplete && finalData && !hasNavigatedRef.current) {
-      console.log('Streaming completed with final data:', finalData);
+      console.log(`✅ [${new Date().toISOString()}] Demographics streaming completed with final data:`, finalData);
 
       // Extract potential causes from final data
       let causes: any[] = [];
@@ -253,20 +253,21 @@ export function DemographicsForm() {
         explanation: cause.explanation_localized || ''
       }));
 
-      setPotentialCauses(transformedCauses);
-      setStreamingCauses(false);
-
       // Mark that we've navigated to prevent infinite loops
       hasNavigatedRef.current = true;
 
-      // Navigate to causes step after a short delay to ensure state is updated
-      setTimeout(() => {
-        if (canGoNext()) {
-          goToNext();
-        }
-      }, 100);
+      // Consolidate all state updates into a single batch to minimize re-renders
+      // This prevents multiple rapid state updates that cause navigation issues
+      setPotentialCauses(transformedCauses);
+      setStreamingCauses(false);
+
+      // Navigate immediately after state updates (no setTimeout delay)
+      // The state updates above are synchronous, so navigation can happen immediately
+      if (canGoNext()) {
+        goToNext();
+      }
     }
-  }, [isComplete, finalData, setPotentialCauses, setStreamingCauses]);
+  }, [isComplete, finalData, setPotentialCauses, setStreamingCauses, canGoNext, goToNext]);
 
   /**
    * Handle streaming errors

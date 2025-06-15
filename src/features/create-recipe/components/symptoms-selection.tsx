@@ -197,12 +197,11 @@ export function SymptomsSelection() {
       // Stop streaming state
       setStreamingProperties(false);
 
-      // Navigate to properties step after a short delay to ensure state is updated
-      setTimeout(() => {
-        if (canGoNext()) {
-          goToNext();
-        }
-      }, 100);
+      // Navigate immediately after state updates (no setTimeout delay)
+      // The state updates above are synchronous, so navigation can happen immediately
+      if (canGoNext()) {
+        goToNext();
+      }
     }
   }, [isPropertiesComplete, propertiesFinalData, canGoNext, goToNext, setStreamingProperties]);
 

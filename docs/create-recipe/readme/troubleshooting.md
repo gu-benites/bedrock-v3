@@ -34,6 +34,12 @@ Based on real implementation experiences, these are the most critical issues tha
 **Time Lost**: 2+ hours debugging backend streaming errors
 **Solution**: Use appropriate timeout (60s+) and consistent state management
 
+### **5. Multiple Re-renders During Navigation (CRITICAL)**
+**Symptoms**: Multiple GET requests to next step page after AI streaming completes
+**Root Cause**: Multiple rapid state updates + setTimeout navigation delay causing re-renders
+**Time Lost**: 1+ hour debugging navigation issues
+**Solution**: Consolidate state updates and remove setTimeout delays in navigation
+
 ## ⚠️ CRITICAL WARNINGS - READ FIRST
 
 This system uses a specific workflow pattern: **AI streams data for the NEXT step while staying on the CURRENT step.**
