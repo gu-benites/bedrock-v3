@@ -42,7 +42,7 @@ This guide focuses on structuring your dashboard's shared layout, nested routes 
     *   **Files**:
         *   `dashboard-sidebar.tsx` (exports `DashboardSidebar` component) **[CREATED IN PHASE 1]** - Contains navigation links.
         *   `dashboard-header.tsx` (exports `DashboardHeader` component) **[CREATED IN PHASE 1]** - Contains page title and header controls.
-        *   `dashboard-user-menu.tsx` (exports `DashboardUserMenu` component, used within `DashboardSidebar`) **[CREATED IN PHASE 1]** - Uses the `useAuth` hook to access `user` and `profile` data for displaying the user's name, email, and avatar. Handles logout using `signOutUserAction`.
+        *   `dashboard-user-menu.tsx` (exports `DashboardUserMenu` component, used within `DashboardSidebar`) **[CREATED IN PHASE 1]** - Uses the `useAuth` hook to access `user` and `profile` data for displaying the user's name, email, and avatar. Handles logout using `signOutAction`.
         *   `index.ts` (Barrel file: `export * from './dashboard-sidebar'; export * from './dashboard-header'; export * from './dashboard-user-menu';`) **[CREATED IN PHASE 1]** - Exports the shared components.
 *   **Old Locations (Obsolete after Phase 1):**
     * `src/features/dashboard/components/sidebar.tsx` `[OBSOLETE after PHASE 1]`
@@ -200,7 +200,7 @@ const { isSigningOut, setIsSigningOut } = useDashboardLoading();
 // For optimistic sign-out UI
 const handleSignOut = async () => {
   setIsSigningOut(true); // Immediate UI feedback
-  await signOutUserAction();
+  await signOutAction();
 };
 ```
 

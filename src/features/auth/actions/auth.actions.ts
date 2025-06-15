@@ -367,23 +367,7 @@ export async function signUpNewUser(prevState: AuthActionState, formData: FormDa
   };
 }
 
-/**
- * Server Action to sign out the currently authenticated user.
- * Calls the authentication service and redirects to the login page.
- *
- * @returns {Promise<void>} Void on successful redirect.
- */
-export async function signOutUserAction(): Promise<void> {
-  logger.info('Sign-out action initiated.');
-  const { error } = await authService.signOutWithSupabase();
 
-  if (error) {
-    logger.error("Sign-out action encountered an error from the service.", { serviceError: error.message });
-  } else {
-    logger.info('Sign-out action successful, redirecting to /login.');
-  }
-  redirect('/login');
-}
 
 interface OAuthSignInOptions {
   provider: 'google' | 'azure'; // Add other providers as needed
@@ -404,7 +388,8 @@ interface OAuthSignInOptions {
  * @returns {Promise<AuthActionState | void>} Returns a state object on failure, or void on successful redirect.
  */
 async function handleOAuthSignIn({ provider, options = {} }: OAuthSignInOptions): Promise<AuthActionState | void> {
-  const origin = headers().get("origin");
+  const headersList = await headers();
+  const origin = headersList.get("origin");
   if (!origin) {
     logger.error(`handleOAuthSignIn (${provider}): Could not determine application origin.`);
     return {

@@ -3,14 +3,12 @@
 
 import { useEffect, useState } from "react";
 
-import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Input, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Separator } from "@/components/ui";
+import { Input, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import { signInWithPasswordAction, signInWithGoogleRedirectAction, signInWithAzureRedirectAction } from "@/features/auth/actions";
 import { useToast } from "@/hooks";
-import { PassForgeLogo, GoogleLogo, MicrosoftLogo } from "@/components/icons";
-import { LogIn, Mail, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import * as Sentry from '@sentry/nextjs';
 import { useSearchParams } from "next/navigation";
 import OneTapComponent from './one-tap-component';
@@ -23,47 +21,13 @@ import OneTapComponent from './one-tap-component';
 function SubmitButton({ isPending }: { isPending: boolean }) {
   return (
     <Button type="submit" className="w-full" disabled={isPending}>
-      {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
-      Log In
+      {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      Login
     </Button>
   );
 }
 
-/**
- * A button component for Google Sign-In.
- * @returns {JSX.Element} The Google Sign-In button.
- */
-function GoogleSignInButton() {
-  const { pending } = useFormStatus(); 
-  return (
-    <Button type="submit" variant="outline" className="w-full" disabled={pending}>
-      {pending ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <GoogleLogo className="mr-2 h-5 w-5" />
-      )}
-      Sign in with Google
-    </Button>
-  );
-}
 
-/**
- * A button component for Microsoft Sign-In.
- * @returns {JSX.Element} The Microsoft Sign-In button.
- */
-function MicrosoftSignInButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" variant="outline" className="w-full" disabled={pending}>
-      {pending ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <MicrosoftLogo className="mr-2 h-5 w-5" />
-      )}
-      Sign in with Microsoft
-    </Button>
-  );
-}
 
 
 // List of common user-facing error messages that shouldn't be sent to Sentry as system errors.
@@ -222,119 +186,130 @@ export default function LoginForm(): JSX.Element {
           showButton={false} // Don't show button here, we have it in the form
         />
       )}
-      <div className="w-full animate-fade-in">
-        <Card className="w-full shadow-xl">
+      <div className="flex flex-col gap-6">
+        <Card>
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <PassForgeLogo className="h-12 w-12 text-primary" />
-            </div>
-            <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
-            <CardDescription>Log in to your PassForge account.</CardDescription>
+            <CardTitle className="text-xl">Welcome back</CardTitle>
+            <CardDescription>
+              Login with your Microsoft or Google account
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Social Logins First */}
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <form action={handleGoogleRedirect} className="w-full sm:flex-1">
-                  <GoogleSignInButton />
-                </form>
-                <form action={handleAzureRedirect} className="w-full sm:flex-1">
-                  <MicrosoftSignInButton />
-                </form>
-              </div>
-            </div>
-
-
-
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
-              </div>
-            </div>
-
-            {/* Email/Password Form */}
-            <form action={handlePasswordSubmit} className="space-y-6">
-              {error && (
-                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                  {error}
-                </div>
-              )}
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    className="pl-10 focus:ring-accent focus:placeholder-transparent"
-                    disabled={isPending}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-foreground"
-                  >
-                    Password
-                  </label>
-                  <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot Password?
-                  </Link>
-                </div>
-                <div className="relative">
-                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    required
-                    className="pl-10 pr-10 focus:ring-accent focus:placeholder-transparent"
-                    disabled={isPending}
-                  />
+          <CardContent>
+            <form action={handlePasswordSubmit}>
+              <div className="grid gap-6">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleAzureRedirect}
                     disabled={isPending}
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
+                        <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z" fill="currentColor"/>
+                      </svg>
+                    )}
+                    Login with Microsoft
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleGoogleRedirect}
+                    disabled={isPending}
+                  >
+                    {isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
+                        <path
+                          d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    )}
+                    Login with Google
                   </Button>
                 </div>
+                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+                  <span className="bg-card text-muted-foreground relative z-10 px-2">
+                    Or continue with
+                  </span>
+                </div>
+                <div className="grid gap-6">
+                  {error && (
+                    <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                      {error}
+                    </div>
+                  )}
+                  <div className="grid gap-3">
+                    <label htmlFor="email">Email</label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                      disabled={isPending}
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <div className="flex items-center">
+                      <label htmlFor="password">Password</label>
+                      <Link
+                        href="/forgot-password"
+                        className="ml-auto text-sm underline-offset-4 hover:underline"
+                      >
+                        Forgot your password?
+                      </Link>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        disabled={isPending}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        disabled={isPending}
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </Button>
+                    </div>
+                  </div>
+                  <SubmitButton isPending={isPending} />
+                </div>
+                <div className="text-center text-sm">
+                  Don&apos;t have an account?{" "}
+                  <Link href="/register" className="underline underline-offset-4">
+                    Sign up
+                  </Link>
+                </div>
               </div>
-              <SubmitButton isPending={isPending} />
             </form>
           </CardContent>
-           <CardFooter className="flex-col items-center text-sm pt-4">
-              <p className="text-muted-foreground">
-                Don&apos;t have an account?{' '}
-                <Link href="/register" className="text-primary font-medium hover:underline">
-                  Sign Up
-                </Link>
-              </p>
-          </CardFooter>
         </Card>
-        <footer className="mt-8 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} PassForge. All rights reserved.
-        </footer>
+        <div className="text-muted-foreground text-center text-xs text-balance">
+          By clicking continue, you agree to our{" "}
+          <Link href="#" className="underline underline-offset-4 hover:text-primary">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="#" className="underline underline-offset-4 hover:text-primary">
+            Privacy Policy
+          </Link>
+          .
+        </div>
       </div>
     </>
   );

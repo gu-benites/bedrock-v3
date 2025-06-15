@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks";
 import { useDashboardLoading } from "@/features/ui/providers/loading-provider";
-import { signOutUserAction } from "@/features/auth/actions";
+import { signOutAction } from "@/features/auth/actions/sign-out.action";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -103,9 +103,16 @@ export function DashboardUserMenu() {
     : null;
 
   const handleSignOut = async (formData: FormData) => {
-    setIsSigningOut(true);
-    setShowLogoutConfirm(false);
-    await signOutUserAction();
+    try {
+      setIsSigningOut(true);
+      setShowLogoutConfirm(false);
+      await signOutAction();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Reset loading state if logout fails
+      setIsSigningOut(false);
+      setShowLogoutConfirm(false);
+    }
   };
 
   if (showSkeletons) {

@@ -50,12 +50,12 @@ const data = {
   navAI: [
     {
       title: "Create Recipe",
-      url: "/dashboard/health-concern",
+      url: "/dashboard/create-recipe/health-concern",
       icon: FlaskConicalIcon,
       items: [
         {
           title: "New Recipe",
-          url: "/dashboard/health-concern",
+          url: "/dashboard/create-recipe/health-concern",
         },
         {
           title: "My Recipes",

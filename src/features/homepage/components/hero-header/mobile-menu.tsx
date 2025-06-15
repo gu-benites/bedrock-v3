@@ -8,7 +8,7 @@ import type { NavItem } from '../../types';
 import NavLink from './nav-link';
 import DropdownItem from './dropdown-item'; 
 import { ChevronDownIcon as ChevronDownIconImported } from './icons'; 
-import { signOutUserAction } from '@/features/auth/actions';
+import { signOutAction } from '@/features/auth/actions';
 import { Button, Separator } from '@/components/ui';
 import { Loader2 } from 'lucide-react';
 
@@ -87,7 +87,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <Button variant="default" asChild size="sm" className="w-full my-1" onClick={onClose}>
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
-                <form action={signOutUserAction} className="w-full">
+                <form action={signOutAction} className="w-full">
                     <Button
                     variant="ghost"
                     type="submit"

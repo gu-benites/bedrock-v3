@@ -110,14 +110,14 @@ Form submissions and auth operations are handled by **Server Actions** located i
 - **User Interface (e.g., `src/features/homepage/components/hero-header/hero-header.tsx` or `src/features/dashboard/layout/user-menu.tsx` - Client Components):**
     - A "Sign Out" button is present.
     - This button is visible to authenticated users, determined by the `useAuth` hook.
-- **Form Submission & Server Action (`src/features/auth/actions/auth.actions.ts`):**
-    - Clicking the "Sign Out" button (which is inside a `<form>`) triggers the `signOutUserAction` Server Action.
+- **Form Submission & Server Action (`src/features/auth/actions/sign-out.action.ts`):**
+    - Clicking the "Sign Out" button (which is inside a `<form>`) triggers the `signOutAction` Server Action.
 - **Service Call (`src/features/auth/services/auth.service.ts`):**
     - The Server Action calls the `signOutWithSupabase` service function.
 - **Supabase Interaction (within Service):**
     - `supabase.auth.signOut()` is called to invalidate the user's session.
 - **Redirection:**
-    - Upon successful sign-out, the `signOutUserAction` redirects the user to the `/login` page.
+    - Upon successful sign-out, the `signOutAction` redirects the user to the `/login` page.
 
 ## II. Client-Side Authentication State (`useAuth` Hook) and Server-Side Prefetching
 

@@ -237,7 +237,7 @@ const authState = useMemo(() => ({
 
 Use optimized server actions:
 ```typescript
-import { signInWithPassword, signOutUserAction } from '@/features/auth/actions';
+import { signInWithPassword, signOutAction } from '@/features/auth/actions';
 ```
 
 ### For Profile Updates
@@ -311,7 +311,7 @@ export function DashboardUserMenu() {
 
   const handleSignOut = async () => {
     setIsSigningOut(true); // Optimistic UI
-    await signOutUserAction();
+    await signOutAction();
   };
 
   if (isLoading) {

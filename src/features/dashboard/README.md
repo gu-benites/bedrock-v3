@@ -143,7 +143,7 @@ Enhanced user menu with optimistic UI updates:
 const handleSignOut = async (formData: FormData) => {
   setIsSigningOut(true);  // Immediate UI feedback
   setShowLogoutConfirm(false);
-  await signOutUserAction();
+  await signOutAction();
 };
 ```
 

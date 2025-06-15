@@ -12,7 +12,7 @@ import { MenuIcon, CloseIcon } from './icons';
 import { NAV_ITEMS_DESKTOP, NAV_ITEMS_MOBILE, LOGO_TEXT } from '../../constants';
 import type { NavItem as NavItemType } from '../../types';
 import { useAuth } from '@/features/auth/hooks';
-import { signOutUserAction } from '@/features/auth/actions';
+import { signOutAction } from '@/features/auth/actions';
 import { Button } from '@/components/ui/button';
 import { PassForgeLogo } from '@/components/icons';
 import { UserCircle2 } from 'lucide-react'; // Loader2 removed as skeletons handle loading state
@@ -182,7 +182,7 @@ const HeroHeader: React.FC = () => {
                       {getInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <form action={signOutUserAction}>
+                  <form action={signOutAction}>
                     <Button variant="ghost" type="submit" size="sm">Sign Out</Button>
                   </form>
                   <Button variant="secondary" asChild size="sm">

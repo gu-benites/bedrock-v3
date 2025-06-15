@@ -44,7 +44,7 @@ interface AIStreamingModalProps {
 
 /**
  * AI Streaming Modal with chat-like auto-scroll behavior
- * 
+ *
  * Features:
  * - Modal overlay with backdrop blur
  * - Real-time streaming item display
@@ -53,7 +53,7 @@ interface AIStreamingModalProps {
  * - Smooth animations
  * - Professional enterprise feel
  */
-export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
+const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
   isOpen,
   title,
   description,
@@ -189,8 +189,6 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
 
         <div className="pt-0">
           <div className="relative">
-
-                <div className="relative">
                   {/* Terminal-like code block */}
                   <div className="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
                     {/* Terminal header */}
@@ -276,8 +274,6 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                       </div>
                     </div>
                   </div>
-
-
                 </div>
 
                 {/* "Analyzing more..." indicator in footer */}
@@ -315,6 +311,8 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
                       }
                     </span>
                   </div>
+                </div>
+              </div>
           </div>
         </div>
       </DialogContent>
@@ -322,4 +320,6 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
   );
 };
 
+// Export both named and default
+export { AIStreamingModal };
 export default AIStreamingModal;
