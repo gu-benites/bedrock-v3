@@ -956,6 +956,197 @@ Test the full workflow:
 - [ ] Error handling works (network failures, AI errors)
 - [ ] Modal content is dynamic (not hardcoded)
 
+## Troubleshooting AI Streaming Data Flow Issues
+
+### Critical Data Transformation Problems
+
+#### 1. Relevancy Scores and Cross-References Lost
+**Symptoms**:
+- Frontend displays `undefined` for `relevancy_score` fields
+- Empty arrays for `addresses_cause_ids`/`addresses_symptom_ids`
+- UI shows "0/5" instead of actual relevancy scores (5, 4, 3, 2)
+
+**Root Causes**:
+- Processing partial data instead of final complete data
+- Field mapping losing critical AI response fields
+- Incomplete data transformation pipeline
+
+**Debugging Steps**:
+```javascript
+// ✅ Step 1: Log raw AI response to verify fields exist
+useEffect(() => {
+  if (propertiesPartialData) {
+    console.log('📥 RAW PROPERTIES PARTIAL DATA:', propertiesPartialData);
+  }
+}, [propertiesPartialData]);
+
+useEffect(() => {
+  if (isComplete && finalData) {
+    console.log('✅ RAW PROPERTIES FINAL DATA:', finalData);
+  }
+}, [isComplete, finalData]);
+
+// ✅ Step 2: Verify field mapping during transformation
+const transformedProperties = propertiesPartialData.map((property, index) => {
+  console.log(`🔄 Transforming property ${index}:`, {
+    allOriginalFields: Object.keys(property),
+    relevancy_score: property.relevancy_score,
+    addresses_cause_ids: property.addresses_cause_ids,
+    fullOriginalProperty: property
+  });
+
+  return {
+    // CRITICAL: Preserve ALL AI response fields
+    property_id: property.property_id,
+    relevancy_score: property.relevancy_score, // Keep original
+    relevancy: property.relevancy_score, // Map for compatibility
+    addresses_cause_ids: property.addresses_cause_ids || [],
+    addresses_symptom_ids: property.addresses_symptom_ids || []
+  };
+});
+```
+
+**Solution Pattern**:
+```javascript
+// ✅ Process both partial data (for streaming) AND final data (for completeness)
+useEffect(() => {
+  if (propertiesPartialData && Array.isArray(propertiesPartialData)) {
+    // Transform partial data for progressive display
+    const transformedProperties = propertiesPartialData.map(property => ({
+      // Preserve ALL AI response fields
+      property_id: property.property_id,
+      relevancy_score: property.relevancy_score,
+      addresses_cause_ids: property.addresses_cause_ids || [],
+      addresses_symptom_ids: property.addresses_symptom_ids || []
+    }));
+    updateTherapeuticProperties(transformedProperties);
+  }
+}, [propertiesPartialData]);
+
+// CRITICAL: Also process final data to ensure completeness
+useEffect(() => {
+  if (isComplete && finalData) {
+    let finalProperties = [];
+
+    if (Array.isArray(finalData)) {
+      finalProperties = finalData.map(property => ({ /* complete mapping */ }));
+    } else if (finalData.data?.therapeutic_properties) {
+      finalProperties = finalData.data.therapeutic_properties.map(property => ({ /* complete mapping */ }));
+    }
+
+    if (finalProperties.length > 0) {
+      console.log('🔄 Updating with final complete data:', finalProperties.length);
+      updateTherapeuticProperties(finalProperties);
+    }
+  }
+}, [isComplete, finalData]);
+```
+
+#### 2. Cross-Reference ID Matching Issues
+**Symptoms**:
+- Cross-references show empty arrays despite AI generating correct IDs
+- `getAddressedCauses()` and `getAddressedSymptoms()` return no matches
+
+**Root Causes**:
+- Different IDs sent to AI vs stored in frontend
+- Fallback ID generation creating inconsistent IDs
+- ID mismatch between pipeline steps
+
+**Debugging Steps**:
+```javascript
+// ✅ Verify ID consistency before sending to AI
+const requestData = {
+  feature: 'create-recipe',
+  step: 'therapeutic-properties',
+  data: {
+    selected_causes: selectedCauses.map(cause => ({
+      cause_id: cause.cause_id, // Use stored ID, not generated fallback
+      name_localized: cause.cause_name
+    })),
+    selected_symptoms: selectedSymptoms.map(symptom => ({
+      symptom_id: symptom.symptom_id, // Use stored ID
+      name_localized: symptom.symptom_name
+    }))
+  }
+};
+
+console.log('🚀 CRITICAL DEBUG - IDs being sent to AI:', {
+  selectedCausesStored: selectedCauses.map(c => ({
+    cause_id: c.cause_id,
+    cause_name: c.cause_name
+  })),
+  causesBeingSent: requestData.data.selected_causes,
+  selectedSymptomsStored: selectedSymptoms.map(s => ({
+    symptom_id: s.symptom_id,
+    symptom_name: s.symptom_name
+  })),
+  symptomsBeingSent: requestData.data.selected_symptoms
+});
+```
+
+**Solution Pattern**:
+```javascript
+// ✅ Debug cross-reference matching with comprehensive logging
+const getAddressedCauses = (property) => {
+  console.log('🔍 getAddressedCauses debug:', {
+    property_id: property.property_id,
+    property_name: property.property_name_localized,
+    addresses_cause_ids: property.addresses_cause_ids,
+    addresses_cause_ids_length: property.addresses_cause_ids?.length || 0,
+    selectedCausesCount: selectedCauses.length,
+    selectedCauseIds: selectedCauses.map(c => c.cause_id),
+    selectedCauseNames: selectedCauses.map(c => c.cause_name)
+  });
+
+  if (!property.addresses_cause_ids || property.addresses_cause_ids.length === 0) {
+    console.log('❌ No addresses_cause_ids found for property');
+    return [];
+  }
+
+  const matchedCauses = selectedCauses.filter(cause => {
+    const isMatch = property.addresses_cause_ids?.includes(cause.cause_id);
+    console.log(`🔍 Checking cause match: ${cause.cause_name} (${cause.cause_id}) -> ${isMatch}`);
+    return isMatch;
+  });
+
+  console.log(`✅ Found ${matchedCauses.length} matching causes for property ${property.property_name_localized}`);
+  return matchedCauses;
+};
+```
+
+#### 3. Field Preservation Guidelines
+**Critical Rules**:
+1. **Always preserve original AI field names**: Keep `relevancy_score`, not just `relevancy`
+2. **Map for compatibility**: Provide both original and legacy field names
+3. **Handle arrays safely**: Use `|| []` for array fields to prevent undefined errors
+4. **Process final data**: Don't rely solely on partial streaming data
+
+**Field Mapping Template**:
+```javascript
+const transformProperty = (property) => ({
+  // Core identification
+  property_id: property.property_id,
+
+  // Names (preserve all variants)
+  property_name: property.property_name_localized, // Legacy compatibility
+  property_name_localized: property.property_name_localized, // AI response
+  property_name_english: property.property_name_english, // AI response
+
+  // Descriptions (preserve all variants)
+  description: property.description_contextual_localized, // Legacy compatibility
+  description_localized: property.description_contextual_localized, // AI response
+  description_contextual_localized: property.description_contextual_localized, // AI response
+
+  // Relevancy (preserve both)
+  relevancy: property.relevancy_score, // Legacy compatibility
+  relevancy_score: property.relevancy_score, // AI response
+
+  // Cross-references (safe array handling)
+  addresses_cause_ids: property.addresses_cause_ids || [],
+  addresses_symptom_ids: property.addresses_symptom_ids || []
+});
+```
+
 ## Common Pitfalls and Troubleshooting
 
 ### **🚨 CRITICAL ISSUES FROM REAL IMPLEMENTATION**
@@ -1156,6 +1347,50 @@ useEffect(() => {
 2. Data flows correctly between steps
 3. Error handling works
 4. Navigation works properly
+
+### Data Flow Debugging Checklist
+
+#### Before Implementation
+- [ ] Verify AI response structure matches expected schema
+- [ ] Check that all required fields are included in transformation
+- [ ] Ensure ID consistency throughout the pipeline
+- [ ] Configure appropriate timeouts for analysis complexity
+
+#### During Debugging
+- [ ] Log raw AI response data (`📥 RAW DATA`)
+- [ ] Verify field mapping (`🔄 Transforming`)
+- [ ] Check ID consistency (`🚀 CRITICAL DEBUG`)
+- [ ] Validate cross-reference matching (`🔍 Cross-reference debug`)
+- [ ] Confirm final data processing (`✅ Found X matching`)
+
+#### After Implementation
+- [ ] Test with real AI responses (not mock data)
+- [ ] Verify all fields display correctly in UI
+- [ ] Test cross-reference functionality
+- [ ] Validate error handling and edge cases
+
+#### Debug Log Patterns to Look For
+```javascript
+// ✅ Good - Fields are preserved
+🔄 Transforming property 0: {
+  relevancy_score: 5,
+  addresses_cause_ids: ["a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14"],
+  addresses_symptom_ids: ["b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15"]
+}
+
+// ❌ Bad - Fields are lost
+🔄 Transforming property 0: {
+  relevancy_score: undefined,
+  addresses_cause_ids: [],
+  addresses_symptom_ids: []
+}
+
+// ✅ Good - IDs match
+🔍 Checking cause match: Dietary changes (a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14) -> true
+
+// ❌ Bad - IDs don't match
+🔍 Checking cause match: Dietary changes (a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14) -> false
+```
 
 ## Validation Checklist
 

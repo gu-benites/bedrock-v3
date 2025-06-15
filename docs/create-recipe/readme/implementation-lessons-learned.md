@@ -66,12 +66,166 @@ This document captures critical lessons learned from multiple AI streaming imple
 **Time Lost**: 45+ minutes debugging why only 1 item showed instead of 5
 **Fix**: Update data type configuration to extract individual oils from nested structure
 
+### **9. Data Transformation Field Loss (CRITICAL)**
+**What Happened**: AI response contained correct `relevancy_score` and `addresses_cause_ids`/`addresses_symptom_ids` fields, but frontend displayed `undefined` values and empty arrays
+**Impact**: Relevancy scores showed 0/5 instead of actual values (5, 4, 3), cross-references not displayed in property cards
+**Root Cause**: Properties processed from `partialData` during streaming instead of `finalData` at completion, losing critical fields
+**Time Lost**: 2+ hours debugging data transformation pipeline
+**Fix**: Process both partial data (for streaming) AND final data (for completeness), preserve all AI response fields
+
+### **10. ID Consistency Across Pipeline (MAJOR)**
+**What Happened**: IDs sent to AI didn't match stored IDs due to fallback generation (`cause_${Date.now()}_${Math.random()}`)
+**Impact**: AI couldn't reference correct causes/symptoms in cross-reference fields, breaking relationship mapping
+**Root Cause**: Inconsistent ID handling between data storage and AI request preparation
+**Time Lost**: 1+ hour debugging why cross-references were empty
+**Fix**: Ensure same IDs used throughout entire pipeline, verify ID consistency with comprehensive logging
+
 ## 📊 **Total Time Impact**
-- **Development Time**: 12+ hours of debugging across multiple implementations instead of 2-3 hours
-- **Trial-and-Error Cycles**: 8+ major debugging sessions across therapeutic properties and suggested oils
+- **Development Time**: 15+ hours of debugging across multiple implementations instead of 2-3 hours
+- **Trial-and-Error Cycles**: 10+ major debugging sessions across therapeutic properties, suggested oils, and data transformation
 - **Documentation Gaps**: Multiple critical patterns not documented initially
 - **Knowledge Transfer**: Lessons learned through painful trial-and-error process
 - **Pattern Refinement**: Multiple iterations to establish working patterns
+- **Data Flow Debugging**: 3+ hours debugging field preservation and ID consistency issues
+
+## 🔍 **Effective Debugging Patterns for AI Streaming Data Flow**
+
+### **Raw AI Response Logging**
+```javascript
+// ✅ CRITICAL - Log raw streaming data to see exactly what AI returns
+useEffect(() => {
+  if (propertiesPartialData && Array.isArray(propertiesPartialData)) {
+    console.log('📥 RAW PROPERTIES PARTIAL DATA:', propertiesPartialData);
+    // Process partial data...
+  }
+}, [propertiesPartialData]);
+
+useEffect(() => {
+  if (isComplete && finalData) {
+    console.log('✅ RAW PROPERTIES FINAL DATA:', finalData);
+    // Process final data...
+  }
+}, [isComplete, finalData]);
+```
+
+### **Field Mapping Analysis**
+```javascript
+// ✅ CRITICAL - Show ALL fields in AI response to identify missing mappings
+const transformedProperties = propertiesPartialData.map((property, index) => {
+  console.log(`🔄 Transforming property ${index}:`, {
+    original: property,
+    allOriginalFields: Object.keys(property),
+    fullOriginalProperty: property,
+    // Specific field checks
+    relevancy_score: property.relevancy_score,
+    addresses_cause_ids: property.addresses_cause_ids,
+    addresses_symptom_ids: property.addresses_symptom_ids
+  });
+
+  return {
+    // Preserve ALL AI response fields
+    property_id: property.property_id,
+    relevancy_score: property.relevancy_score, // Keep original
+    relevancy: property.relevancy_score, // Map for compatibility
+    addresses_cause_ids: property.addresses_cause_ids || [],
+    addresses_symptom_ids: property.addresses_symptom_ids || []
+  };
+});
+```
+
+### **ID Consistency Verification**
+```javascript
+// ✅ CRITICAL - Compare IDs being sent to AI vs stored IDs
+const requestData = {
+  feature: 'create-recipe',
+  step: 'therapeutic-properties',
+  data: {
+    selected_causes: selectedCauses.map(cause => ({
+      cause_id: cause.cause_id, // Use stored ID, not generated fallback
+      name_localized: cause.cause_name
+    }))
+  }
+};
+
+console.log('🚀 CRITICAL DEBUG - IDs being sent to AI:', {
+  selectedCausesStored: selectedCauses.map(c => ({
+    cause_id: c.cause_id,
+    cause_name: c.cause_name
+  })),
+  causesBeingSent: requestData.data.selected_causes.map(c => ({
+    cause_id: c.cause_id,
+    name_localized: c.name_localized
+  }))
+});
+```
+
+### **Cross-Reference Matching Validation**
+```javascript
+// ✅ CRITICAL - Debug ID matching for cross-references
+const getAddressedCauses = (property) => {
+  console.log('🔍 getAddressedCauses debug:', {
+    property_id: property.property_id,
+    property_name: property.property_name_localized,
+    addresses_cause_ids: property.addresses_cause_ids,
+    addresses_cause_ids_length: property.addresses_cause_ids?.length || 0,
+    selectedCausesCount: selectedCauses.length,
+    selectedCauseIds: selectedCauses.map(c => c.cause_id),
+    selectedCauseNames: selectedCauses.map(c => c.cause_name)
+  });
+
+  if (!property.addresses_cause_ids || property.addresses_cause_ids.length === 0) {
+    console.log('❌ No addresses_cause_ids found for property');
+    return [];
+  }
+
+  const matchedCauses = selectedCauses.filter(cause => {
+    const isMatch = property.addresses_cause_ids?.includes(cause.cause_id);
+    console.log(`🔍 Checking cause match: ${cause.cause_name} (${cause.cause_id}) -> ${isMatch}`);
+    return isMatch;
+  });
+
+  console.log(`✅ Found ${matchedCauses.length} matching causes for property ${property.property_name_localized}`);
+  return matchedCauses;
+};
+```
+
+### **Dual Data Processing Pattern**
+```javascript
+// ✅ CRITICAL - Process both partial data (for streaming) AND final data (for completeness)
+useEffect(() => {
+  if (propertiesPartialData && Array.isArray(propertiesPartialData)) {
+    // Transform partial data for progressive display
+    const transformedProperties = propertiesPartialData.map(property => ({
+      // Preserve ALL AI response fields
+      property_id: property.property_id,
+      property_name: property.property_name_localized,
+      relevancy_score: property.relevancy_score, // Keep original
+      relevancy: property.relevancy_score, // Map for compatibility
+      addresses_cause_ids: property.addresses_cause_ids || [],
+      addresses_symptom_ids: property.addresses_symptom_ids || []
+    }));
+    updateTherapeuticProperties(transformedProperties);
+  }
+}, [propertiesPartialData]);
+
+// CRITICAL: Also process final data to ensure completeness
+useEffect(() => {
+  if (isComplete && finalData) {
+    let finalProperties = [];
+
+    if (Array.isArray(finalData)) {
+      finalProperties = finalData.map(property => ({ /* complete mapping */ }));
+    } else if (finalData.data?.therapeutic_properties) {
+      finalProperties = finalData.data.therapeutic_properties.map(property => ({ /* complete mapping */ }));
+    }
+
+    if (finalProperties.length > 0) {
+      console.log('🔄 Updating properties with final complete data:', finalProperties.length, 'properties');
+      updateTherapeuticProperties(finalProperties);
+    }
+  }
+}, [isComplete, finalData]);
+```
 
 ## ✅ **Successful Implementation Patterns**
 

@@ -335,6 +335,145 @@ data: {"type": "completion", "data": "Analysis complete.", "timestamp": "2024-12
 - **AI Service Health**: Connection to OpenAI services
 - **Prompt Availability**: Validation of prompt configurations
 
+## Debugging Best Practices for Data Transformation Issues
+
+### Common Data Flow Problems
+
+#### 1. Relevancy Scores and Cross-References Lost
+**Symptoms**: Frontend displays `undefined` for `relevancy_score`, empty arrays for `addresses_cause_ids`/`addresses_symptom_ids`
+**Root Cause**: Processing partial data instead of final complete data, field mapping issues
+
+**Debugging Pattern**:
+```javascript
+// ✅ Log raw AI response to verify fields exist
+useEffect(() => {
+  if (propertiesPartialData) {
+    console.log('📥 RAW PROPERTIES PARTIAL DATA:', propertiesPartialData);
+  }
+}, [propertiesPartialData]);
+
+useEffect(() => {
+  if (isComplete && finalData) {
+    console.log('✅ RAW PROPERTIES FINAL DATA:', finalData);
+  }
+}, [isComplete, finalData]);
+
+// ✅ Verify field mapping during transformation
+const transformedProperties = propertiesPartialData.map((property, index) => {
+  console.log(`🔄 Transforming property ${index}:`, {
+    allOriginalFields: Object.keys(property),
+    relevancy_score: property.relevancy_score,
+    addresses_cause_ids: property.addresses_cause_ids,
+    fullOriginalProperty: property
+  });
+
+  return {
+    // Preserve ALL AI response fields
+    relevancy_score: property.relevancy_score, // Keep original
+    relevancy: property.relevancy_score, // Map for compatibility
+    addresses_cause_ids: property.addresses_cause_ids || [],
+    addresses_symptom_ids: property.addresses_symptom_ids || []
+  };
+});
+```
+
+#### 2. ID Consistency Issues
+**Symptoms**: Cross-references show empty arrays despite AI generating correct IDs
+**Root Cause**: Different IDs sent to AI vs stored in frontend
+
+**Debugging Pattern**:
+```javascript
+// ✅ Verify ID consistency before sending to AI
+const requestData = {
+  feature: 'create-recipe',
+  step: 'therapeutic-properties',
+  data: {
+    selected_causes: selectedCauses.map(cause => ({
+      cause_id: cause.cause_id, // Use stored ID, not generated fallback
+      name_localized: cause.cause_name
+    }))
+  }
+};
+
+console.log('🚀 CRITICAL DEBUG - IDs being sent to AI:', {
+  selectedCausesStored: selectedCauses.map(c => ({
+    cause_id: c.cause_id,
+    cause_name: c.cause_name
+  })),
+  causesBeingSent: requestData.data.selected_causes
+});
+
+// ✅ Debug cross-reference matching
+const getAddressedCauses = (property) => {
+  console.log('🔍 Cross-reference debug:', {
+    property_addresses_cause_ids: property.addresses_cause_ids,
+    stored_cause_ids: selectedCauses.map(c => c.cause_id)
+  });
+
+  const matches = selectedCauses.filter(cause =>
+    property.addresses_cause_ids?.includes(cause.cause_id)
+  );
+
+  console.log(`✅ Found ${matches.length} matching causes`);
+  return matches;
+};
+```
+
+#### 3. Dual Data Processing Pattern
+**Problem**: Relying only on partial data loses complete field information
+**Solution**: Process both partial data (for streaming) AND final data (for completeness)
+
+```javascript
+// ✅ Process partial data for progressive display
+useEffect(() => {
+  if (propertiesPartialData && Array.isArray(propertiesPartialData)) {
+    const transformedProperties = propertiesPartialData.map(property => ({
+      // Transform with all fields preserved
+    }));
+    updateTherapeuticProperties(transformedProperties);
+  }
+}, [propertiesPartialData]);
+
+// ✅ CRITICAL: Also process final data to ensure completeness
+useEffect(() => {
+  if (isComplete && finalData) {
+    let finalProperties = [];
+
+    if (Array.isArray(finalData)) {
+      finalProperties = finalData.map(property => ({ /* complete mapping */ }));
+    } else if (finalData.data?.therapeutic_properties) {
+      finalProperties = finalData.data.therapeutic_properties.map(property => ({ /* complete mapping */ }));
+    }
+
+    if (finalProperties.length > 0) {
+      console.log('🔄 Updating with final complete data:', finalProperties.length);
+      updateTherapeuticProperties(finalProperties);
+    }
+  }
+}, [isComplete, finalData]);
+```
+
+### Debugging Checklist
+
+#### Before Implementation
+- [ ] Verify AI response structure matches expected schema
+- [ ] Check that all required fields are included in transformation
+- [ ] Ensure ID consistency throughout the pipeline
+- [ ] Configure appropriate timeouts for analysis complexity
+
+#### During Debugging
+- [ ] Log raw AI response data (`📥 RAW DATA`)
+- [ ] Verify field mapping (`🔄 Transforming`)
+- [ ] Check ID consistency (`🚀 CRITICAL DEBUG`)
+- [ ] Validate cross-reference matching (`🔍 Cross-reference debug`)
+- [ ] Confirm final data processing (`✅ Found X matching`)
+
+#### After Implementation
+- [ ] Test with real AI responses (not mock data)
+- [ ] Verify all fields display correctly in UI
+- [ ] Test cross-reference functionality
+- [ ] Validate error handling and edge cases
+
 ## Testing
 
 ### Test Endpoints

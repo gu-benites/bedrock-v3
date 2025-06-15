@@ -73,7 +73,7 @@ export default async function DashboardLayout({
     <DashboardLoadingProvider>
       <SidebarProvider initialVariant="inset" initialCollapsible="offcanvas">
         <DashboardAppSidebar />
-        <SidebarInset>
+        <SidebarInset className="bg-background">
           <DashboardHeader />
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col gap-2">

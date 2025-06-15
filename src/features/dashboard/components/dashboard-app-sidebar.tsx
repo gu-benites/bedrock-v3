@@ -83,10 +83,9 @@ const data = {
   documents: [],
 }
 
-export function DashboardAppSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
-  // variant and collapsible are now controlled by SidebarProvider through context
+export function DashboardAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar className={className} {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
