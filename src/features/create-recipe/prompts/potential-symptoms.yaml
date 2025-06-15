@@ -63,7 +63,8 @@ template: |
   - Focus on listing potential and commonly associated symptoms; this is not a diagnostic tool.
   - Ensure all user-facing text is accurately translated according to the user_language: {{user_language}}
   - Handle user data with sensitivity and prioritize the direct link between the health concern and selected causes.
-  - Generate unique symptom_ids for each symptom.
+  - Generate unique symptom_ids for each symptom using standard UUID format (e.g., "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14")
+  - These symptom_ids must be preserved and used consistently throughout the entire workflow
   - Include proper meta information with current timestamp and success status.
   - Echo back the input data in the echo section for verification.
 
@@ -112,7 +113,7 @@ schema:
               properties:
                 symptom_id:
                   type: "string"
-                  description: "Unique identifier for the symptom"
+                  description: "Unique UUID identifier for the symptom (e.g., 'a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14')"
                 name_localized:
                   type: "string"
                   description: "Localized name of the symptom"

@@ -52,6 +52,7 @@ export const DATA_TRANSFORMATIONS = {
     from: 'recipe-wizard',
     to: 'create-recipe',
     transform: (cause: any) => ({
+      cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Preserve AI-generated ID
       cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
       cause_suggestion: cause.suggestion_localized || '',
       explanation: cause.explanation_localized || ''
@@ -63,6 +64,7 @@ export const DATA_TRANSFORMATIONS = {
     from: 'recipe-wizard',
     to: 'create-recipe',
     transform: (symptom: any) => ({
+      symptom_id: symptom.symptom_id || `symptom_${Date.now()}_${Math.random()}`, // Preserve AI-generated ID
       symptom_name: symptom.name_localized || symptom.symptom_id || 'Unknown symptom',
       symptom_suggestion: symptom.suggestion_localized || '',
       explanation: symptom.explanation_localized || ''

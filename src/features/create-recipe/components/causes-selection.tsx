@@ -61,9 +61,16 @@ export function CausesSelection() {
    * Initialize selected causes from store
    */
   useEffect(() => {
+    console.log('🔄 Initializing selected causes from store:', {
+      selectedCausesCount: selectedCauses.length,
+      selectedCauses: selectedCauses.map(c => ({ id: c.cause_id, name: c.cause_name }))
+    });
+
     if (selectedCauses.length > 0) {
-      const ids = new Set(selectedCauses.map(cause => cause.cause_name));
+      // CRITICAL FIX: Use cause_id instead of cause_name for selection tracking
+      const ids = new Set(selectedCauses.map(cause => cause.cause_id));
       setSelectedCauseIds(ids);
+      console.log('✅ Initialized selected cause IDs:', Array.from(ids));
     }
   }, [selectedCauses]);
 
@@ -114,11 +121,24 @@ export function CausesSelection() {
       console.log('📥 Received streaming symptoms:', partialData.length, 'total');
 
       // Transform to match PotentialSymptom interface
-      const transformedSymptoms: PotentialSymptom[] = partialData.map((symptom: any) => ({
-        symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
-        symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
-        explanation: symptom.explanation_localized || symptom.explanation || ''
-      }));
+      // CRITICAL: Preserve AI-generated symptom_id from the response
+      const transformedSymptoms: PotentialSymptom[] = partialData.map((symptom: any, index: number) => {
+        const symptomId = symptom.symptom_id || `symptom_fallback_${Date.now()}_${index}`;
+
+        // Debug logging for data transformation
+        console.log(`🔄 Transforming symptom ${index}:`, {
+          original: symptom,
+          symptomId: symptomId,
+          hasOriginalId: !!symptom.symptom_id
+        });
+
+        return {
+          symptom_id: symptomId, // Fallback only if AI didn't provide ID
+          symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+          symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+          explanation: symptom.explanation_localized || symptom.explanation || ''
+        };
+      });
 
       setPotentialSymptoms(transformedSymptoms);
 
@@ -144,11 +164,23 @@ export function CausesSelection() {
 
       // Process final data if needed (fallback)
       if (Array.isArray(symptomsFinalData)) {
-        const transformedSymptoms: PotentialSymptom[] = symptomsFinalData.map((symptom: any) => ({
-          symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
-          symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
-          explanation: symptom.explanation_localized || symptom.explanation || ''
-        }));
+        const transformedSymptoms: PotentialSymptom[] = symptomsFinalData.map((symptom: any, index: number) => {
+          const symptomId = symptom.symptom_id || `symptom_final_fallback_${Date.now()}_${index}`;
+
+          // Debug logging for final data transformation
+          console.log(`🔄 Final transform symptom ${index}:`, {
+            original: symptom,
+            symptomId: symptomId,
+            hasOriginalId: !!symptom.symptom_id
+          });
+
+          return {
+            symptom_id: symptomId, // Fallback only if AI didn't provide ID
+            symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+            symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+            explanation: symptom.explanation_localized || symptom.explanation || ''
+          };
+        });
 
         if (transformedSymptoms.length > 0) {
           setPotentialSymptoms(transformedSymptoms);
@@ -166,27 +198,52 @@ export function CausesSelection() {
    * Handle cause selection toggle
    */
   const handleCauseToggle = (cause: PotentialCause) => {
-    const newSelectedIds = new Set(selectedCauseIds);
-    const causeId = cause.cause_name;
+    const causeId = cause.cause_id;
 
-    if (newSelectedIds.has(causeId)) {
+    // Debug logging and safety checks
+    console.log('🔄 Cause toggle clicked:', {
+      causeName: cause.cause_name,
+      causeId: causeId,
+      isIdValid: !!causeId,
+      currentSelectedIds: Array.from(selectedCauseIds),
+      totalCauses: potentialCauses.length
+    });
+
+    // Safety check: ensure cause has a valid ID
+    if (!causeId) {
+      console.error('❌ Cause missing ID:', cause);
+      setError('Invalid cause data. Please refresh and try again.');
+      return;
+    }
+
+    const newSelectedIds = new Set(selectedCauseIds);
+    const isCurrentlySelected = newSelectedIds.has(causeId);
+
+    if (isCurrentlySelected) {
+      // Remove from selection
       newSelectedIds.delete(causeId);
+      console.log('➖ Removing cause from selection:', causeId);
     } else {
-      if (newSelectedIds.size >= 10) {
-        setError('You can select up to 10 causes maximum.');
-        return;
-      }
+      // Add to selection - allow selecting all available causes
       newSelectedIds.add(causeId);
+      console.log('➕ Adding cause to selection:', causeId);
       clearError();
     }
+
+    console.log('📊 Selection state after toggle:', {
+      newSelectedCount: newSelectedIds.size,
+      newSelectedIds: Array.from(newSelectedIds)
+    });
 
     setSelectedCauseIds(newSelectedIds);
 
     // Update store with selected causes
     const newSelectedCauses = potentialCauses.filter(c =>
-      newSelectedIds.has(c.cause_name)
+      newSelectedIds.has(c.cause_id) // Use cause_id for filtering
     );
     updateSelectedCauses(newSelectedCauses);
+
+    console.log('✅ Updated selected causes in store:', newSelectedCauses.length);
 
     // Mark step as completed if at least one cause is selected
     if (newSelectedCauses.length > 0) {
@@ -230,11 +287,11 @@ export function CausesSelection() {
           health_concern: healthConcern?.healthConcern || '',
           demographics: {
             gender: demographics?.gender,
-            age_category: demographics?.ageCategory,
-            age_specific: demographics?.specificAge?.toString()
+            age_category: demographics?.ageCategory,  // ✅ Map ageCategory → age_category for template variables
+            age_specific: demographics?.specificAge?.toString()  // ✅ Map specificAge → age_specific for template variables
           },
           selected_causes: selectedCauses.map(cause => ({
-            cause_id: `cause_${Date.now()}_${Math.random()}`,
+            cause_id: cause.cause_id, // Use the AI-generated ID from the stored cause
             name_localized: cause.cause_name,
             suggestion_localized: cause.cause_suggestion,
             explanation_localized: cause.explanation
@@ -270,7 +327,7 @@ export function CausesSelection() {
     loadPotentialCauses();
   };
 
-  const isFormValid = selectedCauseIds.size > 0 && selectedCauseIds.size <= 10;
+  const isFormValid = selectedCauseIds.size > 0 && selectedCauseIds.size <= potentialCauses.length;
 
   return (
     <div data-testid="causes-selection" className="space-y-6">
@@ -354,24 +411,30 @@ export function CausesSelection() {
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              Select 1-10 causes that might apply to you
+              Select 1-{potentialCauses.length} causes that might apply to you
             </p>
             <span className={cn(
               "text-sm font-medium",
-              selectedCauseIds.size > 10 ? "text-destructive" : "text-foreground"
+              selectedCauseIds.size > potentialCauses.length ? "text-destructive" : "text-foreground"
             )}>
-              {selectedCauseIds.size}/10 selected
+              {selectedCauseIds.size}/{potentialCauses.length} selected
             </span>
           </div>
 
           {/* Causes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {potentialCauses.map((cause, index) => {
-              const isSelected = selectedCauseIds.has(cause.cause_name);
+              const isSelected = selectedCauseIds.has(cause.cause_id); // Use cause_id for selection check
+
+              // Debug logging for visual state
+              if (index === 0) { // Only log for first item to avoid spam
+                console.log(`🎨 Rendering causes - Selected IDs:`, Array.from(selectedCauseIds));
+                console.log(`🎨 First cause ID: ${cause.cause_id}, isSelected: ${isSelected}`);
+              }
 
               return (
                 <div
-                  key={`${cause.cause_name}-${index}`}
+                  key={`${cause.cause_id}-${index}`} // Use cause_id for unique keys
                   className={cn(
                     "border rounded-lg p-4 cursor-pointer transition-all duration-200",
                     "hover:shadow-md",

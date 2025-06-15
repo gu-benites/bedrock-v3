@@ -218,7 +218,9 @@ export function DemographicsForm() {
       console.log('✅ Complete items found:', completeItems.length, 'of', partialData.length);
 
       // Transform recipe-wizard format to create-recipe format
+      // CRITICAL: Preserve AI-generated cause_id from the response
       const transformedCauses = completeItems.map((cause: any, index: number) => ({
+        cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
         cause_name: cause.name_localized,
         cause_suggestion: cause.suggestion_localized,
         explanation: cause.explanation_localized
@@ -247,7 +249,9 @@ export function DemographicsForm() {
       }
 
       // Transform to create-recipe format
+      // CRITICAL: Preserve AI-generated cause_id from the response
       const transformedCauses = causes.map((cause: any) => ({
+        cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
         cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
         cause_suggestion: cause.suggestion_localized || '',
         explanation: cause.explanation_localized || ''

@@ -298,15 +298,16 @@ describe('Step Mapping Configuration', () => {
 
     it('should transform data correctly', () => {
       const testData = {
-        cause_id: 'test',
+        cause_id: 'test-cause-id',
         name_localized: 'Test Cause',
         suggestion_localized: 'Test suggestion',
         explanation_localized: 'Test explanation'
       };
 
       const transformed = DATA_TRANSFORMATIONS.POTENTIAL_CAUSES.transform(testData);
-      
+
       expect(transformed).toEqual({
+        cause_id: 'test-cause-id', // Should preserve AI-generated ID
         cause_name: 'Test Cause',
         cause_suggestion: 'Test suggestion',
         explanation: 'Test explanation'

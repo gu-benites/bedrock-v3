@@ -66,7 +66,10 @@ template: |
 
   Provide the result strictly in the following JSON format. **JSON key names must be in English.** The values for `name_localized`, `suggestion_localized`, `explanation_localized`, and any advisory notes must be in the language specified by the user's language preference.
 
-  **Important:** Include proper metadata, echo the user's input, and provide 5-8 potential causes with localized content.
+  **Important:**
+  - Include proper metadata, echo the user's input, and provide 5-8 potential causes with localized content
+  - Generate unique cause_ids for each cause using standard UUID format (e.g., "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14")
+  - These cause_ids must be preserved and used consistently throughout the entire workflow
 
 # JSON Schema for Response Validation
 schema:
@@ -113,7 +116,7 @@ schema:
               properties:
                 cause_id:
                   type: "string"
-                  description: "Unique identifier for the potential cause."
+                  description: "Unique UUID identifier for the potential cause (e.g., 'a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14')."
                 name_localized:
                   type: "string"
                   description: "Localized name of the cause."
@@ -167,11 +170,11 @@ example_response:
     message: "Successfully retrieved potential causes."
   data:
     potential_causes:
-      - cause_id: "cause_chronic_stress"
+      - cause_id: "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14"
         name_localized: "Chronic Stress Response"
         suggestion_localized: "Prolonged stress affecting your body's natural balance"
         explanation_localized: "Chronic stress can lead to elevated cortisol levels and persistent tension, contributing to various health concerns."
-      - cause_id: "cause_sleep_disruption"
+      - cause_id: "b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15"
         name_localized: "Sleep Pattern Disruption"
         suggestion_localized: "Irregular sleep patterns affecting emotional regulation"
         explanation_localized: "Poor sleep quality can affect neurotransmitter balance and stress hormone regulation."

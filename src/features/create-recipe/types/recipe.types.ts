@@ -48,6 +48,7 @@ export interface DemographicsData {
  * Step 3: Potential cause selection data
  */
 export interface PotentialCause {
+  cause_id: string; // AI-generated unique ID
   cause_name: string;
   cause_suggestion: string;
   explanation: string;
@@ -57,6 +58,7 @@ export interface PotentialCause {
  * Step 4: Symptom selection data
  */
 export interface PotentialSymptom {
+  symptom_id: string; // AI-generated unique ID
   symptom_name: string;
   symptom_suggestion: string;
   explanation: string;
@@ -68,11 +70,18 @@ export interface PotentialSymptom {
 export interface TherapeuticProperty {
   property_id: string;
   property_name: string;
-  property_name_in_english: string;
+  property_name_localized?: string;
+  property_name_english?: string;
+  property_name_in_english?: string; // Legacy field
   description: string;
-  causes_addressed: string;
-  symptoms_addressed: string;
-  relevancy: number;
+  description_localized?: string;
+  description_contextual_localized?: string; // AI response field
+  causes_addressed?: string; // Legacy field
+  symptoms_addressed?: string; // Legacy field
+  addresses_cause_ids?: string[]; // New field from AI response
+  addresses_symptom_ids?: string[]; // New field from AI response
+  relevancy: number; // Legacy field for compatibility
+  relevancy_score?: number; // AI response field
 }
 
 /**

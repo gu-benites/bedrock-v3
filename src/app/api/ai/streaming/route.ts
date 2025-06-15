@@ -76,14 +76,44 @@ function prepareTemplateVariables(feature: string, data: any): Record<string, an
 
   // For create-recipe feature - properly structure template variables
   if (feature === 'create-recipe') {
-    return {
+    const demographics = data.demographics || {};
+
+    const templateVars = {
+      // Health concern
+      healthConcern: data.health_concern || '',
       health_concern: data.health_concern || '',
-      demographics: data.demographics || {},
+
+      // Demographics - flatten for easier template access
+      gender: demographics.gender || '',
+      ageCategory: demographics.age_category || '',
+      age_category: demographics.age_category || '',
+      specificAge: demographics.age_specific || '',
+      age_specific: demographics.age_specific || '',
+      language: data.user_language || 'PT_BR',
+      user_language: data.user_language || 'PT_BR',
+
+      // Nested demographics object for complex templates
+      demographics: demographics,
+
+      // Selected data
       selected_causes: data.selected_causes || [],
       selected_symptoms: data.selected_symptoms || [],
-      target_property: data.target_property || {},
-      user_language: data.user_language || 'PT_BR'
+      target_property: data.target_property || {}
     };
+
+    // Debug logging for template variable population
+    console.log('[Template Variables] create-recipe feature:', {
+      inputDemographics: demographics,
+      outputVariables: {
+        gender: templateVars.gender,
+        ageCategory: templateVars.ageCategory,
+        age_category: templateVars.age_category,
+        specificAge: templateVars.specificAge,
+        age_specific: templateVars.age_specific
+      }
+    });
+
+    return templateVars;
   }
 
   // Default: return data as-is for other features
@@ -437,7 +467,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       setTimeout(() => reject(new Error('Request timeout')), API_TIMEOUT);
     });
 
-    const agentPromise = run(agent, prompt, { stream: true });
+    // Fix: Don't pass prompt again - it's already in agent.instructions
+    // This was causing system/user message duplication
+    const agentPromise = run(agent, '', { stream: true });
     console.log('[Streaming API] Agent promise created, waiting for result');
 
     let result: any;

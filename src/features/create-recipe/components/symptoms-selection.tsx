@@ -75,9 +75,16 @@ export function SymptomsSelection() {
    * Initialize selected symptoms from store
    */
   useEffect(() => {
+    console.log('🔄 Initializing selected symptoms from store:', {
+      selectedSymptomsCount: selectedSymptoms.length,
+      selectedSymptoms: selectedSymptoms.map(s => ({ id: s.symptom_id, name: s.symptom_name }))
+    });
+
     if (selectedSymptoms.length > 0) {
-      const ids = new Set(selectedSymptoms.map(symptom => symptom.symptom_name));
+      // CRITICAL FIX: Use symptom_id instead of symptom_name for selection tracking
+      const ids = new Set(selectedSymptoms.map(symptom => symptom.symptom_id));
       setSelectedSymptomIds(ids);
+      console.log('✅ Initialized selected symptom IDs:', Array.from(ids));
     }
   }, [selectedSymptoms]);
 
@@ -101,11 +108,24 @@ export function SymptomsSelection() {
       console.log('✅ Complete symptoms found:', completeItems.length, 'of', partialData.length);
 
       // Transform to match PotentialSymptom interface
-      const transformedSymptoms: PotentialSymptom[] = completeItems.map((symptom: any) => ({
-        symptom_name: symptom.name_localized,
-        symptom_suggestion: symptom.suggestion_localized,
-        explanation: symptom.explanation_localized
-      }));
+      // CRITICAL: Preserve AI-generated symptom_id from the response
+      const transformedSymptoms: PotentialSymptom[] = completeItems.map((symptom: any, index: number) => {
+        const symptomId = symptom.symptom_id || `symptom_streaming_fallback_${Date.now()}_${index}`;
+
+        // Debug logging for data transformation
+        console.log(`🔄 Transforming streaming symptom ${index}:`, {
+          original: symptom,
+          symptomId: symptomId,
+          hasOriginalId: !!symptom.symptom_id
+        });
+
+        return {
+          symptom_id: symptomId, // Preserve AI-generated ID
+          symptom_name: symptom.name_localized,
+          symptom_suggestion: symptom.suggestion_localized,
+          explanation: symptom.explanation_localized
+        };
+      });
 
       setPotentialSymptoms(transformedSymptoms);
 
@@ -135,11 +155,23 @@ export function SymptomsSelection() {
 
       // Process final data if needed (fallback)
       if (Array.isArray(finalData)) {
-        const transformedSymptoms: PotentialSymptom[] = finalData.map((symptom: any) => ({
-          symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
-          symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
-          explanation: symptom.explanation_localized || symptom.explanation || ''
-        }));
+        const transformedSymptoms: PotentialSymptom[] = finalData.map((symptom: any, index: number) => {
+          const symptomId = symptom.symptom_id || `symptom_final_fallback_${Date.now()}_${index}`;
+
+          // Debug logging for final data transformation
+          console.log(`🔄 Final transform symptom ${index}:`, {
+            original: symptom,
+            symptomId: symptomId,
+            hasOriginalId: !!symptom.symptom_id
+          });
+
+          return {
+            symptom_id: symptomId, // Preserve AI-generated ID
+            symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+            symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+            explanation: symptom.explanation_localized || symptom.explanation || ''
+          };
+        });
 
         if (transformedSymptoms.length > 0) {
           setPotentialSymptoms(transformedSymptoms);
@@ -148,11 +180,23 @@ export function SymptomsSelection() {
         const data = finalData as any;
         if (data.data?.potential_symptoms && Array.isArray(data.data.potential_symptoms)) {
           const symptoms = data.data.potential_symptoms;
-          const transformedSymptoms: PotentialSymptom[] = symptoms.map((symptom: any) => ({
-            symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
-            symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
-            explanation: symptom.explanation_localized || symptom.explanation || ''
-          }));
+          const transformedSymptoms: PotentialSymptom[] = symptoms.map((symptom: any, index: number) => {
+            const symptomId = symptom.symptom_id || `symptom_nested_fallback_${Date.now()}_${index}`;
+
+            // Debug logging for nested data transformation
+            console.log(`🔄 Nested transform symptom ${index}:`, {
+              original: symptom,
+              symptomId: symptomId,
+              hasOriginalId: !!symptom.symptom_id
+            });
+
+            return {
+              symptom_id: symptomId, // Preserve AI-generated ID
+              symptom_name: symptom.name_localized || symptom.symptom_name || 'Unknown symptom',
+              symptom_suggestion: symptom.suggestion_localized || symptom.symptom_suggestion || '',
+              explanation: symptom.explanation_localized || symptom.explanation || ''
+            };
+          });
 
           if (transformedSymptoms.length > 0) {
             setPotentialSymptoms(transformedSymptoms);
@@ -168,42 +212,134 @@ export function SymptomsSelection() {
   useEffect(() => {
     if (propertiesPartialData && Array.isArray(propertiesPartialData) && propertiesPartialData.length > 0) {
       console.log('📥 Received streaming properties:', propertiesPartialData.length, 'total');
+      console.log('📥 RAW PROPERTIES PARTIAL DATA:', propertiesPartialData);
 
       // Transform to match TherapeuticProperty interface
-      const transformedProperties: TherapeuticProperty[] = propertiesPartialData.map((property: any) => ({
-        property_id: property.property_id,
-        property_name: property.property_name_localized,
-        property_name_localized: property.property_name_localized,
-        property_name_english: property.property_name_english,
-        description: property.description_contextual_localized,
-        description_localized: property.description_contextual_localized,
-        relevancy: property.relevancy_score,
-        addresses_cause_ids: property.addresses_cause_ids || [],
-        addresses_symptom_ids: property.addresses_symptom_ids || []
-      }));
+      // CRITICAL: Use correct field names from AI response
+      const transformedProperties: TherapeuticProperty[] = propertiesPartialData.map((property: any, index: number) => {
+        // Debug logging for properties transformation
+        console.log(`🔄 Transforming property ${index}:`, {
+          original: property,
+          property_id: property.property_id,
+          property_name_localized: property.property_name_localized,
+          relevancy_score: property.relevancy_score,
+          addresses_cause_ids: property.addresses_cause_ids,
+          addresses_symptom_ids: property.addresses_symptom_ids,
+          // CRITICAL: Show ALL fields in the original property to see what's actually there
+          allOriginalFields: Object.keys(property),
+          fullOriginalProperty: property
+        });
+
+        return {
+          property_id: property.property_id,
+          property_name: property.property_name_localized, // Map to property_name for compatibility
+          property_name_localized: property.property_name_localized,
+          property_name_english: property.property_name_english,
+          description: property.description_contextual_localized, // Map to description for compatibility
+          description_localized: property.description_contextual_localized,
+          description_contextual_localized: property.description_contextual_localized, // Keep original field
+          relevancy: property.relevancy_score, // Map to relevancy for compatibility
+          relevancy_score: property.relevancy_score, // Keep original field
+          addresses_cause_ids: property.addresses_cause_ids || [],
+          addresses_symptom_ids: property.addresses_symptom_ids || []
+        };
+      });
 
       updateTherapeuticProperties(transformedProperties);
     }
   }, [propertiesPartialData, updateTherapeuticProperties]);
 
   /**
-   * Handle therapeutic properties streaming completion - Navigate to properties step
+   * Handle therapeutic properties streaming completion - Process final data and navigate
    */
   useEffect(() => {
     if (isPropertiesComplete && propertiesFinalData && !hasNavigatedRef.current) {
-      console.log('✅ Properties streaming completed, navigating...');
+      console.log('✅ Properties streaming completed with final data:', propertiesFinalData);
+      console.log('✅ RAW PROPERTIES FINAL DATA:', propertiesFinalData);
       hasNavigatedRef.current = true;
+
+      // CRITICAL: Process final data to ensure we have complete properties with all fields
+      let finalProperties: TherapeuticProperty[] = [];
+
+      if (Array.isArray(propertiesFinalData)) {
+        // Direct array of properties
+        finalProperties = propertiesFinalData.map((property: any, index: number) => {
+          console.log(`🔄 Final transform property ${index}:`, {
+            original: property,
+            property_id: property.property_id,
+            property_name_localized: property.property_name_localized,
+            relevancy_score: property.relevancy_score,
+            addresses_cause_ids: property.addresses_cause_ids,
+            addresses_symptom_ids: property.addresses_symptom_ids,
+            // CRITICAL: Show ALL fields in the final property to see what's actually there
+            allFinalFields: Object.keys(property),
+            fullFinalProperty: property
+          });
+
+          return {
+            property_id: property.property_id,
+            property_name: property.property_name_localized,
+            property_name_localized: property.property_name_localized,
+            property_name_english: property.property_name_english,
+            description: property.description_contextual_localized,
+            description_localized: property.description_contextual_localized,
+            description_contextual_localized: property.description_contextual_localized,
+            relevancy: property.relevancy_score,
+            relevancy_score: property.relevancy_score,
+            addresses_cause_ids: property.addresses_cause_ids || [],
+            addresses_symptom_ids: property.addresses_symptom_ids || []
+          };
+        });
+      } else if (propertiesFinalData && typeof propertiesFinalData === 'object' && 'data' in propertiesFinalData) {
+        // Nested structure
+        const data = propertiesFinalData as any;
+        if (data.data?.therapeutic_properties && Array.isArray(data.data.therapeutic_properties)) {
+          const properties = data.data.therapeutic_properties;
+          finalProperties = properties.map((property: any, index: number) => {
+            console.log(`🔄 Nested final transform property ${index}:`, {
+              original: property,
+              property_id: property.property_id,
+              property_name_localized: property.property_name_localized,
+              relevancy_score: property.relevancy_score,
+              addresses_cause_ids: property.addresses_cause_ids,
+              addresses_symptom_ids: property.addresses_symptom_ids,
+              // CRITICAL: Show ALL fields in the nested property to see what's actually there
+              allNestedFields: Object.keys(property),
+              fullNestedProperty: property
+            });
+
+            return {
+              property_id: property.property_id,
+              property_name: property.property_name_localized,
+              property_name_localized: property.property_name_localized,
+              property_name_english: property.property_name_english,
+              description: property.description_contextual_localized,
+              description_localized: property.description_contextual_localized,
+              description_contextual_localized: property.description_contextual_localized,
+              relevancy: property.relevancy_score,
+              relevancy_score: property.relevancy_score,
+              addresses_cause_ids: property.addresses_cause_ids || [],
+              addresses_symptom_ids: property.addresses_symptom_ids || []
+            };
+          });
+        }
+      }
+
+      // Update with final complete data if we have it
+      if (finalProperties.length > 0) {
+        console.log('🔄 Updating properties with final complete data:', finalProperties.length, 'properties');
+        updateTherapeuticProperties(finalProperties);
+      }
 
       // Stop streaming state
       setStreamingProperties(false);
 
-      // Navigate immediately after state updates (no setTimeout delay)
-      // The state updates above are synchronous, so navigation can happen immediately
+      // Navigate immediately after state updates
       if (canGoNext()) {
         goToNext();
       }
     }
-  }, [isPropertiesComplete, propertiesFinalData, canGoNext, goToNext, setStreamingProperties]);
+  }, [isPropertiesComplete, propertiesFinalData, canGoNext, goToNext, setStreamingProperties, updateTherapeuticProperties]);
 
   /**
    * Handle therapeutic properties streaming errors
@@ -265,11 +401,13 @@ export function SymptomsSelection() {
         step: 'potential-symptoms',
         data: {
           health_concern: healthConcern?.healthConcern || '',
-          gender: demographics.gender,
-          age_category: demographics.ageCategory,
-          age_specific: demographics.specificAge?.toString() || demographics.ageCategory,
+          demographics: {
+            gender: demographics.gender,
+            age_category: demographics.ageCategory,  // ✅ Map ageCategory → age_category for template variables
+            age_specific: demographics.specificAge?.toString() || demographics.ageCategory  // ✅ Map specificAge → age_specific for template variables
+          },
           selected_causes: selectedCauses.map(cause => ({
-            cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`,
+            cause_id: cause.cause_id, // Use the AI-generated ID from the stored cause
             name_localized: cause.cause_name,
             suggestion_localized: cause.cause_suggestion,
             explanation_localized: cause.explanation
@@ -313,27 +451,52 @@ export function SymptomsSelection() {
    * Handle symptom selection toggle
    */
   const handleSymptomToggle = (symptom: PotentialSymptom) => {
-    const newSelectedIds = new Set(selectedSymptomIds);
-    const symptomId = symptom.symptom_name;
+    const symptomId = symptom.symptom_id;
 
-    if (newSelectedIds.has(symptomId)) {
+    // Debug logging and safety checks
+    console.log('🔄 Symptom toggle clicked:', {
+      symptomName: symptom.symptom_name,
+      symptomId: symptomId,
+      isIdValid: !!symptomId,
+      currentSelectedIds: Array.from(selectedSymptomIds),
+      totalSymptoms: potentialSymptoms.length
+    });
+
+    // Safety check: ensure symptom has a valid ID
+    if (!symptomId) {
+      console.error('❌ Symptom missing ID:', symptom);
+      setError('Invalid symptom data. Please refresh and try again.');
+      return;
+    }
+
+    const newSelectedIds = new Set(selectedSymptomIds);
+    const isCurrentlySelected = newSelectedIds.has(symptomId);
+
+    if (isCurrentlySelected) {
+      // Remove from selection
       newSelectedIds.delete(symptomId);
+      console.log('➖ Removing symptom from selection:', symptomId);
     } else {
-      if (newSelectedIds.size >= 15) {
-        setError('You can select up to 15 symptoms maximum.');
-        return;
-      }
+      // Add to selection - allow selecting all available symptoms
       newSelectedIds.add(symptomId);
+      console.log('➕ Adding symptom to selection:', symptomId);
       clearError();
     }
+
+    console.log('📊 Selection state after toggle:', {
+      newSelectedCount: newSelectedIds.size,
+      newSelectedIds: Array.from(newSelectedIds)
+    });
 
     setSelectedSymptomIds(newSelectedIds);
 
     // Update store with selected symptoms
     const newSelectedSymptoms = potentialSymptoms.filter(s =>
-      newSelectedIds.has(s.symptom_name)
+      newSelectedIds.has(s.symptom_id) // Use symptom_id for filtering
     );
     updateSelectedSymptoms(newSelectedSymptoms);
+
+    console.log('✅ Updated selected symptoms in store:', newSelectedSymptoms.length);
 
     // Mark step as completed if at least one symptom is selected
     if (newSelectedSymptoms.length > 0) {
@@ -365,8 +528,8 @@ export function SymptomsSelection() {
           health_concern: healthConcern?.healthConcern || '',
           demographics: {
             gender: demographics?.gender,
-            age_category: demographics?.ageCategory,
-            age_specific: demographics?.specificAge?.toString()
+            age_category: demographics?.ageCategory,  // ✅ Map ageCategory → age_category for template variables
+            age_specific: demographics?.specificAge?.toString()  // ✅ Map specificAge → age_specific for template variables
           },
           selected_causes: selectedCauses.map(cause => ({
             cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`,
@@ -375,7 +538,7 @@ export function SymptomsSelection() {
             explanation_localized: cause.explanation
           })),
           selected_symptoms: selectedSymptoms.map(symptom => ({
-            symptom_id: `symptom_${Date.now()}_${Math.random()}`,
+            symptom_id: symptom.symptom_id, // Use the AI-generated ID from the stored symptom
             name_localized: symptom.symptom_name,
             suggestion_localized: symptom.symptom_suggestion,
             explanation_localized: symptom.explanation
@@ -383,6 +546,15 @@ export function SymptomsSelection() {
           user_language: 'PT_BR'
         }
       };
+
+      // CRITICAL DEBUG: Log the exact IDs being sent to AI vs. what's stored
+      console.log('🚀 CRITICAL DEBUG - IDs being sent to AI:', {
+        selectedCausesStored: selectedCauses.map(c => ({ cause_id: c.cause_id, cause_name: c.cause_name })),
+        selectedSymptomsStored: selectedSymptoms.map(s => ({ symptom_id: s.symptom_id, symptom_name: s.symptom_name })),
+        causesBeingSent: requestData.data.selected_causes.map(c => ({ cause_id: c.cause_id, name_localized: c.name_localized })),
+        symptomsBeingSent: requestData.data.selected_symptoms.map(s => ({ symptom_id: s.symptom_id, name_localized: s.name_localized })),
+        fullRequestData: requestData
+      });
 
       await startPropertiesStream('/api/ai/streaming', requestData);
 
@@ -412,7 +584,7 @@ export function SymptomsSelection() {
     loadPotentialSymptoms();
   };
 
-  const isFormValid = selectedSymptomIds.size > 0 && selectedSymptomIds.size <= 15;
+  const isFormValid = selectedSymptomIds.size > 0 && selectedSymptomIds.size <= potentialSymptoms.length;
 
   return (
     <div data-testid="symptoms-selection" className="space-y-6">
@@ -486,24 +658,30 @@ export function SymptomsSelection() {
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              Select 1-15 symptoms that you're experiencing
+              Select 1-{potentialSymptoms.length} symptoms that you're experiencing
             </p>
             <span className={cn(
               "text-sm font-medium",
-              selectedSymptomIds.size > 15 ? "text-destructive" : "text-foreground"
+              selectedSymptomIds.size > potentialSymptoms.length ? "text-destructive" : "text-foreground"
             )}>
-              {selectedSymptomIds.size}/15 selected
+              {selectedSymptomIds.size}/{potentialSymptoms.length} selected
             </span>
           </div>
 
           {/* Symptoms Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {potentialSymptoms.map((symptom, index) => {
-              const isSelected = selectedSymptomIds.has(symptom.symptom_name);
+              const isSelected = selectedSymptomIds.has(symptom.symptom_id); // Use symptom_id for selection check
+
+              // Debug logging for visual state
+              if (index === 0) { // Only log for first item to avoid spam
+                console.log(`🎨 Rendering symptoms - Selected IDs:`, Array.from(selectedSymptomIds));
+                console.log(`🎨 First symptom ID: ${symptom.symptom_id}, isSelected: ${isSelected}`);
+              }
 
               return (
                 <div
-                  key={`${symptom.symptom_name}-${index}`}
+                  key={`${symptom.symptom_id}-${index}`} // Use symptom_id for unique keys
                   className={cn(
                     "border rounded-lg p-4 cursor-pointer transition-all duration-200",
                     "hover:shadow-md",

@@ -36,8 +36,7 @@ export function PropertiesDisplay() {
   } = useRecipeStore();
 
   const {
-    setStreamingError,
-    streamingError
+    setStreamingError
   } = useRecipeStreaming();
 
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
@@ -45,6 +44,47 @@ export function PropertiesDisplay() {
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
   const [currentProperty, setCurrentProperty] = useState<TherapeuticProperty | null>(null);
   const processedCompletionRef = useRef<string | null>(null);
+
+  // Debug logging for properties data
+  useEffect(() => {
+    console.log('🔍 Properties Display Debug:', {
+      therapeuticPropertiesCount: therapeuticProperties.length,
+      therapeuticProperties: therapeuticProperties.map(p => ({
+        property_id: p.property_id,
+        property_name: p.property_name,
+        property_name_localized: p.property_name_localized,
+        description: p.description,
+        description_contextual_localized: p.description_contextual_localized,
+        relevancy: p.relevancy,
+        relevancy_score: p.relevancy_score,
+        addresses_cause_ids: p.addresses_cause_ids,
+        addresses_symptom_ids: p.addresses_symptom_ids,
+        // Show ALL fields to debug what's actually stored
+        allFields: Object.keys(p),
+        // Show the COMPLETE property object
+        fullProperty: p
+      })),
+      selectedCausesCount: selectedCauses.length,
+      selectedCausesData: selectedCauses.map(c => ({ cause_id: c.cause_id, cause_name: c.cause_name })),
+      selectedSymptomsCount: selectedSymptoms.length,
+      selectedSymptomsData: selectedSymptoms.map(s => ({ symptom_id: s.symptom_id, symptom_name: s.symptom_name }))
+    });
+
+    // CRITICAL DEBUG: Check each property's relevancy score individually
+    therapeuticProperties.forEach((property, index) => {
+      console.log(`🔍 Property ${index} relevancy debug:`, {
+        property_id: property.property_id,
+        property_name: property.property_name_localized || property.property_name,
+        relevancy_score: property.relevancy_score,
+        relevancy: property.relevancy,
+        typeof_relevancy_score: typeof property.relevancy_score,
+        typeof_relevancy: typeof property.relevancy,
+        calculated_score: property.relevancy_score || property.relevancy || 0,
+        // Show the COMPLETE property object for this specific property
+        fullPropertyObject: property
+      });
+    });
+  }, [therapeuticProperties, selectedCauses, selectedSymptoms]);
 
   // AI Streaming setup for suggested oils
   const {
@@ -308,8 +348,8 @@ export function PropertiesDisplay() {
           health_concern: healthConcern.healthConcern,
           demographics: {
             gender: demographics.gender,
-            age_category: demographics.ageCategory,
-            age_specific: demographics.specificAge.toString()
+            age_category: demographics.ageCategory,  // ✅ Map ageCategory → age_category for template variables
+            age_specific: demographics.specificAge.toString()  // ✅ Map specificAge → age_specific for template variables
           },
           selected_causes: selectedCauses.map((cause, index) => ({
             cause_id: `cause-${index}-${cause.cause_name.toLowerCase().replace(/\s+/g, '-')}`,
@@ -381,24 +421,66 @@ export function PropertiesDisplay() {
     loadTherapeuticProperties();
   };
 
+
+
   /**
-   * Get relevancy color
+   * Get addressed causes for a property
    */
-  const getRelevancyColor = (relevancy: number) => {
-    if (relevancy >= 4) return 'text-green-600 bg-green-50 border-green-200';
-    if (relevancy >= 3) return 'text-blue-600 bg-blue-50 border-blue-200';
-    if (relevancy >= 2) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-gray-600 bg-gray-50 border-gray-200';
+  const getAddressedCauses = (property: TherapeuticProperty) => {
+    console.log('🔍 getAddressedCauses debug:', {
+      property_id: property.property_id,
+      property_name: property.property_name_localized || property.property_name,
+      addresses_cause_ids: property.addresses_cause_ids,
+      addresses_cause_ids_length: property.addresses_cause_ids?.length || 0,
+      selectedCausesCount: selectedCauses.length,
+      selectedCauseIds: selectedCauses.map(c => c.cause_id),
+      selectedCauseNames: selectedCauses.map(c => c.cause_name)
+    });
+
+    if (!property.addresses_cause_ids || property.addresses_cause_ids.length === 0) {
+      console.log('❌ No addresses_cause_ids found for property');
+      return [];
+    }
+
+    // Match by the actual AI-generated cause IDs
+    const matchedCauses = selectedCauses.filter(cause => {
+      const isMatch = property.addresses_cause_ids?.includes(cause.cause_id);
+      console.log(`🔍 Checking cause match: ${cause.cause_name} (${cause.cause_id}) -> ${isMatch}`);
+      return isMatch;
+    });
+
+    console.log(`✅ Found ${matchedCauses.length} matching causes for property ${property.property_name_localized}`);
+    return matchedCauses;
   };
 
   /**
-   * Get relevancy label
+   * Get addressed symptoms for a property
    */
-  const getRelevancyLabel = (relevancy: number) => {
-    if (relevancy >= 4) return 'Highly Relevant';
-    if (relevancy >= 3) return 'Very Relevant';
-    if (relevancy >= 2) return 'Moderately Relevant';
-    return 'Somewhat Relevant';
+  const getAddressedSymptoms = (property: TherapeuticProperty) => {
+    console.log('🔍 getAddressedSymptoms debug:', {
+      property_id: property.property_id,
+      property_name: property.property_name_localized || property.property_name,
+      addresses_symptom_ids: property.addresses_symptom_ids,
+      addresses_symptom_ids_length: property.addresses_symptom_ids?.length || 0,
+      selectedSymptomsCount: selectedSymptoms.length,
+      selectedSymptomIds: selectedSymptoms.map(s => s.symptom_id),
+      selectedSymptomNames: selectedSymptoms.map(s => s.symptom_name)
+    });
+
+    if (!property.addresses_symptom_ids || property.addresses_symptom_ids.length === 0) {
+      console.log('❌ No addresses_symptom_ids found for property');
+      return [];
+    }
+
+    // Match by the actual AI-generated symptom IDs
+    const matchedSymptoms = selectedSymptoms.filter(symptom => {
+      const isMatch = property.addresses_symptom_ids?.includes(symptom.symptom_id);
+      console.log(`🔍 Checking symptom match: ${symptom.symptom_name} (${symptom.symptom_id}) -> ${isMatch}`);
+      return isMatch;
+    });
+
+    console.log(`✅ Found ${matchedSymptoms.length} matching symptoms for property ${property.property_name_localized}`);
+    return matchedSymptoms;
   };
 
   return (
@@ -485,182 +567,169 @@ export function PropertiesDisplay() {
       {!isLoadingProperties && therapeuticProperties.length > 0 && (
         <div className="space-y-6">
           {/* Properties Grid */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {therapeuticProperties
-              .sort((a, b) => b.relevancy - a.relevancy) // Sort by relevancy (highest first)
-              .map((property, index) => (
-                <div
-                  key={`${property.property_id}-${index}`}
-                  className="border rounded-lg p-6 space-y-4 hover:shadow-md transition-shadow"
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {property.property_name}
-                      </h3>
-                      {property.property_name_in_english !== property.property_name && (
-                        <p className="text-sm text-muted-foreground">
-                          ({property.property_name_in_english})
-                        </p>
-                      )}
-                    </div>
+              .sort((a, b) => (b.relevancy_score || b.relevancy || 0) - (a.relevancy_score || a.relevancy || 0))
+              .map((property, index) => {
+                const addressedCauses = getAddressedCauses(property);
+                const addressedSymptoms = getAddressedSymptoms(property);
+                const relevancyScore = property.relevancy_score || property.relevancy || 0;
 
-                    <div className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium border",
-                      getRelevancyColor(property.relevancy)
-                    )}>
-                      {getRelevancyLabel(property.relevancy)} ({property.relevancy}/5)
-                    </div>
-                  </div>
+                // Debug logging for property data
+                console.log(`🎨 Rendering property ${index}:`, {
+                  property_id: property.property_id,
+                  property_name_localized: property.property_name_localized,
+                  property_name: property.property_name,
+                  relevancy_score: property.relevancy_score,
+                  relevancy: property.relevancy,
+                  calculated_relevancy_score: relevancyScore,
+                  typeof_relevancy_score: typeof property.relevancy_score,
+                  typeof_relevancy: typeof property.relevancy,
+                  addresses_cause_ids: property.addresses_cause_ids,
+                  addresses_symptom_ids: property.addresses_symptom_ids,
+                  addressedCausesFound: addressedCauses.length,
+                  addressedSymptomsFound: addressedSymptoms.length,
+                  // Show the ENTIRE property object to see what fields exist
+                  fullPropertyObject: property
+                });
 
-                  {/* Description */}
-                  <p className="text-muted-foreground">
-                    {property.description}
-                  </p>
-
-                  {/* Addresses */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {property.causes_addressed && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-foreground">Addresses Causes:</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {property.causes_addressed}
-                        </p>
+                return (
+                  <div
+                    key={`${property.property_id}-${index}`}
+                    className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg"
+                  >
+                    {/* Relevancy Score Badge */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <div className={cn(
+                        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset",
+                        relevancyScore >= 5
+                          ? "bg-green-50 text-green-700 ring-green-600/20"
+                          : relevancyScore >= 4
+                          ? "bg-blue-50 text-blue-700 ring-blue-600/20"
+                          : relevancyScore >= 3
+                          ? "bg-yellow-50 text-yellow-700 ring-yellow-600/20"
+                          : "bg-gray-50 text-gray-700 ring-gray-600/20"
+                      )}>
+                        <svg className="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.107 10.5a.75.75 0 00-1.214 1.029l1.5 2.25a.75.75 0 001.214-.094l3.75-5.25z" clipRule="evenodd" />
+                        </svg>
+                        {relevancyScore}/5
                       </div>
-                    )}
-
-                    {property.symptoms_addressed && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-foreground">Addresses Symptoms:</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {property.symptoms_addressed}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Suggested Essential Oils */}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-medium text-foreground">Recommended Essential Oils</h4>
-                      {isStreamingFromHook && (
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                          <div className="animate-spin rounded-full h-3 w-3 border-b border-primary"></div>
-                          <span>Finding oils...</span>
-                        </div>
-                      )}
                     </div>
 
-                    {(() => {
-                      // Find oils for this specific property
-                      const propertyOils = suggestedOils.find(
-                        oil => oil.property_id === property.property_id
-                      );
+                    <div className="p-6">
+                      {/* Header */}
+                      <div className="space-y-2 mb-4">
+                        <h3 className="text-xl font-semibold leading-none tracking-tight">
+                          {property.property_name_localized || property.property_name || 'Unknown Property'}
+                        </h3>
+                        {property.property_name_english && property.property_name_english !== property.property_name_localized && (
+                          <p className="text-sm text-muted-foreground">
+                            {property.property_name_english}
+                          </p>
+                        )}
+                      </div>
 
+                      {/* Description */}
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        {property.description_contextual_localized || property.description || 'No description available'}
+                      </p>
 
-
-                      if (isStreamingFromHook && currentProperty?.property_id === property.property_id && !propertyOils) {
-                        return (
-                          <div className="bg-muted/30 rounded-lg p-4 text-center">
-                            <div className="animate-pulse space-y-2">
-                              <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
-                              <div className="h-3 bg-muted rounded w-1/2 mx-auto"></div>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (!propertyOils || !propertyOils.suggested_oils || propertyOils.suggested_oils.length === 0) {
-                        if (streamingError) {
-                          return (
-                            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-                              <p className="text-destructive text-xs">{streamingError}</p>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="bg-muted/30 rounded-lg p-4 text-center space-y-3">
-                            <p className="text-xs text-muted-foreground">
-                              Click the button below to find essential oils for this specific property.
-                            </p>
-
-                            <button
-                              onClick={() => handleAnalyzeSingleProperty(property)}
-                              disabled={!healthConcern || !demographics || isStreamingFromHook}
-                              className={cn(
-                                "px-3 py-2 rounded-md font-medium transition-colors text-xs",
-                                "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-                                healthConcern && demographics && !isStreamingFromHook
-                                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              )}
-                            >
-                              {isStreamingFromHook && currentProperty?.property_id === property.property_id
-                                ? "🔍 Finding oils..."
-                                : `🔍 Find Oils for ${property.property_name}`
-                              }
-                            </button>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div className="space-y-3">
-                          {propertyOils.suggested_oils
-                            .sort((a, b) => (b.relevancy_to_property_score || 0) - (a.relevancy_to_property_score || 0))
-                            .slice(0, 5) // Show top 5 oils
-                            .map((oil, oilIndex) => (
-                              <div
-                                key={`${oil.oil_id || oil.name_english}-${oilIndex}`}
-                                className="bg-muted/20 rounded-lg p-3 space-y-2"
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="space-y-1">
-                                    <h5 className="text-sm font-medium text-foreground">
-                                      {oil.name_localized || oil.name_english}
-                                    </h5>
-                                    {oil.name_botanical && (
-                                      <p className="text-xs text-muted-foreground italic">
-                                        {oil.name_botanical}
-                                      </p>
-                                    )}
-                                  </div>
-                                  {oil.relevancy_to_property_score && (
-                                    <div className={cn(
-                                      "px-2 py-1 rounded-full text-xs font-medium",
-                                      oil.relevancy_to_property_score >= 4
-                                        ? "bg-green-100 text-green-700"
-                                        : oil.relevancy_to_property_score >= 3
-                                        ? "bg-blue-100 text-blue-700"
-                                        : "bg-yellow-100 text-yellow-700"
-                                    )}>
-                                      {oil.relevancy_to_property_score}/5
-                                    </div>
-                                  )}
-                                </div>
-                                {oil.match_rationale_localized && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {oil.match_rationale_localized}
-                                  </p>
-                                )}
+                      {/* Addressed Causes and Symptoms */}
+                      {(addressedCauses.length > 0 || addressedSymptoms.length > 0) && (
+                        <div className="space-y-4 pt-4 border-t border-border/50">
+                          {addressedCauses.length > 0 && (
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium text-foreground flex items-center">
+                                <svg className="mr-2 h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Addresses Causes ({addressedCauses.length})
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {addressedCauses.map((cause, causeIndex) => (
+                                  <span
+                                    key={`${cause.cause_id}-${causeIndex}`}
+                                    className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-700/10"
+                                    title={cause.explanation}
+                                  >
+                                    {cause.cause_name}
+                                  </span>
+                                ))}
                               </div>
-                            ))}
+                            </div>
+                          )}
 
-                          {propertyOils.suggested_oils.length > 5 && (
-                            <div className="text-center">
-                              <p className="text-xs text-muted-foreground">
-                                +{propertyOils.suggested_oils.length - 5} more oils available
-                              </p>
+                          {addressedSymptoms.length > 0 && (
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium text-foreground flex items-center">
+                                <svg className="mr-2 h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Addresses Symptoms ({addressedSymptoms.length})
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {addressedSymptoms.map((symptom, symptomIndex) => (
+                                  <span
+                                    key={`${symptom.symptom_id}-${symptomIndex}`}
+                                    className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                                    title={symptom.explanation}
+                                  >
+                                    {symptom.symptom_name}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>
-                      );
-                    })()}
+                      )}
+
+                      {/* Essential Oils Button */}
+                      <div className="border-t pt-4 mt-4">
+                        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 text-center space-y-3 border border-green-200/50">
+                          <div className="space-y-2">
+                            <svg className="mx-auto h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                            <p className="text-sm font-medium text-green-800">
+                              Discover Essential Oils
+                            </p>
+                            <p className="text-xs text-green-700">
+                              Get personalized oil recommendations for this therapeutic property
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={() => handleAnalyzeSingleProperty(property)}
+                            disabled={!healthConcern || !demographics || isStreamingFromHook}
+                            className={cn(
+                              "inline-flex items-center px-4 py-2 rounded-md font-medium transition-colors text-sm",
+                              "focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+                              healthConcern && demographics && !isStreamingFromHook
+                                ? "bg-green-600 text-white hover:bg-green-700 shadow-sm"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            )}
+                          >
+                            {isStreamingFromHook && currentProperty?.property_id === property.property_id ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Finding oils...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Find Essential Oils
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
           </div>
 
           {/* Info Box */}
