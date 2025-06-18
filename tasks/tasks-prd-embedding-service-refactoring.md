@@ -13,6 +13,7 @@ This document outlines the specific tasks required to implement the requirements
 - `src/app/api/ai/streaming/route.ts` - API route that adds vectorSearchTools for suggested-oils step, needs validation
 - `docs/ai-integration/embedding-service-patterns.md` - New documentation for integration patterns
 - `docs/ai-integration/troubleshooting-embeddings.md` - New troubleshooting guide for embedding service issues
+- `src/lib/ai/utils/vector-math.ts` - Standalone utility functions for vector mathematics (e.g., cosine similarity).
 
 ### Notes
 
@@ -66,3 +67,23 @@ This document outlines the specific tasks required to implement the requirements
   - [x] 5.5 Document best practices for error handling with embedding operations.
   - [x] 5.6 Create a migration guide for developers updating existing tools to use the embeddings service.
   - [x] 5.7 Add JSDoc comments to embeddings service methods for a better developer experience.
+
+## 6.0 Post-Refactoring Adjustments (Feedback Implementation)
+
+This section covers changes made to address feedback received after the initial refactoring phases.
+
+- [ ] 6.1 Refactor `OpenAIEmbeddingsService` for Single Responsibility
+  - [x] 6.1.1 Remove domain-specific helper methods (`createTherapeuticPropertyEmbedding`, `createOilDescriptionEmbedding`, `createPortugueseSearchEmbedding`).
+  - [x] 6.1.2 Remove `calculateCosineSimilarity` static method (moved to standalone utility).
+  - [x] 6.1.3 Remove `createEmbeddings` (inefficient batching method).
+  - [x] 6.1.4 Remove `validateEmbeddingsConfig` and `getConfig` utility functions.
+  - [x] 6.1.5 Simplify `EmbeddingConfig` and `DEFAULT_CONFIG` (remove `maxTokens` and related truncation logic).
+  - [x] 6.1.6 Update JSDoc comments for remaining/modified service methods and class.
+- [ ] 6.2 Adapt `vector-search-tool.ts` to Service Changes
+  - [x] 6.2.1 Restore/Adapt Portuguese Search Query Construction in `searchWithPinecone` to call the simplified `embeddingsService.createEmbedding`.
+  - [ ] 6.2.2 Review and update error handling/logging in `searchWithPinecone` (if needed after changes).
+- [x] 6.3 Create Standalone `calculateCosineSimilarity` Utility
+  - [x] 6.3.1 Create `src/lib/ai/utils/vector-math.ts` with the `calculateCosineSimilarity` function.
+- [ ] 6.4 Update Documentation to Reflect Service Simplification
+  - [ ] 6.4.1 Modify `docs/ai-integration/embedding-service-patterns.md`.
+  - [ ] 6.4.2 Modify `docs/ai-integration/troubleshooting-embeddings.md`.

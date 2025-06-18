@@ -36,19 +36,30 @@ async function searchWithPinecone(
   try {
     console.log('🔄 Generating embedding...');
     const embeddingsService = getEmbeddingsService();
-    // Assuming createPortugueseSearchEmbedding is robust and its errors are already prefixed by "EmbeddingService:"
-    const { embeddingResponse, searchQueryUsed } = await embeddingsService.createPortugueseSearchEmbedding(
-      therapeutic_property,
-      health_concern,
-      additional_context,
-      embedding_model
-    );
+
+    // Construct the Portuguese search query locally
+    const lowerTherapeuticProperty = therapeutic_property.toLowerCase();
+    const lowerHealthConcern = health_concern.toLowerCase();
+
+    const searchQueries = [
+      `propriedades ${lowerTherapeuticProperty} para ${lowerHealthConcern}`,
+      `óleos essenciais ${lowerTherapeuticProperty}`,
+      `óleos para ${lowerHealthConcern}`,
+      additional_context ? `${lowerTherapeuticProperty} ${additional_context.toLowerCase()}` : null,
+    ].filter(Boolean) as string[];
+
+    searchQueryUsedForEmbedding = searchQueries[0] || `${lowerTherapeuticProperty} ${lowerHealthConcern}`;
+    // Log the locally constructed query
+    console.log(`📝 Search query constructed for embedding: ${searchQueryUsedForEmbedding}`);
+
+    const embeddingResponse = await embeddingsService.createEmbedding({
+      text: searchQueryUsedForEmbedding,
+      model: embedding_model, // Pass the optional model override
+    });
 
     embedding = embeddingResponse.embedding;
-    searchQueryUsedForEmbedding = searchQueryUsed;
-    embeddingModelUsed = embeddingResponse.model;
+    embeddingModelUsed = embeddingResponse.model; // Get the model used from the response
 
-    console.log(`📝 Search query used by service: ${searchQueryUsedForEmbedding}`);
     if (!embedding || embedding.length === 0) {
       // This specific error is already clear from embedding service if it throws one for empty embeddings.
       // If not, this is a good place to ensure it's explicitly an embedding related error.
