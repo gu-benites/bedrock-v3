@@ -14,10 +14,13 @@
     "validate:streaming": "node scripts/validate-streaming.js",
     "demo:typing": "node scripts/test-structured-typing.js",
     "test:oils": "node scripts/test-oils-integration.js",
-    "test:pinecone": "node scripts/test-pinecone-search.js"
+    "test:pinecone": "node scripts/test-pinecone-search.js",
+    "pubmed:cli": "npx tsx own-openai-examples/pubmed-research-agent/index.ts",
+    "pubmed:orchestrated": "npx tsx own-openai-examples/pubmed-research-agent/fixed-cli.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
+    "@modelcontextprotocol/sdk": "^1.12.3",
     "@openai/agents": "^0.0.4",
     "@pinecone-database/pinecone": "^6.1.0",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -54,6 +57,7 @@
     "firebase": "^11.8.1",
     "framer-motion": "^11.4.0",
     "js-yaml": "^4.1.0",
+    "limiter": "^3.0.0",
     "lucide-react": "^0.475.0",
     "next": "^15.3.3",
     "next-themes": "^0.4.6",
@@ -66,6 +70,8 @@
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "winston": "^3.13.1",
     "zod": "^3.24.2",
     "zustand": "^4.5.4"
