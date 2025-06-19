@@ -68,22 +68,7 @@ export function WizardContainer({
   showBreadcrumbs = true,
   showProgress = true,
   className
-}: WizardContainerProps = {}) {
-  // Performance monitoring
-  useRenderPerformanceMonitor('WizardContainer', { currentStep, layout, showBreadcrumbs, showProgress }, {
-    trackProps: true,
-    logThreshold: 5
-  });
-
-  // Intelligent route prefetching based on user behavior
-  const { getUserBehaviorStats } = useIntelligentPrefetcher(activeStep, {
-    enabled: true,
-    priority: 'low'
-  });
-
-  const { stepInfo, goToNext, goToPrevious, canGoNext, canGoPrevious, getCompletionPercentage } = useRecipeWizardNavigation();
-
-  // Use optimized selectors to prevent unnecessary re-renders
+}: WizardContainerProps = {}) {  // Use optimized selectors to prevent unnecessary re-renders
   const { currentStep: storeCurrentStep, isLoading, error, sessionId } = useRecipeStore(
     useCallback((state) => ({
       currentStep: state.currentStep,
@@ -103,6 +88,20 @@ export function WizardContainer({
   // Use prop or store current step
   const activeStep = currentStep || storeCurrentStep;
 
+  // Performance monitoring
+  useRenderPerformanceMonitor('WizardContainer', { currentStep, layout, showBreadcrumbs, showProgress }, {
+    trackProps: true,
+    logThreshold: 5
+  });
+
+  // Intelligent route prefetching based on user behavior
+  useIntelligentPrefetcher(activeStep, {
+    enabled: true,
+    priority: 'low'
+  });
+
+  const { stepInfo } = useRecipeWizardNavigation();
+
   // Memoize sync condition to prevent unnecessary effect runs
   const shouldSync = useMemo(() => {
     return currentStep && currentStep !== storeCurrentStep && !isLoading;
@@ -118,12 +117,10 @@ export function WizardContainer({
           storeStep: storeCurrentStep
         });
       }
-      setCurrentStep(currentStep);
+      setCurrentStep(currentStep!);
     }
   }, [shouldSync, currentStep, storeCurrentStep, setCurrentStep]);
 
-  // Memoize progress calculation to prevent unnecessary recalculations
-  const progressPercentage = useMemo(() => getCompletionPercentage(), [getCompletionPercentage]);
 
   // Memoize layout decisions to prevent unnecessary re-renders
   const layoutConfig = useMemo(() => {
