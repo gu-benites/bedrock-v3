@@ -12,13 +12,10 @@ import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { demographicsSchema } from '../schemas/recipe-schemas';
 import type { DemographicsData, PotentialCause } from '../types/recipe.types';
-import { RecipeStep } from '../types/recipe.types';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import { cn } from '@/lib/utils';
 import { AIStreamingModal } from '@/components/ui/ai-streaming-modal';
 import { useBatchedRecipeUpdates } from '../hooks/use-batched-recipe-updates';
-import { useRenderPerformanceMonitor } from '@/hooks/use-render-performance-monitor';
-import { useStreamingPrefetcher } from '@/hooks/use-route-prefetcher';
 
 /**
  * Age category options (simplified as per user preferences)
@@ -42,12 +39,6 @@ const GENDER_OPTIONS = [
  * Demographics Form component
  */
 export function DemographicsForm() {
-  // Performance monitoring
-  useRenderPerformanceMonitor('DemographicsForm', undefined, {
-    trackProps: false,
-    logThreshold: 8
-  });
-
   const {
     healthConcern,
     demographics,
@@ -82,12 +73,6 @@ export function DemographicsForm() {
 
   // Use batched updates for better performance
   const { completeAIStreaming, startAIStreaming, handleStreamingError } = useBatchedRecipeUpdates();
-
-  // Route prefetching for better navigation performance
-  useStreamingPrefetcher(RecipeStep.DEMOGRAPHICS, isStreamingCauses, {
-    enabled: true,
-    priority: 'high'
-  });
 
   // Ref to track if we've already navigated to avoid infinite loops
   const hasNavigatedRef = React.useRef(false);

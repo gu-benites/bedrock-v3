@@ -1,0 +1,152 @@
+{
+  "timestamp": "2025-06-19T06:44:59.369Z",
+  "data": {
+    "sessionStart": "2025-06-19T06:44:59.369Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:01.522Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 658,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Potential causes for endometriosis identified based on user profile.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\n        \"name_localized\": \"Hormonal changes associated with menopa",
+    "bufferSuffix": " health and consulting a healthcare provider\",\n        \"explanation_localized\": \"At age 50, hormonal"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:02.581Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1427,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Potential causes for endometriosis identified based on user profile.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\n        \"name_localized\": \"Hormonal changes associated with menopa",
+    "bufferSuffix": "diet rich in fruits, vegetables, and omega-3s\",\n        \"explanation_localized\": \"Diet can influence"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:03.630Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2266,
+    "bufferPreview": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Potential causes for endometriosis identified based on user profile.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\n        \"name_localized\": \"Hormonal changes associated with menopa",
+    "bufferSuffix": "planation_localized\": \"Sleep quality affects hormone regulation and pain perception, influencing end"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:04.576Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2934,
+    "fullBuffer": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Potential causes for endometriosis identified based on user profile.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\n        \"name_localized\": \"Hormonal changes associated with menopause\",\n        \"suggestion_localized\": \"Monitoring hormonal health and consulting a healthcare provider\",\n        \"explanation_localized\": \"At age 50, hormonal fluctuations, especially menopause, can influence endometriosis symptoms or related issues.\"\n      },\n      {\n        \"cause_id\": \"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\n        \"name_localized\": \"Chronic stress affecting hormonal balance\",\n        \"suggestion_localized\": \"Incorporating stress-reduction techniques and relaxation practices\",\n        \"explanation_localized\": \"Stress can impact hormonal regulation and exacerbate endometrial tissue irritations or pain.\"\n      },\n      {\n        \"cause_id\": \"c3d4e5f6-g7h8-9i10-j11k12l13m14n15\",\n        \"name_localized\": \"Diet and inflammation levels\",\n        \"suggestion_localized\": \"Adopting an anti-inflammatory diet rich in fruits, vegetables, and omega-3s\",\n        \"explanation_localized\": \"Diet can influence inflammation levels, which may impact endometriosis symptoms and overall pelvic health.\"\n      },\n      {\n        \"cause_id\": \"d4e5f6g7-h8i9-10j11-k12l13m14n15o16\",\n        \"name_localized\": \"Sedentary lifestyle and physical activity levels\",\n        \"suggestion_localized\": \"Regular gentle exercise to promote healthy circulation and reduce discomfort\",\n        \"explanation_localized\": \"Lack of activity can contribute to pelvic congestion and discomfort linked with endometriosis.\"\n      },\n      {\n        \"cause_id\": \"e5f6g7h8-i9j10-11k12-l13m14n15o16p17\",\n        \"name_localized\": \"Sleep disturbances or poor sleep hygiene\",\n        \"suggestion_localized\": \"Improving sleep routines and creating a restful environment\",\n        \"explanation_localized\": \"Sleep quality affects hormone regulation and pain perception, influencing endometriosis symptoms.\"\n      },\n      {\n        \"cause_id\": \"f6g7h8i9-j0k1-2l3m-4n5o-6p7q8r9s10t11\",\n        \"name_localized\": \"Environmental factors such as exposure to endocrine disruptors\",\n        \"suggestion_localized\": \"Reducing exposure to plastics, pesticides, and chemicals in daily products\",\n        \"explanation_localized\": \"Certain environmental chemicals can interfere with hormonal balance and potentially influence endometriosis.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"endometriose\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"50\",\n      \"age_unit\": \"years\"\n    }\n  }\n}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:04.643Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6853b39d3b188198a10b1535d6efd52f0768916f8d0b9b23",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\n  \"meta\": {\n    \"step_name\": \"Potential Causes Analysis\",\n    \"request_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"timestamp_utc\": \"2023-10-01T12:00:00Z\",\n    \"version\": \"1.0\",\n    \"user_language\": \"en\",\n    \"status\": \"success\",\n    \"message\": \"Potential causes for endometriosis identified based on user profile.\"\n  },\n  \"data\": {\n    \"potential_causes\": [\n      {\n        \"cause_id\": \"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\n        \"name_localized\": \"Hormonal changes associated with menopause\",\n        \"suggestion_localized\": \"Monitoring hormonal health and consulting a healthcare provider\",\n        \"explanation_localized\": \"At age 50, hormonal fluctuations, especially menopause, can influence endometriosis symptoms or related issues.\"\n      },\n      {\n        \"cause_id\": \"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\n        \"name_localized\": \"Chronic stress affecting hormonal balance\",\n        \"suggestion_localized\": \"Incorporating stress-reduction techniques and relaxation practices\",\n        \"explanation_localized\": \"Stress can impact hormonal regulation and exacerbate endometrial tissue irritations or pain.\"\n      },\n      {\n        \"cause_id\": \"c3d4e5f6-g7h8-9i10-j11k12l13m14n15\",\n        \"name_localized\": \"Diet and inflammation levels\",\n        \"suggestion_localized\": \"Adopting an anti-inflammatory diet rich in fruits, vegetables, and omega-3s\",\n        \"explanation_localized\": \"Diet can influence inflammation levels, which may impact endometriosis symptoms and overall pelvic health.\"\n      },\n      {\n        \"cause_id\": \"d4e5f6g7-h8i9-10j11-k12l13m14n15o16\",\n        \"name_localized\": \"Sedentary lifestyle and physical activity levels\",\n        \"suggestion_localized\": \"Regular gentle exercise to promote healthy circulation and reduce discomfort\",\n        \"explanation_localized\": \"Lack of activity can contribute to pelvic congestion and discomfort linked with endometriosis.\"\n      },\n      {\n        \"cause_id\": \"e5f6g7h8-i9j10-11k12-l13m14n15o16p17\",\n        \"name_localized\": \"Sleep disturbances or poor sleep hygiene\",\n        \"suggestion_localized\": \"Improving sleep routines and creating a restful environment\",\n        \"explanation_localized\": \"Sleep quality affects hormone regulation and pain perception, influencing endometriosis symptoms.\"\n      },\n      {\n        \"cause_id\": \"f6g7h8i9-j0k1-2l3m-4n5o-6p7q8r9s10t11\",\n        \"name_localized\": \"Environmental factors such as exposure to endocrine disruptors\",\n        \"suggestion_localized\": \"Reducing exposure to plastics, pesticides, and chemicals in daily products\",\n        \"explanation_localized\": \"Certain environmental chemicals can interfere with hormonal balance and potentially influence endometriosis.\"\n      }\n    ]\n  },\n  \"echo\": {\n    \"health_concern_input\": \"endometriose\",\n    \"user_info_input\": {\n      \"gender\": \"female\",\n      \"age_category\": \"adult\",\n      \"age_specific\": \"50\",\n      \"age_unit\": \"years\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:04.659Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Potential Causes Analysis",
+        "request_id": "123e4567-e89b-12d3-a456-426614174000",
+        "timestamp_utc": "2023-10-01T12:00:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Potential causes for endometriosis identified based on user profile."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14",
+            "name_localized": "Hormonal changes associated with menopause",
+            "suggestion_localized": "Monitoring hormonal health and consulting a healthcare provider",
+            "explanation_localized": "At age 50, hormonal fluctuations, especially menopause, can influence endometriosis symptoms or related issues."
+          },
+          {
+            "cause_id": "b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15",
+            "name_localized": "Chronic stress affecting hormonal balance",
+            "suggestion_localized": "Incorporating stress-reduction techniques and relaxation practices",
+            "explanation_localized": "Stress can impact hormonal regulation and exacerbate endometrial tissue irritations or pain."
+          },
+          {
+            "cause_id": "c3d4e5f6-g7h8-9i10-j11k12l13m14n15",
+            "name_localized": "Diet and inflammation levels",
+            "suggestion_localized": "Adopting an anti-inflammatory diet rich in fruits, vegetables, and omega-3s",
+            "explanation_localized": "Diet can influence inflammation levels, which may impact endometriosis symptoms and overall pelvic health."
+          },
+          {
+            "cause_id": "d4e5f6g7-h8i9-10j11-k12l13m14n15o16",
+            "name_localized": "Sedentary lifestyle and physical activity levels",
+            "suggestion_localized": "Regular gentle exercise to promote healthy circulation and reduce discomfort",
+            "explanation_localized": "Lack of activity can contribute to pelvic congestion and discomfort linked with endometriosis."
+          },
+          {
+            "cause_id": "e5f6g7h8-i9j10-11k12-l13m14n15o16p17",
+            "name_localized": "Sleep disturbances or poor sleep hygiene",
+            "suggestion_localized": "Improving sleep routines and creating a restful environment",
+            "explanation_localized": "Sleep quality affects hormone regulation and pain perception, influencing endometriosis symptoms."
+          },
+          {
+            "cause_id": "f6g7h8i9-j0k1-2l3m-4n5o-6p7q8r9s10t11",
+            "name_localized": "Environmental factors such as exposure to endocrine disruptors",
+            "suggestion_localized": "Reducing exposure to plastics, pesticides, and chemicals in daily products",
+            "explanation_localized": "Certain environmental chemicals can interfere with hormonal balance and potentially influence endometriosis."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "endometriose",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "50",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:45:04.682Z",
+  "data": {
+    "sessionEnd": "2025-06-19T06:45:04.682Z"
+  }
+}
+---

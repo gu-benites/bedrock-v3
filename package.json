@@ -18,7 +18,6 @@
     "performance:baseline": "node scripts/monitor-performance-baseline.js",
     "performance:navigation": "node scripts/verify-navigation-timing.js",
     "performance:webpack": "node scripts/validate-webpack-optimizations.js",
-    "performance:monitor": "echo 'Open browser console and run: performanceMonitor.logReport()' && npm run dev",
     "pubmed:cli": "npx tsx own-openai-examples/pubmed-research-agent/index.ts",
     "pubmed:orchestrated": "npx tsx own-openai-examples/pubmed-research-agent/fixed-cli.ts"
   },

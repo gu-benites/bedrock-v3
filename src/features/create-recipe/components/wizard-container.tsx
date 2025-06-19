@@ -19,10 +19,6 @@ import { PropertiesDisplay } from './properties-display';
 import { MobileLayout } from './mobile-layout';
 import { DashboardLayout } from './dashboard-layout';
 import { RecipeErrorBoundary } from './error-boundary';
-import { useRenderPerformanceMonitor } from '@/hooks/use-render-performance-monitor';
-import { PerformanceMonitorProvider } from './performance-monitor';
-import { PrefetchMonitorProvider } from './prefetch-monitor';
-import { useIntelligentPrefetcher } from '@/hooks/use-route-prefetcher';
 
 /**
  * Props for the WizardContainer
@@ -68,7 +64,10 @@ export function WizardContainer({
   showBreadcrumbs = true,
   showProgress = true,
   className
-}: WizardContainerProps = {}) {  // Use optimized selectors to prevent unnecessary re-renders
+}: WizardContainerProps = {}) {
+  const { stepInfo, goToNext, goToPrevious, canGoNext, canGoPrevious, getCompletionPercentage } = useRecipeWizardNavigation();
+
+  // Use optimized selectors to prevent unnecessary re-renders
   const { currentStep: storeCurrentStep, isLoading, error, sessionId } = useRecipeStore(
     useCallback((state) => ({
       currentStep: state.currentStep,
@@ -88,20 +87,6 @@ export function WizardContainer({
   // Use prop or store current step
   const activeStep = currentStep || storeCurrentStep;
 
-  // Performance monitoring
-  useRenderPerformanceMonitor('WizardContainer', { currentStep, layout, showBreadcrumbs, showProgress }, {
-    trackProps: true,
-    logThreshold: 5
-  });
-
-  // Intelligent route prefetching based on user behavior
-  useIntelligentPrefetcher(activeStep, {
-    enabled: true,
-    priority: 'low'
-  });
-
-  const { stepInfo } = useRecipeWizardNavigation();
-
   // Memoize sync condition to prevent unnecessary effect runs
   const shouldSync = useMemo(() => {
     return currentStep && currentStep !== storeCurrentStep && !isLoading;
@@ -117,10 +102,12 @@ export function WizardContainer({
           storeStep: storeCurrentStep
         });
       }
-      setCurrentStep(currentStep!);
+      setCurrentStep(currentStep);
     }
   }, [shouldSync, currentStep, storeCurrentStep, setCurrentStep]);
 
+  // Memoize progress calculation to prevent unnecessary recalculations
+  const progressPercentage = useMemo(() => getCompletionPercentage(), [getCompletionPercentage]);
 
   // Memoize layout decisions to prevent unnecessary re-renders
   const layoutConfig = useMemo(() => {
@@ -169,9 +156,7 @@ export function WizardContainer({
 
   // Render with appropriate layout
   return (
-    <PerformanceMonitorProvider>
-      <PrefetchMonitorProvider>
-        <RecipeErrorBoundary>
+    <RecipeErrorBoundary>
       {layout === 'dashboard' ? (
         layoutConfig.shouldShowSimplifiedLayout ? (
           // Simplified layout for health concern step - no breadcrumbs or sidebar
@@ -201,9 +186,7 @@ export function WizardContainer({
           {wizardContent}
         </MobileLayout>
       )}
-        </RecipeErrorBoundary>
-      </PrefetchMonitorProvider>
-    </PerformanceMonitorProvider>
+    </RecipeErrorBoundary>
   );
 }
 

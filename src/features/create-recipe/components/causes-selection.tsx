@@ -9,11 +9,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import type { PotentialCause, PotentialSymptom } from '../types/recipe.types';
-import { RecipeStep } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import AIStreamingModal from '@/components/ui/ai-streaming-modal';
-import { useStreamingPrefetcher } from '@/hooks/use-route-prefetcher';
 
 /**
  * Causes Selection component
@@ -55,12 +53,6 @@ export function CausesSelection() {
 
   // Ref to track navigation to prevent infinite loops
   const hasNavigatedRef = useRef(false);
-
-  // Route prefetching for better navigation performance
-  useStreamingPrefetcher(RecipeStep.CAUSES, isStreamingSymptoms, {
-    enabled: true,
-    priority: 'high'
-  });
 
   // Determine if we're in a loading state (either local loading or streaming from demographics)
   const isLoadingCauses = isStreamingCauses || isLoading;

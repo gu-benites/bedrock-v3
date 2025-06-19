@@ -1,0 +1,164 @@
+{
+  "timestamp": "2025-06-19T06:47:50.632Z",
+  "data": {
+    "sessionStart": "2025-06-19T06:47:50.632Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:53.042Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 668,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Potential Causes Analysis\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-05T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Analysis generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic Stress or Anxiety\",\"suggestion_localized\":\"Consider relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and anxiety ",
+    "bufferSuffix": "'s disease symptoms.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"name_localized\":\"Dietary"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:53.882Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1498,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Potential Causes Analysis\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-05T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Analysis generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic Stress or Anxiety\",\"suggestion_localized\":\"Consider relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and anxiety ",
+    "bufferSuffix": "_localized\":\"Poor sleep and fatigue can impair immune function and worsen chronic inflammation.\"},{\""
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:54.812Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2193,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Potential Causes Analysis\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-05T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Analysis generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic Stress or Anxiety\",\"suggestion_localized\":\"Consider relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and anxiety ",
+    "bufferSuffix": "llergens, may contribute to inflammatory responses.\"},{\"cause_id\":\"g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:55.780Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2914,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"Potential Causes Analysis\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-05T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Analysis generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic Stress or Anxiety\",\"suggestion_localized\":\"Consider relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and anxiety can affect gut health and immune function, which may influence Crohn's disease symptoms.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"name_localized\":\"Dietary Factors\",\"suggestion_localized\":\"Review and adjust your diet to identify potential triggers.\",\"explanation_localized\":\"Certain foods can exacerbate Crohn's disease symptoms, especially in sensitive individuals.\"},{\"cause_id\":\"c3d4e5f6-g7h8-i9j-10k11-l12l13m14n15o16\",\"name_localized\":\"Age-Related Immune Changes\",\"suggestion_localized\":\"Maintain a balanced diet and regular medical follow-ups.\",\"explanation_localized\":\"As individuals age, the immune system can change, possibly impacting autoimmune or inflammatory conditions like Crohn's.\"},{\"cause_id\":\"d4e5f6g7-h8i9-j0k1-l12m-34n56o78p90\",\"name_localized\":\"Physical Fatigue and Lack of Sleep\",\"suggestion_localized\":\"Aim for regular, restorative sleep patterns.\",\"explanation_localized\":\"Poor sleep and fatigue can impair immune function and worsen chronic inflammation.\"},{\"cause_id\":\"e5f6g7h8-i9j0-k1l2-m3n4-o5p6q7r8s9t0\",\"name_localized\":\"Psychosocial Factors and Life Stressors\",\"suggestion_localized\":\"Engage in supportive social activities and consider counseling if needed.\",\"explanation_localized\":\"Emotional stressors, including life changes or social pressures, can influence gastrointestinal health.\"},{\"cause_id\":\"f6g7h8i9-j0k1-l2m3-n4o5-p6q7r8s9t0u1\",\"name_localized\":\"Environmental Factors\",\"suggestion_localized\":\"Evaluate your living and working environment for potential irritants.\",\"explanation_localized\":\"Environmental exposures, like pollutants or allergens, may contribute to inflammatory responses.\"},{\"cause_id\":\"g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u1v2\",\"name_localized\":\"Medication Side Effects\",\"suggestion_localized\":\"Discuss with your healthcare provider about medications you are taking.\",\"explanation_localized\":\"Certain medications can affect gut health or interact with Crohn's disease management.\"},{\"cause_id\":\"h8i9j0k1-l2m3-n4o5-p6q7-r8s9t0u1v2w3\",\"name_localized\":\"Age-specific Nutritional Needs\",\"suggestion_localized\":\"Consult a dietitian to optimize your nutritional intake.\",\"explanation_localized\":\"Nutritional deficiencies common in older adults can impact overall health and disease management.\"}]},\"echo\":{\"health_concern_input\":\"doencar de chron\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"senior\",\"age_specific\":\"50\",\"age_unit\":\"years\"}}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:55.833Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6853b449073c819bba6a6806121982930826b9fa1fe67d1a",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"Potential Causes Analysis\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-05T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Analysis generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic Stress or Anxiety\",\"suggestion_localized\":\"Consider relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and anxiety can affect gut health and immune function, which may influence Crohn's disease symptoms.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"name_localized\":\"Dietary Factors\",\"suggestion_localized\":\"Review and adjust your diet to identify potential triggers.\",\"explanation_localized\":\"Certain foods can exacerbate Crohn's disease symptoms, especially in sensitive individuals.\"},{\"cause_id\":\"c3d4e5f6-g7h8-i9j-10k11-l12l13m14n15o16\",\"name_localized\":\"Age-Related Immune Changes\",\"suggestion_localized\":\"Maintain a balanced diet and regular medical follow-ups.\",\"explanation_localized\":\"As individuals age, the immune system can change, possibly impacting autoimmune or inflammatory conditions like Crohn's.\"},{\"cause_id\":\"d4e5f6g7-h8i9-j0k1-l12m-34n56o78p90\",\"name_localized\":\"Physical Fatigue and Lack of Sleep\",\"suggestion_localized\":\"Aim for regular, restorative sleep patterns.\",\"explanation_localized\":\"Poor sleep and fatigue can impair immune function and worsen chronic inflammation.\"},{\"cause_id\":\"e5f6g7h8-i9j0-k1l2-m3n4-o5p6q7r8s9t0\",\"name_localized\":\"Psychosocial Factors and Life Stressors\",\"suggestion_localized\":\"Engage in supportive social activities and consider counseling if needed.\",\"explanation_localized\":\"Emotional stressors, including life changes or social pressures, can influence gastrointestinal health.\"},{\"cause_id\":\"f6g7h8i9-j0k1-l2m3-n4o5-p6q7r8s9t0u1\",\"name_localized\":\"Environmental Factors\",\"suggestion_localized\":\"Evaluate your living and working environment for potential irritants.\",\"explanation_localized\":\"Environmental exposures, like pollutants or allergens, may contribute to inflammatory responses.\"},{\"cause_id\":\"g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u1v2\",\"name_localized\":\"Medication Side Effects\",\"suggestion_localized\":\"Discuss with your healthcare provider about medications you are taking.\",\"explanation_localized\":\"Certain medications can affect gut health or interact with Crohn's disease management.\"},{\"cause_id\":\"h8i9j0k1-l2m3-n4o5-p6q7-r8s9t0u1v2w3\",\"name_localized\":\"Age-specific Nutritional Needs\",\"suggestion_localized\":\"Consult a dietitian to optimize your nutritional intake.\",\"explanation_localized\":\"Nutritional deficiencies common in older adults can impact overall health and disease management.\"}]},\"echo\":{\"health_concern_input\":\"doencar de chron\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"senior\",\"age_specific\":\"50\",\"age_unit\":\"years\"}}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:55.847Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Potential Causes Analysis",
+        "request_id": "123e4567-e89b-12d3-a456-426614174000",
+        "timestamp_utc": "2023-10-05T12:00:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Analysis generated successfully."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14",
+            "name_localized": "Chronic Stress or Anxiety",
+            "suggestion_localized": "Consider relaxation techniques and stress management strategies.",
+            "explanation_localized": "Stress and anxiety can affect gut health and immune function, which may influence Crohn's disease symptoms."
+          },
+          {
+            "cause_id": "b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15",
+            "name_localized": "Dietary Factors",
+            "suggestion_localized": "Review and adjust your diet to identify potential triggers.",
+            "explanation_localized": "Certain foods can exacerbate Crohn's disease symptoms, especially in sensitive individuals."
+          },
+          {
+            "cause_id": "c3d4e5f6-g7h8-i9j-10k11-l12l13m14n15o16",
+            "name_localized": "Age-Related Immune Changes",
+            "suggestion_localized": "Maintain a balanced diet and regular medical follow-ups.",
+            "explanation_localized": "As individuals age, the immune system can change, possibly impacting autoimmune or inflammatory conditions like Crohn's."
+          },
+          {
+            "cause_id": "d4e5f6g7-h8i9-j0k1-l12m-34n56o78p90",
+            "name_localized": "Physical Fatigue and Lack of Sleep",
+            "suggestion_localized": "Aim for regular, restorative sleep patterns.",
+            "explanation_localized": "Poor sleep and fatigue can impair immune function and worsen chronic inflammation."
+          },
+          {
+            "cause_id": "e5f6g7h8-i9j0-k1l2-m3n4-o5p6q7r8s9t0",
+            "name_localized": "Psychosocial Factors and Life Stressors",
+            "suggestion_localized": "Engage in supportive social activities and consider counseling if needed.",
+            "explanation_localized": "Emotional stressors, including life changes or social pressures, can influence gastrointestinal health."
+          },
+          {
+            "cause_id": "f6g7h8i9-j0k1-l2m3-n4o5-p6q7r8s9t0u1",
+            "name_localized": "Environmental Factors",
+            "suggestion_localized": "Evaluate your living and working environment for potential irritants.",
+            "explanation_localized": "Environmental exposures, like pollutants or allergens, may contribute to inflammatory responses."
+          },
+          {
+            "cause_id": "g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u1v2",
+            "name_localized": "Medication Side Effects",
+            "suggestion_localized": "Discuss with your healthcare provider about medications you are taking.",
+            "explanation_localized": "Certain medications can affect gut health or interact with Crohn's disease management."
+          },
+          {
+            "cause_id": "h8i9j0k1-l2m3-n4o5-p6q7-r8s9t0u1v2w3",
+            "name_localized": "Age-specific Nutritional Needs",
+            "suggestion_localized": "Consult a dietitian to optimize your nutritional intake.",
+            "explanation_localized": "Nutritional deficiencies common in older adults can impact overall health and disease management."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "doencar de chron",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "senior",
+          "age_specific": "50",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:47:55.860Z",
+  "data": {
+    "sessionEnd": "2025-06-19T06:47:55.860Z"
+  }
+}
+---
