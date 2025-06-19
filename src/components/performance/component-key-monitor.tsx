@@ -287,7 +287,7 @@ export const ComponentKeyMonitor: React.FC<ComponentKeyMonitorProps> = ({
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="text-xs text-gray-500 space-y-1">
           <div>💡 Tip: Stability score = (1 - keyChanges/componentMounts) × 100</div>
-          <div>🎯 Target: >90% for optimal performance</div>
+          <div>🎯 Target: {'>'}90% for optimal performance</div>
         </div>
       </div>
     </div>

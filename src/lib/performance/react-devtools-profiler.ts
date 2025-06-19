@@ -5,7 +5,7 @@
 
 interface ProfilerData {
   id: string;
-  phase: 'mount' | 'update';
+  phase: 'mount' | 'update' | 'nested-update';
   actualDuration: number;
   baseDuration: number;
   startTime: number;
@@ -110,15 +110,25 @@ class ReactDevToolsProfiler {
 
     // Limit stored sessions
     if (this.sessions.size > this.config.maxSessions) {
-      const oldestSession = Array.from(this.sessions.keys())[0];
-      this.sessions.delete(oldestSession);
+      const oldestSessionId = Array.from(this.sessions.keys())[0];
+      if (oldestSessionId) {
+        this.sessions.delete(oldestSessionId);
+      }
     }
 
     const session = this.currentSession;
+    if (!session) {
+      console.warn('No active profiling session to stop');
+      return null;
+    }
+
     this.currentSession = null;
+    session.endTime = session.endTime || performance.now();
+
+    const duration = session.endTime - session.startTime;
 
     console.log(`🔍 React profiling stopped: ${session.sessionId}`, {
-      duration: session.endTime - session.startTime,
+      duration,
       totalProfiles: session.profiles.length,
       totalRenderTime: session.totalRenderTime,
       slowComponents: session.slowestComponents.length

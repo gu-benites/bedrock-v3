@@ -3,6 +3,7 @@
  * Visual interface for monitoring state persistence performance and debugging
  */
 
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { persistencePerformanceMonitor } from '@/features/create-recipe/hooks/use-optimized-persistence';
@@ -300,8 +301,8 @@ export const PersistenceMonitor: React.FC<PersistenceMonitorProps> = ({
       {/* Footer */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="text-xs text-gray-500 space-y-1">
-          <div>💡 Tip: Target <10ms for saves, <25ms for complex operations</div>
-          <div>🎯 Monitor operations that run frequently or take >50ms</div>
+          <div>💡 Tip: Target {'<'}10ms for saves, {'<'}25ms for complex operations</div>
+          <div>🎯 Monitor operations that run frequently or take {'>'}50ms</div>
         </div>
       </div>
     </div>
@@ -340,4 +341,4 @@ export const PersistenceMonitorProvider: React.FC<{ children: React.ReactNode }>
       )}
     </>
   );
-};
+}; 

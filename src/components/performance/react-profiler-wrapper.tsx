@@ -29,25 +29,25 @@ export const ReactProfilerWrapper: React.FC<ReactProfilerWrapperProps> = ({
   logSlowRenders = true,
   slowRenderThreshold = 16
 }) => {
-  const handleRender: ProfilerOnRenderCallback = (
-    profileId,
+  const handleRender: ProfilerOnRenderCallback = function (
+    id,
     phase,
     actualDuration,
     baseDuration,
     startTime,
     commitTime,
-    interactions
-  ) => {
+    ...rest
+  ) {
     // Record data in our profiling system
     if (enabled) {
       const profilerData: ProfilerData = {
-        id: profileId,
+        id,
         phase,
         actualDuration,
         baseDuration,
         startTime,
         commitTime,
-        interactions
+        interactions: new Set(rest)
       };
 
       reactProfiler.recordProfilerData(profilerData);
@@ -55,19 +55,19 @@ export const ReactProfilerWrapper: React.FC<ReactProfilerWrapperProps> = ({
       // Log slow renders
       if (logSlowRenders && actualDuration > slowRenderThreshold) {
         console.warn(
-          `🐌 Slow render detected: ${profileId} (${phase}) took ${actualDuration.toFixed(2)}ms`,
+          `🐌 Slow render detected: ${id} (${phase}) took ${actualDuration.toFixed(2)}ms`,
           {
             actualDuration,
             baseDuration,
             phase,
-            interactions: Array.from(interactions)
+            interactions: rest
           }
         );
       }
     }
 
     // Call custom onRender callback if provided
-    onRender?.(profileId, phase, actualDuration, baseDuration, startTime, commitTime, interactions);
+    onRender?.(id, phase, actualDuration, baseDuration, startTime, commitTime);
   };
 
   if (!enabled) {

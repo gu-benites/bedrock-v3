@@ -1,0 +1,164 @@
+{
+  "timestamp": "2025-06-19T06:02:55.536Z",
+  "data": {
+    "sessionStart": "2025-06-19T06:02:55.535Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:02:58.465Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 643,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"potential_causes_response\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes identified based on the user's profile and health concern.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Dehydration\",\"suggestion_localized\":\"Ensure adequate hydration throughout the day.\",\"explanation_localized\":\"Not drink",
+    "bufferSuffix": "pecially in children.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-0j11-k12l13m14n15\",\"name_localized\":\"Lack of"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:02:59.451Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1462,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"potential_causes_response\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes identified based on the user's profile and health concern.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Dehydration\",\"suggestion_localized\":\"Ensure adequate hydration throughout the day.\",\"explanation_localized\":\"Not drink",
+    "bufferSuffix": "s.\",\"explanation_localized\":\"Nutritional gaps, such as lack of magnesium or vitamins, can contribute"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:03:00.550Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2176,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"potential_causes_response\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes identified based on the user's profile and health concern.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Dehydration\",\"suggestion_localized\":\"Ensure adequate hydration throughout the day.\",\"explanation_localized\":\"Not drink",
+    "bufferSuffix": "-k1l2-3m4n-5o16-p17q18r19s20\",\"name_localized\":\"Environmental factors such as noise or bright lights"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:03:01.596Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2848,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"potential_causes_response\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes identified based on the user's profile and health concern.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Dehydration\",\"suggestion_localized\":\"Ensure adequate hydration throughout the day.\",\"explanation_localized\":\"Not drinking enough fluids can lead to headaches, especially in children.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-0j11-k12l13m14n15\",\"name_localized\":\"Lack of sleep or irregular sleep schedule\",\"suggestion_localized\":\"Try to establish a consistent sleep routine.\",\"explanation_localized\":\"Poor sleep is a common cause of headaches in children, affecting their overall well-being.\"},{\"cause_id\":\"c3d4e5f6-g7h8-9i0j-1k12-l13m14n15o16\",\"name_localized\":\"Eye strain from screen time\",\"suggestion_localized\":\"Limit screen exposure and ensure proper lighting when using electronic devices.\",\"explanation_localized\":\"Extended screen use can cause eye strain leading to headaches, especially in children.\"},{\"cause_id\":\"d4e5f6g7-h8i9-0j1k-2l13-m14n15o16p17\",\"name_localized\":\"Nutritional deficiencies\",\"suggestion_localized\":\"Ensure a balanced diet with sufficient vitamins and minerals.\",\"explanation_localized\":\"Nutritional gaps, such as lack of magnesium or vitamins, can contribute to headaches in children.\"},{\"cause_id\":\"e5f6g7h8-i9j0-1k2l-3m14-n15o16p17q18\",\"name_localized\":\"Stress or emotional factors\",\"suggestion_localized\":\"Encourage open communication and stress management activities.\",\"explanation_localized\":\"Emotional stress or anxiety can manifest as physical symptoms like headaches in children.\"},{\"cause_id\":\"f6g7h8i9-j0k1-2l3m-4n15-o16p17q18r19\",\"name_localized\":\"Poor posture\",\"suggestion_localized\":\"Promote correct posture during activities and breaks.\",\"explanation_localized\":\"Incorrect posture can lead to muscle tension and headaches in children.\"},{\"cause_id\":\"g7h8i9j0-k1l2-3m4n-5o16-p17q18r19s20\",\"name_localized\":\"Environmental factors such as noise or bright lights\",\"suggestion_localized\":\"Create a calm and comfortable environment for the child.\",\"explanation_localized\":\"Excessive noise or bright lights can trigger headaches in sensitive children.\"},{\"cause_id\":\"h8i9j0k1-l2m3-4n5o-6p17-q18r19s20t21\",\"name_localized\":\"Underlying health issues (less likely but possible)\",\"suggestion_localized\":\"Monitor symptoms and consult a healthcare professional if necessary.\",\"explanation_localized\":\"Certain health conditions, though less common, can cause recurring headaches in children.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"child\",\"age_specific\":\"10\",\"age_unit\":\"years\"}}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:03:01.651Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6853a9c24768819a93b5b88e94642b110bbc379a2cf9d271",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"potential_causes_response\",\"request_id\":\"123e4567-e89b-12d3-a456-426614174000\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes identified based on the user's profile and health concern.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Dehydration\",\"suggestion_localized\":\"Ensure adequate hydration throughout the day.\",\"explanation_localized\":\"Not drinking enough fluids can lead to headaches, especially in children.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-0j11-k12l13m14n15\",\"name_localized\":\"Lack of sleep or irregular sleep schedule\",\"suggestion_localized\":\"Try to establish a consistent sleep routine.\",\"explanation_localized\":\"Poor sleep is a common cause of headaches in children, affecting their overall well-being.\"},{\"cause_id\":\"c3d4e5f6-g7h8-9i0j-1k12-l13m14n15o16\",\"name_localized\":\"Eye strain from screen time\",\"suggestion_localized\":\"Limit screen exposure and ensure proper lighting when using electronic devices.\",\"explanation_localized\":\"Extended screen use can cause eye strain leading to headaches, especially in children.\"},{\"cause_id\":\"d4e5f6g7-h8i9-0j1k-2l13-m14n15o16p17\",\"name_localized\":\"Nutritional deficiencies\",\"suggestion_localized\":\"Ensure a balanced diet with sufficient vitamins and minerals.\",\"explanation_localized\":\"Nutritional gaps, such as lack of magnesium or vitamins, can contribute to headaches in children.\"},{\"cause_id\":\"e5f6g7h8-i9j0-1k2l-3m14-n15o16p17q18\",\"name_localized\":\"Stress or emotional factors\",\"suggestion_localized\":\"Encourage open communication and stress management activities.\",\"explanation_localized\":\"Emotional stress or anxiety can manifest as physical symptoms like headaches in children.\"},{\"cause_id\":\"f6g7h8i9-j0k1-2l3m-4n15-o16p17q18r19\",\"name_localized\":\"Poor posture\",\"suggestion_localized\":\"Promote correct posture during activities and breaks.\",\"explanation_localized\":\"Incorrect posture can lead to muscle tension and headaches in children.\"},{\"cause_id\":\"g7h8i9j0-k1l2-3m4n-5o16-p17q18r19s20\",\"name_localized\":\"Environmental factors such as noise or bright lights\",\"suggestion_localized\":\"Create a calm and comfortable environment for the child.\",\"explanation_localized\":\"Excessive noise or bright lights can trigger headaches in sensitive children.\"},{\"cause_id\":\"h8i9j0k1-l2m3-4n5o-6p17-q18r19s20t21\",\"name_localized\":\"Underlying health issues (less likely but possible)\",\"suggestion_localized\":\"Monitor symptoms and consult a healthcare professional if necessary.\",\"explanation_localized\":\"Certain health conditions, though less common, can cause recurring headaches in children.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"child\",\"age_specific\":\"10\",\"age_unit\":\"years\"}}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:03:01.669Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "potential_causes_response",
+        "request_id": "123e4567-e89b-12d3-a456-426614174000",
+        "timestamp_utc": "2023-10-01T12:00:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Potential causes identified based on the user's profile and health concern."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14",
+            "name_localized": "Dehydration",
+            "suggestion_localized": "Ensure adequate hydration throughout the day.",
+            "explanation_localized": "Not drinking enough fluids can lead to headaches, especially in children."
+          },
+          {
+            "cause_id": "b2c3d4e5-f6g7-8h9i-0j11-k12l13m14n15",
+            "name_localized": "Lack of sleep or irregular sleep schedule",
+            "suggestion_localized": "Try to establish a consistent sleep routine.",
+            "explanation_localized": "Poor sleep is a common cause of headaches in children, affecting their overall well-being."
+          },
+          {
+            "cause_id": "c3d4e5f6-g7h8-9i0j-1k12-l13m14n15o16",
+            "name_localized": "Eye strain from screen time",
+            "suggestion_localized": "Limit screen exposure and ensure proper lighting when using electronic devices.",
+            "explanation_localized": "Extended screen use can cause eye strain leading to headaches, especially in children."
+          },
+          {
+            "cause_id": "d4e5f6g7-h8i9-0j1k-2l13-m14n15o16p17",
+            "name_localized": "Nutritional deficiencies",
+            "suggestion_localized": "Ensure a balanced diet with sufficient vitamins and minerals.",
+            "explanation_localized": "Nutritional gaps, such as lack of magnesium or vitamins, can contribute to headaches in children."
+          },
+          {
+            "cause_id": "e5f6g7h8-i9j0-1k2l-3m14-n15o16p17q18",
+            "name_localized": "Stress or emotional factors",
+            "suggestion_localized": "Encourage open communication and stress management activities.",
+            "explanation_localized": "Emotional stress or anxiety can manifest as physical symptoms like headaches in children."
+          },
+          {
+            "cause_id": "f6g7h8i9-j0k1-2l3m-4n15-o16p17q18r19",
+            "name_localized": "Poor posture",
+            "suggestion_localized": "Promote correct posture during activities and breaks.",
+            "explanation_localized": "Incorrect posture can lead to muscle tension and headaches in children."
+          },
+          {
+            "cause_id": "g7h8i9j0-k1l2-3m4n-5o16-p17q18r19s20",
+            "name_localized": "Environmental factors such as noise or bright lights",
+            "suggestion_localized": "Create a calm and comfortable environment for the child.",
+            "explanation_localized": "Excessive noise or bright lights can trigger headaches in sensitive children."
+          },
+          {
+            "cause_id": "h8i9j0k1-l2m3-4n5o-6p17-q18r19s20t21",
+            "name_localized": "Underlying health issues (less likely but possible)",
+            "suggestion_localized": "Monitor symptoms and consult a healthcare professional if necessary.",
+            "explanation_localized": "Certain health conditions, though less common, can cause recurring headaches in children."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "dor de cabeça",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "child",
+          "age_specific": "10",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T06:03:01.715Z",
+  "data": {
+    "sessionEnd": "2025-06-19T06:03:01.715Z"
+  }
+}
+---

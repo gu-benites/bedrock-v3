@@ -291,8 +291,8 @@ export const CalculationPerformanceMonitor: React.FC<CalculationPerformanceMonit
       {/* Footer */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="text-xs text-gray-500 space-y-1">
-          <div>💡 Tip: Target <1ms for frequent calculations, <5ms for complex ones</div>
-          <div>🎯 Monitor calculations that run frequently or take >10ms</div>
+          <div>💡 Tip: Target {'<'}1ms for frequent calculations, {'<'}5ms for complex ones</div>
+          <div>🎯 Monitor calculations that run frequently or take {'>'}10ms</div>
         </div>
       </div>
     </div>

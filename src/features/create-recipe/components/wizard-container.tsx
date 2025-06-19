@@ -5,9 +5,8 @@
 
 'use client';
 
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
-import { useRecipeStore } from '../store/recipe-store';
 import { RecipeStep } from '../types/recipe.types';
 import { HealthConcernForm } from './health-concern-form';
 import { HealthConcernChatInput } from './health-concern-chat-input';
@@ -35,13 +34,13 @@ import { NormalizationPerformanceMonitorProvider } from '@/components/debug/norm
 import { PersistenceMonitorProvider } from '@/components/debug/persistence-monitor';
 import { useOptimizedPersistence } from '../hooks/use-optimized-persistence';
 import { useIntelligentPrefetcher } from '@/hooks/use-route-prefetcher';
-import { useNavigationTiming, useNavigationPerformance } from '@/hooks/use-navigation-timing';
+
 import {
   useOptimizedWizardState,
   useOptimizedActions,
   useSelectorPerformanceMonitor
 } from '../hooks/use-optimized-store-selectors';
-import { ComponentKeyStrategies, useComponentKeys } from '@/lib/utils/component-key-strategies';
+import { ComponentKeyStrategies } from '@/lib/utils/component-key-strategies';
 
 /**
  * Props for the WizardContainer
@@ -58,7 +57,19 @@ interface WizardContainerProps {
  * Renders the appropriate step component based on current step
  * Memoized to prevent unnecessary re-renders when props haven't changed
  */
-const StepRenderer = React.memo(({ step, sessionId, layout }: { step: RecipeStep; sessionId: string; layout?: string }) => {
+const StepRenderer = React.memo(({ 
+  step, 
+  sessionId, 
+  layout,
+  stepInfo,
+  isLoading
+}: { 
+  step: RecipeStep; 
+  sessionId: string; 
+  layout?: string;
+  stepInfo: any;
+  isLoading: boolean;
+}) => {
   switch (step) {
     case RecipeStep.HEALTH_CONCERN:
       // Use chat-style input for dashboard layout, regular form for others
@@ -68,11 +79,27 @@ const StepRenderer = React.memo(({ step, sessionId, layout }: { step: RecipeStep
     case RecipeStep.DEMOGRAPHICS:
       return <DemographicsForm key={ComponentKeyStrategies.wizardStep('demographics', sessionId)} />;
     case RecipeStep.CAUSES:
-      return <CausesSelection key={ComponentKeyStrategies.wizardStep('causes', sessionId)} />;
+      return (
+        <CausesSelection 
+          key={ComponentKeyStrategies.wizardStep('causes', sessionId)}
+          items={stepInfo.causes || []}
+          selectedIds={stepInfo.selectedCauses || new Set()}
+          onSelectionChange={() => {/* TODO: Implement cause selection change */}}
+          isLoading={isLoading}
+        />
+      );
     case RecipeStep.SYMPTOMS:
       return <SymptomsSelection key={ComponentKeyStrategies.wizardStep('symptoms', sessionId)} />;
     case RecipeStep.PROPERTIES:
-      return <PropertiesDisplay key={ComponentKeyStrategies.wizardStep('properties', sessionId)} />;
+      return (
+        <PropertiesDisplay 
+          key={ComponentKeyStrategies.wizardStep('properties', sessionId)}
+          properties={stepInfo.properties || []}
+          selectedCauses={stepInfo.selectedCauses || []}
+          selectedSymptoms={stepInfo.selectedSymptoms || []}
+          isLoading={isLoading}
+        />
+      );
     default:
       return <div key={ComponentKeyStrategies.wizardStep('unknown', sessionId)}>Unknown step</div>;
   }
@@ -93,58 +120,32 @@ export function WizardContainer({
     trackProps: true,
     logThreshold: 5
   });
-
-  // Navigation timing
-  const { logNavigation, logUserInteraction, measureSync } = useNavigationTiming({
-    componentName: 'WizardContainer',
-    trackRenders: true
-  });
-
-  const { measureNavigation } = useNavigationPerformance();
-
-  // Intelligent route prefetching based on user behavior
-  const { getUserBehaviorStats } = useIntelligentPrefetcher(activeStep, {
-    enabled: true,
-    priority: 'low'
-  });
-
-  const { stepInfo, goToNext, goToPrevious, canGoNext, canGoPrevious, getCompletionPercentage } = useRecipeWizardNavigation();
+  // Get navigation and step info
+  const { stepInfo } = useRecipeWizardNavigation();
 
   // Use optimized selectors to prevent unnecessary re-renders
   const { currentStep: storeCurrentStep, isLoading, error, sessionId } = useOptimizedWizardState();
   const { setCurrentStep, resetWizard } = useOptimizedActions();
 
-  // Monitor selector performance in development
-  useSelectorPerformanceMonitor('WizardContainer');
-
-  // Optimized persistence with intelligent strategies
-  const {
-    saveState,
-    restoreState,
-    hasStateChanged,
-    getStats: getPersistenceStats,
-    isEnabled: isPersistenceEnabled
-  } = useOptimizedPersistence({
-    enabled: true,
-    autoRestore: true,
-    trackChanges: true,
-    performanceMode: 'balanced',
-    onRestoreComplete: (data) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 State restored in WizardContainer:', Object.keys(data));
-      }
-    },
-    onSaveComplete: (data) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('💾 State saved in WizardContainer:', Object.keys(data));
-      }
-    }
-  });
-
   // Use prop or store current step
   const activeStep = currentStep || storeCurrentStep;
 
-  // Memoize sync condition to prevent unnecessary effect runs
+  // Intelligent route prefetching based on user behavior
+  useIntelligentPrefetcher(activeStep, {
+    enabled: true,
+    priority: 'low'
+  });
+
+  // Monitor selector performance in development
+  useSelectorPerformanceMonitor('WizardContainer');
+  // Initialize persistence
+  useOptimizedPersistence({
+    enabled: true,
+    autoRestore: true,
+    trackChanges: true,
+    performanceMode: 'balanced'
+  });
+  // Memoize sync conditionto prevent unnecessary effect runs
   const shouldSync = useMemo(() => {
     return currentStep && currentStep !== storeCurrentStep && !isLoading;
   }, [currentStep, storeCurrentStep, isLoading]);
@@ -164,7 +165,7 @@ export function WizardContainer({
   }, [shouldSync, currentStep, storeCurrentStep, setCurrentStep]);
 
   // Memoize progress calculation to prevent unnecessary recalculations
-  const progressPercentage = useMemo(() => getCompletionPercentage(), [getCompletionPercentage]);
+
 
   // Memoize layout decisions to prevent unnecessary re-renders
   const layoutConfig = useMemo(() => {
@@ -202,11 +203,15 @@ export function WizardContainer({
       {/* Current Step Announcement */}
       <div role="status" aria-label="Current step" className="sr-only">
         Currently on {stepInfo.current.title}, step {stepInfo.progress} of 6
-      </div>
-
-      {/* Step Content */}
+      </div>      {/* Step Content */}
       <div className="min-h-[400px]">
-        <StepRenderer step={activeStep} sessionId={sessionId} layout={layout} />
+        <StepRenderer 
+          step={activeStep} 
+          sessionId={sessionId} 
+          layout={layout}
+          stepInfo={stepInfo}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   ), [isLoading, error, resetWizard, stepInfo.current.title, stepInfo.progress, activeStep, sessionId, layout]);
@@ -232,7 +237,13 @@ export function WizardContainer({
         layoutConfig.shouldShowSimplifiedLayout ? (
           // Simplified layout for health concern step - no breadcrumbs or sidebar
           <div className="h-full">
-            <StepRenderer step={activeStep} sessionId={sessionId} layout={layout} />
+            <StepRenderer 
+              step={activeStep} 
+              sessionId={sessionId} 
+              layout={layout}
+              stepInfo={stepInfo}
+              isLoading={isLoading}
+            />
           </div>
         ) : (
           // Regular dashboard layout for other steps

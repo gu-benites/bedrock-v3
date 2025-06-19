@@ -167,6 +167,11 @@ class ComponentPreloader {
    * Execute component preload with timeout
    */
   private async executeComponentPreload(componentPath: string, options: PreloadOptions): Promise<any> {
+    if (!this.validateComponentPath(componentPath)) {
+      throw new Error('Invalid component path');
+    }
+
+    const resolvedPath = this.resolveComponentPath(componentPath);
     const { priority, timeout } = options;
 
     return new Promise(async (resolve, reject) => {
@@ -180,7 +185,7 @@ class ComponentPreloader {
         // Use different strategies based on priority
         if (priority === 'high') {
           // Immediate import for high priority
-          component = await import(componentPath);
+          component = await import(/* webpackMode: "eager" */ resolvedPath);
         } else {
           // Use requestIdleCallback for low priority
           if ('requestIdleCallback' in window) {
@@ -188,7 +193,7 @@ class ComponentPreloader {
               (window as any).requestIdleCallback(resolve, { timeout: 1000 });
             });
           }
-          component = await import(componentPath);
+          component = await import(/* webpackMode: "eager" */ resolvedPath);
         }
 
         clearTimeout(timeoutId);
@@ -234,8 +239,14 @@ class ComponentPreloader {
       componentPath,
       loadSync: async () => {
         try {
-          console.log(`🚨 Loading component synchronously as fallback: ${componentPath}`);
-          return await import(componentPath);
+          if (!this.validateComponentPath(componentPath)) {
+            throw new Error('Invalid component path');
+          }
+
+          const resolvedPath = this.resolveComponentPath(componentPath);
+          console.log(`🚨 Loading component synchronously as fallback: ${resolvedPath}`);
+          
+          return await import(/* webpackMode: "eager" */ resolvedPath);
         } catch (error) {
           console.error(`❌ Synchronous fallback also failed: ${componentPath}`, error);
           return this.createErrorBoundaryComponent(componentPath, error);
@@ -507,6 +518,59 @@ class ComponentPreloader {
   configureFallbackStrategy(strategy: Partial<FallbackStrategy>): void {
     this.fallbackStrategy = { ...this.fallbackStrategy, ...strategy };
     console.log('⚙️ Fallback strategy updated:', this.fallbackStrategy);
+  }
+
+  /**
+   * Resolve component path to proper import path
+   */
+  private resolveComponentPath(componentPath: string): string {
+    // Handle absolute paths
+    if (componentPath.startsWith('@/')) {
+      return componentPath;
+    }
+
+    // Handle relative paths
+    if (componentPath.startsWith('./') || componentPath.startsWith('../')) {
+      // Convert to absolute path using @ alias
+      const normalizedPath = componentPath
+        .replace(/^\.\//, '')
+        .replace(/^\.\.\//, '');
+      return `@/features/create-recipe/components/${normalizedPath}`;
+    }
+
+    // Handle bare component names (assume they're in components directory)
+    if (!componentPath.includes('/')) {
+      return `@/features/create-recipe/components/${componentPath}`;
+    }
+
+    return componentPath;
+  }
+
+  /**
+   * Validate component path before importing
+   */
+  private validateComponentPath(componentPath: string): boolean {
+    // Ensure path is a string and not empty
+    if (typeof componentPath !== 'string' || !componentPath) {
+      console.error('❌ Invalid component path:', componentPath);
+      return false;
+    }
+
+    // Ensure path doesn't contain dangerous patterns
+    const dangerousPatterns = [
+      '\\',          // Windows path separator
+      '..',          // Parent directory
+      '~',           // Home directory
+      '/',           // Root directory
+      'node_modules' // Node modules
+    ];
+
+    if (dangerousPatterns.some(pattern => componentPath.includes(pattern))) {
+      console.error('❌ Potentially unsafe component path:', componentPath);
+      return false;
+    }
+
+    return true;
   }
 }
 

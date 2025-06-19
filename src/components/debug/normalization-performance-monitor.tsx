@@ -303,7 +303,7 @@ export const NormalizationPerformanceMonitor: React.FC<NormalizationPerformanceM
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="text-xs text-gray-500 space-y-1">
           <div>💡 Tip: Target {'<'}2ms for normalization, {'<'}5ms for complex operations</div>
-          <div>🎯 Monitor operations that run frequently or take >10ms</div>
+          <div>🎯 Monitor operations that run frequently or take {'>'}10ms</div>
         </div>
       </div>
     </div>
