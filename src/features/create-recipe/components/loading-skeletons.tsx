@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { ComponentKeyStrategies } from '@/lib/utils/component-key-strategies';
 
 /**
  * Base skeleton component
@@ -86,7 +85,7 @@ export function SelectionGridSkeleton({
       )}>
         {Array.from({ length: items }).map((_, i) => (
           <div
-            key={ComponentKeyStrategies.skeleton('grid-item', i)}
+            key={i}
             className="border rounded-lg p-4 space-y-3"
           >
             <div className="flex items-start space-x-3">
@@ -150,7 +149,7 @@ export function PropertiesDisplaySkeleton({
       <div className="space-y-4">
         {Array.from({ length: properties }).map((_, i) => (
           <div
-            key={ComponentKeyStrategies.skeleton('property', i)}
+            key={i}
             className="border rounded-lg p-6 space-y-4"
           >
             {/* Header */}
@@ -168,7 +167,7 @@ export function PropertiesDisplaySkeleton({
             {/* Addresses */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Array.from({ length: 2 }).map((_, j) => (
-                <div key={ComponentKeyStrategies.skeleton('address', j)} className="space-y-2">
+                <div key={j} className="space-y-2">
                   <Skeleton className="h-4 w-32" />
                   <SkeletonText lines={1} />
                 </div>

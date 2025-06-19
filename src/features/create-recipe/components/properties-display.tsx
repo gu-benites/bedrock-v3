@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRecipeStore, useRecipeStreaming } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
@@ -15,8 +15,6 @@ import { fetchTherapeuticProperties } from '../services/recipe-api.service';
 
 import type { TherapeuticProperty } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
-import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
-import { usePropertiesWithAddressedItems, useOilRecommendationsSummary } from '@/lib/utils/memo-calculation-hooks';
 
 /**
  * Memoized property card component for better performance
@@ -155,9 +153,8 @@ const PropertyCard = React.memo(({
 
 /**
  * Properties Display component
- * Optimized with React.memo for performance
  */
-const PropertiesDisplayComponent = () => {
+export function PropertiesDisplay() {
   const {
     healthConcern,
     demographics,
@@ -182,15 +179,6 @@ const PropertiesDisplayComponent = () => {
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
   const [currentProperty, setCurrentProperty] = useState<TherapeuticProperty | null>(null);
   const processedCompletionRef = useRef<string | null>(null);
-
-  // Optimized calculations with useMemo
-  const propertiesWithAddressed = usePropertiesWithAddressedItems(
-    therapeuticProperties,
-    selectedCauses,
-    selectedSymptoms
-  );
-
-  const oilsSummary = useOilRecommendationsSummary(suggestedOils);
 
   // Debug logging for properties data
   useEffect(() => {
@@ -715,10 +703,12 @@ const PropertiesDisplayComponent = () => {
         <div className="space-y-6">
           {/* Properties Grid */}
           <div className="space-y-6">
-            {propertiesWithAddressed
-              .sort((a, b) => b.relevancyScore - a.relevancyScore)
+            {therapeuticProperties
+              .sort((a, b) => (b.relevancy_score || b.relevancy || 0) - (a.relevancy_score || a.relevancy || 0))
               .map((property, index) => {
-                const { addressedCauses, addressedSymptoms, relevancyScore } = property;
+                const addressedCauses = getAddressedCauses(property);
+                const addressedSymptoms = getAddressedSymptoms(property);
+                const relevancyScore = property.relevancy_score || property.relevancy || 0;
 
                 // Debug logging for property data
                 console.log(`🎨 Rendering property ${index}:`, {
@@ -751,48 +741,6 @@ const PropertiesDisplayComponent = () => {
                 );
               })}
           </div>
-
-          {/* Oil Recommendations Summary */}
-          {oilsSummary.hasRecommendations && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-green-900">Oil Recommendations Summary</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-green-700 font-medium">{oilsSummary.totalProperties}</span>
-                    <span className="text-green-600 ml-1">Properties analyzed</span>
-                  </div>
-                  <div>
-                    <span className="text-green-700 font-medium">{oilsSummary.uniqueOils}</span>
-                    <span className="text-green-600 ml-1">Unique oils found</span>
-                  </div>
-                  <div>
-                    <span className="text-green-700 font-medium">{oilsSummary.totalOils}</span>
-                    <span className="text-green-600 ml-1">Total recommendations</span>
-                  </div>
-                  <div>
-                    <span className="text-green-700 font-medium">{oilsSummary.averageOilsPerProperty.toFixed(1)}</span>
-                    <span className="text-green-600 ml-1">Avg per property</span>
-                  </div>
-                </div>
-                {oilsSummary.mostRecommended.length > 0 && (
-                  <div>
-                    <p className="text-xs text-green-700 mb-2">Most recommended oils:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {oilsSummary.mostRecommended.slice(0, 3).map((rec, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-md"
-                        >
-                          {rec.oil.name_localized || rec.oil.name_english} ({rec.recommendationCount}x)
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -889,10 +837,4 @@ const PropertiesDisplayComponent = () => {
       />
     </div>
   );
-};
-
-// Memoized version with custom comparison for optimal performance
-export const PropertiesDisplay = memo(
-  PropertiesDisplayComponent,
-  withMemoMonitoring('PropertiesDisplay', MemoComparisons.propertiesDisplay)
-);
+}

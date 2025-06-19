@@ -5,9 +5,7 @@
  */
 
 import { create } from 'zustand';
-import { useCallback } from 'react';
 import { RecipeStep } from '../types/recipe.types';
-import { stateMonitoringMiddleware } from '@/lib/debug/state-change-monitor';
 import type {
   RecipeWizardState,
   RecipeWizardActions,
@@ -85,11 +83,8 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
 /**
  * Main recipe wizard store WITHOUT persistence for reset-on-refresh behavior
  * Data is intentionally not persisted so browser refresh clears all state
- * Includes state change monitoring for development debugging
  */
-export const useRecipeStore = create<RecipeStore>()(
-  stateMonitoringMiddleware('recipe-store')(
-    (set, get) => ({
+export const useRecipeStore = create<RecipeStore>()((set, get) => ({
   ...initialState,
       
       // Step navigation actions - optimized to reduce unnecessary re-renders
@@ -555,169 +550,56 @@ export const useRecipeStore = create<RecipeStore>()(
 
         console.log('✅ Recipe wizard reset completed - all data and states cleared');
       }
-    })
-  )
-);
+    }));
 
 /**
- * Optimized selector hooks for specific parts of the state
- * These hooks use shallow comparison to prevent unnecessary re-renders
+ * Selector hooks for specific parts of the state
  */
+export const useRecipeNavigationStore = () => useRecipeStore((state) => ({
+  currentStep: state.currentStep,
+  completedSteps: state.completedSteps,
+  setCurrentStep: state.setCurrentStep,
+  markStepCompleted: state.markStepCompleted,
+  canNavigateToStep: state.canNavigateToStep
+}));
 
-// Navigation-specific selectors with memoization
-export const useRecipeNavigationStore = () => useRecipeStore(
-  useCallback((state) => ({
-    currentStep: state.currentStep,
-    completedSteps: state.completedSteps,
-    setCurrentStep: state.setCurrentStep,
-    markStepCompleted: state.markStepCompleted,
-    canNavigateToStep: state.canNavigateToStep
-  }), [])
-);
+export const useRecipeData = () => useRecipeStore((state) => ({
+  healthConcern: state.healthConcern,
+  demographics: state.demographics,
+  selectedCauses: state.selectedCauses,
+  selectedSymptoms: state.selectedSymptoms,
+  therapeuticProperties: state.therapeuticProperties,
+  suggestedOils: state.suggestedOils
+}));
 
-// Data-specific selectors with shallow comparison
-export const useRecipeData = () => useRecipeStore(
-  useCallback((state) => ({
-    healthConcern: state.healthConcern,
-    demographics: state.demographics,
-    selectedCauses: state.selectedCauses,
-    selectedSymptoms: state.selectedSymptoms,
-    therapeuticProperties: state.therapeuticProperties,
-    suggestedOils: state.suggestedOils
-  }), [])
-);
+export const useRecipeApiData = () => useRecipeStore((state) => ({
+  potentialCauses: state.potentialCauses,
+  potentialSymptoms: state.potentialSymptoms,
+  setPotentialCauses: state.setPotentialCauses,
+  setPotentialSymptoms: state.setPotentialSymptoms
+}));
 
-// API data selectors with optimized comparison
-export const useRecipeApiData = () => useRecipeStore(
-  useCallback((state) => ({
-    potentialCauses: state.potentialCauses,
-    potentialSymptoms: state.potentialSymptoms,
-    setPotentialCauses: state.setPotentialCauses,
-    setPotentialSymptoms: state.setPotentialSymptoms
-  }), [])
-);
+export const useRecipeStatus = () => useRecipeStore((state) => ({
+  isLoading: state.isLoading,
+  error: state.error,
+  setLoading: state.setLoading,
+  setError: state.setError,
+  clearError: state.clearError
+}));
 
-// Status selectors with minimal re-renders
-export const useRecipeStatus = () => useRecipeStore(
-  useCallback((state) => ({
-    isLoading: state.isLoading,
-    error: state.error,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    clearError: state.clearError
-  }), [])
-);
-
-// Streaming selectors with optimized updates
-export const useRecipeStreaming = () => useRecipeStore(
-  useCallback((state) => ({
-    isStreamingCauses: state.isStreamingCauses,
-    isStreamingSymptoms: state.isStreamingSymptoms,
-    isStreamingProperties: state.isStreamingProperties,
-    isStreamingOils: state.isStreamingOils,
-    streamingError: state.streamingError,
-    setStreamingCauses: state.setStreamingCauses,
-    setStreamingSymptoms: state.setStreamingSymptoms,
-    setStreamingProperties: state.setStreamingProperties,
-    setStreamingOils: state.setStreamingOils,
-    setStreamingError: state.setStreamingError,
-    clearStreamingError: state.clearStreamingError
-  }), [])
-);
-
-/**
- * Granular selectors for specific use cases to minimize re-renders
- */
-
-// Current step only selector
-export const useCurrentStep = () => useRecipeStore(
-  useCallback((state) => state.currentStep, [])
-);
-
-// Loading state only selector
-export const useIsLoading = () => useRecipeStore(
-  useCallback((state) => state.isLoading, [])
-);
-
-// Error state only selector
-export const useRecipeError = () => useRecipeStore(
-  useCallback((state) => state.error, [])
-);
-
-// Specific streaming state selectors
-export const useIsStreamingCauses = () => useRecipeStore(
-  useCallback((state) => state.isStreamingCauses, [])
-);
-
-export const useIsStreamingSymptoms = () => useRecipeStore(
-  useCallback((state) => state.isStreamingSymptoms, [])
-);
-
-export const useIsStreamingProperties = () => useRecipeStore(
-  useCallback((state) => state.isStreamingProperties, [])
-);
-
-export const useIsStreamingOils = () => useRecipeStore(
-  useCallback((state) => state.isStreamingOils, [])
-);
-
-// Potential data selectors with length optimization
-export const usePotentialCauses = () => useRecipeStore(
-  useCallback((state) => state.potentialCauses, [])
-);
-
-export const usePotentialSymptoms = () => useRecipeStore(
-  useCallback((state) => state.potentialSymptoms, [])
-);
-
-// Count-only selectors for performance
-export const usePotentialCausesCount = () => useRecipeStore(
-  useCallback((state) => state.potentialCauses.length, [])
-);
-
-export const usePotentialSymptomsCount = () => useRecipeStore(
-  useCallback((state) => state.potentialSymptoms.length, [])
-);
-
-export const useSelectedCausesCount = () => useRecipeStore(
-  useCallback((state) => state.selectedCauses.length, [])
-);
-
-export const useSelectedSymptomsCount = () => useRecipeStore(
-  useCallback((state) => state.selectedSymptoms.length, [])
-);
-
-// Actions-only selectors to prevent re-renders when data changes
-export const useRecipeActions = () => useRecipeStore(
-  useCallback((state) => ({
-    updateHealthConcern: state.updateHealthConcern,
-    updateDemographics: state.updateDemographics,
-    updateSelectedCauses: state.updateSelectedCauses,
-    updateSelectedSymptoms: state.updateSelectedSymptoms,
-    updateTherapeuticProperties: state.updateTherapeuticProperties,
-    updateSuggestedOils: state.updateSuggestedOils,
-    setPotentialCauses: state.setPotentialCauses,
-    setPotentialSymptoms: state.setPotentialSymptoms,
-    setCurrentStep: state.setCurrentStep,
-    markStepCompleted: state.markStepCompleted,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    clearError: state.clearError,
-    resetWizard: state.resetWizard
-  }), [])
-);
-
-// Streaming actions-only selector
-export const useRecipeStreamingActions = () => useRecipeStore(
-  useCallback((state) => ({
-    setStreamingCauses: state.setStreamingCauses,
-    setStreamingSymptoms: state.setStreamingSymptoms,
-    setStreamingProperties: state.setStreamingProperties,
-    setStreamingOils: state.setStreamingOils,
-    setStreamingError: state.setStreamingError,
-    clearStreamingError: state.clearStreamingError
-  }), [])
-);
+export const useRecipeStreaming = () => useRecipeStore((state) => ({
+  isStreamingCauses: state.isStreamingCauses,
+  isStreamingSymptoms: state.isStreamingSymptoms,
+  isStreamingProperties: state.isStreamingProperties,
+  isStreamingOils: state.isStreamingOils,
+  streamingError: state.streamingError,
+  setStreamingCauses: state.setStreamingCauses,
+  setStreamingSymptoms: state.setStreamingSymptoms,
+  setStreamingProperties: state.setStreamingProperties,
+  setStreamingOils: state.setStreamingOils,
+  setStreamingError: state.setStreamingError,
+  clearStreamingError: state.clearStreamingError
+}));
 
 /**
  * Utility function to clear all recipe data

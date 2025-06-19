@@ -7,7 +7,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePrefetchMetrics, useIntelligentPrefetcher } from '@/hooks/use-route-prefetcher';
-import { useComponentPreloader } from '@/lib/preload/component-preloader';
 import { useRecipeStore } from '../store/recipe-store';
 import { cn } from '@/lib/utils';
 
@@ -25,11 +24,9 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
   const { currentStep } = useRecipeStore();
   const metrics = usePrefetchMetrics();
   const { getIntelligentRecommendations, getUserBehaviorStats } = useIntelligentPrefetcher(currentStep);
-  const { getFailureStats, clearFailureHistory } = useComponentPreloader();
-
+  
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [behaviorStats, setBehaviorStats] = useState<any>({});
-  const [failureStats, setFailureStats] = useState<any>({});
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Update recommendations and stats
@@ -37,9 +34,8 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
     if (isVisible) {
       setRecommendations(getIntelligentRecommendations());
       setBehaviorStats(getUserBehaviorStats());
-      setFailureStats(getFailureStats());
     }
-  }, [isVisible, currentStep, getIntelligentRecommendations, getUserBehaviorStats, getFailureStats]);
+  }, [isVisible, currentStep, getIntelligentRecommendations, getUserBehaviorStats]);
 
   if (!isVisible) {
     return (
@@ -90,30 +86,15 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
       <div className="p-3 space-y-2">
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded">
-            <div className="font-medium text-purple-700 dark:text-purple-300">Routes</div>
+            <div className="font-medium text-purple-700 dark:text-purple-300">Prefetched</div>
             <div className="text-lg font-bold text-purple-900 dark:text-purple-100">
               {metrics.totalPrefetched}
             </div>
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded">
-            <div className="font-medium text-green-700 dark:text-green-300">Components</div>
+            <div className="font-medium text-green-700 dark:text-green-300">Success Rate</div>
             <div className="text-lg font-bold text-green-900 dark:text-green-100">
-              {(metrics as any).componentsPreloaded || 0}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
-            <div className="font-medium text-blue-700 dark:text-blue-300">Assets</div>
-            <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-              {(metrics as any).assetsPreloaded || 0}
-            </div>
-          </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-            <div className="font-medium text-yellow-700 dark:text-yellow-300">Avg Time</div>
-            <div className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
-              {((metrics as any).averagePreloadTime || 0).toFixed(0)}ms
+              {metrics.successRate.toFixed(0)}%
             </div>
           </div>
         </div>
@@ -234,51 +215,6 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
             </div>
           </div>
 
-          {/* Failure Statistics */}
-          {failureStats.totalFailures > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-3">
-              <h4 className="text-sm font-medium mb-2 text-red-700 dark:text-red-300">
-                Failure Statistics
-              </h4>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span>Total Failures:</span>
-                  <span className="font-medium text-red-600">{failureStats.totalFailures}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Failure Rate:</span>
-                  <span className="font-medium text-red-600">
-                    {failureStats.failureRate.toFixed(1)}%
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Fallbacks Used:</span>
-                  <span className="font-medium text-orange-600">{failureStats.fallbacksUsed}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Retry Attempts:</span>
-                  <span className="font-medium text-blue-600">{failureStats.retryAttempts}</span>
-                </div>
-
-                <div className="mt-2">
-                  <button
-                    onClick={() => {
-                      clearFailureHistory();
-                      setFailureStats(getFailureStats());
-                    }}
-                    className="w-full text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200"
-                  >
-                    Clear Failure History
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Actions */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-3">
             <div className="flex space-x-2">
@@ -287,7 +223,6 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
                   console.log('🧠 Prefetch Metrics:', metrics);
                   console.log('🧠 User Behavior Stats:', behaviorStats);
                   console.log('🧠 Current Recommendations:', recommendations);
-                  console.log('🧠 Failure Stats:', failureStats);
                 }}
                 className="flex-1 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200"
               >
@@ -295,7 +230,7 @@ export const PrefetchMonitor: React.FC<PrefetchMonitorProps> = ({
               </button>
               <button
                 onClick={() => {
-                  const data = { metrics, behaviorStats, recommendations, failureStats };
+                  const data = { metrics, behaviorStats, recommendations };
                   navigator.clipboard?.writeText(JSON.stringify(data, null, 2));
                 }}
                 className="flex-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200"

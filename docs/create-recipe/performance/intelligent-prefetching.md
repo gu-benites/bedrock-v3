@@ -1,25 +1,14 @@
-# Intelligent Component Preloading System
+# Intelligent Route Prefetching System
 
 ## Overview
 
-The intelligent component preloading system proactively loads React components, JavaScript bundles, and static assets based on user behavior patterns, AI streaming states, and system resource availability to provide seamless navigation experiences in the create-recipe workflow.
+The intelligent route prefetching system proactively loads routes based on user behavior patterns, AI streaming states, and system resource availability to provide seamless navigation experiences.
 
 ## Core Features
 
-### 1. Component Preloading Strategy
+### 1. Streaming-Aware Prefetching
 
-**Why Component Preloading?**
-
-In a recipe building workflow, user data is dynamic and personalized (AI-generated causes, symptoms, properties are unique per user). Traditional data caching doesn't make sense. Instead, we focus on preloading the **static parts** that can improve performance:
-
-- **React Components**: JavaScript modules for next workflow steps
-- **JavaScript Bundles**: Webpack chunks for upcoming routes
-- **CSS Stylesheets**: Styles for next route components
-- **Static Assets**: Icons, images, fonts used in UI
-
-### 2. Streaming-Aware Component Preloading
-
-**Location**: `src/hooks/use-route-prefetcher.ts` + `src/lib/preload/component-preloader.ts`
+**Location**: `src/hooks/use-route-prefetcher.ts`
 
 The system coordinates with AI streaming to avoid resource conflicts:
 
@@ -27,11 +16,9 @@ The system coordinates with AI streaming to avoid resource conflicts:
 // Register streaming activity
 registerStreamingActivity('demographics-streaming', true);
 
-// Streaming-aware component preloading
+// Streaming-aware prefetching
 useStreamingPrefetcher(RecipeStep.DEMOGRAPHICS, isStreaming, {
   respectStreaming: true,
-  preloadComponents: true,
-  preloadAssets: true,
   priority: 'low'
 });
 ```

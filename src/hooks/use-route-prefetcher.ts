@@ -6,7 +6,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RecipeStep } from '@/features/create-recipe/types/recipe.types';
-import { componentPreloader } from '@/lib/preload/component-preloader';
 
 interface PrefetchOptions {
   enabled?: boolean;
@@ -16,9 +15,6 @@ interface PrefetchOptions {
   respectStreaming?: boolean; // Avoid prefetching during AI streaming
   networkThreshold?: 'slow-2g' | '2g' | '3g' | '4g'; // Minimum network speed
   cpuThreshold?: number; // Minimum CPU idle time (0-1)
-  preloadComponents?: boolean; // Enable component preloading
-  preloadAssets?: boolean; // Enable asset preloading
-  preloadStyles?: boolean; // Enable stylesheet preloading
 }
 
 interface PrefetchState {
@@ -142,15 +138,6 @@ const ROUTE_MAP: Record<RecipeStep, string> = {
   [RecipeStep.PROPERTIES]: '/create-recipe/properties'
 };
 
-// Component path mapping for preloading
-const COMPONENT_MAP: Record<RecipeStep, string> = {
-  [RecipeStep.HEALTH_CONCERN]: '@/features/create-recipe/components/health-concern-form',
-  [RecipeStep.DEMOGRAPHICS]: '@/features/create-recipe/components/demographics-form',
-  [RecipeStep.CAUSES]: '@/features/create-recipe/components/causes-selection',
-  [RecipeStep.SYMPTOMS]: '@/features/create-recipe/components/symptoms-selection',
-  [RecipeStep.PROPERTIES]: '@/features/create-recipe/components/properties-display'
-};
-
 // Step progression mapping
 const NEXT_STEP_MAP: Record<RecipeStep, RecipeStep | null> = {
   [RecipeStep.HEALTH_CONCERN]: RecipeStep.DEMOGRAPHICS,
@@ -171,10 +158,7 @@ export const useRoutePrefetcher = (options: PrefetchOptions = {}) => {
     maxConcurrent = 2,
     respectStreaming = true,
     networkThreshold = '3g',
-    cpuThreshold = 0.5,
-    preloadComponents = true,
-    preloadAssets = true,
-    preloadStyles = true
+    cpuThreshold = 0.5
   } = options;
 
   const router = useRouter();
@@ -191,10 +175,10 @@ export const useRoutePrefetcher = (options: PrefetchOptions = {}) => {
   }, []);
 
   /**
-   * Prefetch a route with component preloading
+   * Prefetch a route with intelligent timing
    */
   const prefetchRoute = useCallback(async (
-    route: string,
+    route: string, 
     options: { immediate?: boolean; priority?: 'high' | 'low' } = {}
   ) => {
     if (!enabled || !isSupported) return false;
@@ -202,7 +186,7 @@ export const useRoutePrefetcher = (options: PrefetchOptions = {}) => {
     const { immediate = false, priority: routePriority = priority } = options;
 
     // Skip if already prefetched, prefetching, or failed recently
-    if (globalPrefetchState.prefetched.has(route) ||
+    if (globalPrefetchState.prefetched.has(route) || 
         globalPrefetchState.prefetching.has(route) ||
         globalPrefetchState.failed.has(route)) {
       return false;
@@ -240,62 +224,11 @@ export const useRoutePrefetcher = (options: PrefetchOptions = {}) => {
 
         console.log(`🔄 Prefetching route: ${route} (priority: ${routePriority})`);
 
-        // Use Next.js router prefetch for route
+        // Use Next.js router prefetch
         router.prefetch(route);
 
-        // Preload components for create-recipe workflow
-        if (preloadComponents) {
-          const step = Object.entries(ROUTE_MAP).find(([, r]) => r === route)?.[0] as RecipeStep;
-          if (step && COMPONENT_MAP[step]) {
-            try {
-              const result = await componentPreloader.preloadComponent(COMPONENT_MAP[step], {
-                priority: routePriority,
-                preloadComponents: true,
-                preloadAssets,
-                preloadStyles
-              });
-
-              // Check if we got a fallback component
-              if (result && result.__fallback) {
-                console.warn(`⚠️ Using fallback for component: ${route}`);
-              } else if (result && result.__errorBoundary) {
-                console.error(`🚨 Component preload failed completely: ${route}`);
-              } else {
-                console.log(`🧩 Component preloaded successfully for route: ${route}`);
-              }
-            } catch (error) {
-              console.warn(`⚠️ Component preload failed for ${route}:`, error);
-              // Don't fail the entire prefetch operation due to component preload failure
-            }
-          }
-        }
-
-        // Preload additional assets if enabled
-        if (preloadAssets || preloadStyles) {
-          const preloadResources = [];
-
-          if (preloadStyles) {
-            // Add any route-specific stylesheets
-            preloadResources.push({
-              type: 'style' as const,
-              path: `/styles/pages${route}.css`
-            });
-          }
-
-          if (preloadAssets) {
-            // Add any route-specific assets (icons, images)
-            // This would be customized based on actual assets used
-          }
-
-          if (preloadResources.length > 0) {
-            try {
-              await componentPreloader.preloadBatch(preloadResources);
-              console.log(`📦 Assets preloaded for route: ${route}`);
-            } catch (error) {
-              console.warn(`⚠️ Asset preload failed for ${route}:`, error);
-            }
-          }
-        }
+        // Simulate network request timing for monitoring
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         globalPrefetchState.prefetched.add(route);
         globalPrefetchState.prefetching.delete(route);
@@ -722,7 +655,7 @@ export const useIntelligentPrefetcher = (
 };
 
 /**
- * Performance monitoring for prefetching with component preloading
+ * Performance monitoring for prefetching with streaming coordination
  */
 export const usePrefetchMetrics = () => {
   const [metrics, setMetrics] = useState({
@@ -733,11 +666,7 @@ export const usePrefetchMetrics = () => {
     isStreamingActive: false,
     activeStreams: 0,
     streamingDuration: 0,
-    componentsPreloaded: 0,
-    assetsPreloaded: 0,
-    stylesPreloaded: 0,
-    preloadFailures: 0,
-    averagePreloadTime: 0
+    deferredPrefetches: 0
   });
 
   useEffect(() => {
@@ -747,8 +676,6 @@ export const usePrefetchMetrics = () => {
         ? Date.now() - globalStreamingState.streamingStartTime
         : 0;
 
-      const preloadMetrics = componentPreloader.getMetrics();
-
       setMetrics({
         totalPrefetched: globalPrefetchState.prefetched.size,
         totalFailed: globalPrefetchState.failed.size,
@@ -757,11 +684,7 @@ export const usePrefetchMetrics = () => {
         isStreamingActive: globalStreamingState.isAnyStreaming,
         activeStreams: globalStreamingState.activeStreams.size,
         streamingDuration,
-        componentsPreloaded: preloadMetrics.componentsPreloaded,
-        assetsPreloaded: preloadMetrics.assetsPreloaded,
-        stylesPreloaded: preloadMetrics.stylesPreloaded,
-        preloadFailures: preloadMetrics.failures,
-        averagePreloadTime: preloadMetrics.averagePreloadTime
+        deferredPrefetches: 0 // This would need to be tracked separately
       });
     };
 

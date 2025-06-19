@@ -60,88 +60,50 @@ export const useBatchedRecipeUpdates = () => {
   }, [store]);
 
   /**
-   * Complete AI streaming workflow with atomic batched updates
+   * Complete AI streaming workflow with batched updates
    * This is commonly used when AI streaming completes
    */
   const completeAIStreaming = useCallback((
     step: 'causes' | 'symptoms' | 'properties' | 'oils',
     data: PotentialCause[] | PotentialSymptom[] | TherapeuticProperty[] | PropertyOilSuggestions[],
-    options: {
-      nextStep?: RecipeStep;
-      markCompleted?: boolean;
-      clearErrors?: boolean;
-      additionalUpdates?: Record<string, any>;
-    } = {}
+    nextStep?: RecipeStep
   ) => {
-    const { nextStep, markCompleted = true, clearErrors = true, additionalUpdates = {} } = options;
-
-    // Use store's atomic batchUpdateStepData for single state update
-    const atomicUpdates: Parameters<typeof store.batchUpdateStepData>[0] = {
-      ...additionalUpdates
+    const streamingUpdates: Parameters<typeof updateStreamingStates>[0] = {
+      streamingError: null
     };
+
+    const stepUpdates: Parameters<typeof updateStepData>[0] = {};
 
     // Set the appropriate streaming state to false and update data
     switch (step) {
       case 'causes':
-        atomicUpdates.potentialCauses = data as PotentialCause[];
-        break;
-      case 'symptoms':
-        atomicUpdates.potentialSymptoms = data as PotentialSymptom[];
-        break;
-      case 'properties':
-        atomicUpdates.therapeuticProperties = data as TherapeuticProperty[];
-        break;
-      case 'oils':
-        atomicUpdates.suggestedOils = data as PropertyOilSuggestions[];
-        break;
-    }
-
-    // Add navigation if specified
-    if (nextStep) {
-      atomicUpdates.currentStep = nextStep;
-    }
-
-    // Clear errors if specified
-    if (clearErrors) {
-      atomicUpdates.error = null;
-      atomicUpdates.streamingError = null;
-    }
-
-    // Mark step as completed if specified
-    if (markCompleted) {
-      const currentCompleted = store.completedSteps;
-      const stepToComplete = getCurrentStepForType(step);
-      if (!currentCompleted.includes(stepToComplete)) {
-        atomicUpdates.completedSteps = [...currentCompleted, stepToComplete];
-      }
-    }
-
-    // Perform single atomic update for all data changes
-    store.batchUpdateStepData(atomicUpdates);
-
-    // Update streaming states separately to avoid conflicts with data updates
-    const streamingUpdates: Parameters<typeof updateStreamingStates>[0] = {};
-    switch (step) {
-      case 'causes':
         streamingUpdates.isStreamingCauses = false;
+        stepUpdates.potentialCauses = data as PotentialCause[];
         break;
       case 'symptoms':
         streamingUpdates.isStreamingSymptoms = false;
+        stepUpdates.potentialSymptoms = data as PotentialSymptom[];
         break;
       case 'properties':
         streamingUpdates.isStreamingProperties = false;
+        stepUpdates.therapeuticProperties = data as TherapeuticProperty[];
         break;
       case 'oils':
         streamingUpdates.isStreamingOils = false;
+        stepUpdates.suggestedOils = data as PropertyOilSuggestions[];
         break;
     }
 
-    if (clearErrors) {
-      streamingUpdates.streamingError = null;
+    // Add next step if provided
+    if (nextStep) {
+      stepUpdates.currentStep = nextStep;
     }
 
+    // Batch all updates together
     updateStreamingStates(streamingUpdates);
-  }, [updateStreamingStates, store]);
+    updateStepData(stepUpdates);
+    updateLoadingAndError({ isLoading: false, error: null });
+  }, [updateStreamingStates, updateStepData, updateLoadingAndError]);
 
   /**
    * Start AI streaming workflow with batched updates
@@ -175,75 +137,19 @@ export const useBatchedRecipeUpdates = () => {
   }, [updateStreamingStates, updateLoadingAndError]);
 
   /**
-   * Handle AI streaming error with atomic batched updates
+   * Handle AI streaming error with batched updates
    */
-  const handleStreamingError = useCallback((
-    error: string,
-    options: {
-      step?: 'causes' | 'symptoms' | 'properties' | 'oils';
-      preserveData?: boolean;
-      retryable?: boolean;
-    } = {}
-  ) => {
-    const { step, preserveData = true, retryable = true } = options;
-
-    // Use atomic update for error state
-    const atomicUpdates: Parameters<typeof store.batchUpdateStepData>[0] = {
-      error: retryable ? `${error} (Click retry to try again)` : error
-    };
-
-    // Clear data if not preserving
-    if (!preserveData && step) {
-      switch (step) {
-        case 'causes':
-          atomicUpdates.potentialCauses = [];
-          break;
-        case 'symptoms':
-          atomicUpdates.potentialSymptoms = [];
-          break;
-        case 'properties':
-          atomicUpdates.therapeuticProperties = [];
-          break;
-        case 'oils':
-          atomicUpdates.suggestedOils = [];
-          break;
-      }
-    }
-
-    // Perform atomic update
-    store.batchUpdateStepData(atomicUpdates);
-
-    // Update streaming states
-    const streamingUpdates: Parameters<typeof updateStreamingStates>[0] = {
+  const handleStreamingError = useCallback((error: string) => {
+    // Stop all streaming and set error
+    updateStreamingStates({
+      isStreamingCauses: false,
+      isStreamingSymptoms: false,
+      isStreamingProperties: false,
+      isStreamingOils: false,
       streamingError: error
-    };
-
-    if (step) {
-      // Stop only the specific streaming step
-      switch (step) {
-        case 'causes':
-          streamingUpdates.isStreamingCauses = false;
-          break;
-        case 'symptoms':
-          streamingUpdates.isStreamingSymptoms = false;
-          break;
-        case 'properties':
-          streamingUpdates.isStreamingProperties = false;
-          break;
-        case 'oils':
-          streamingUpdates.isStreamingOils = false;
-          break;
-      }
-    } else {
-      // Stop all streaming
-      streamingUpdates.isStreamingCauses = false;
-      streamingUpdates.isStreamingSymptoms = false;
-      streamingUpdates.isStreamingProperties = false;
-      streamingUpdates.isStreamingOils = false;
-    }
-
-    updateStreamingStates(streamingUpdates);
-  }, [updateStreamingStates, store]);
+    });
+    updateLoadingAndError({ isLoading: false, error });
+  }, [updateStreamingStates, updateLoadingAndError]);
 
   /**
    * Navigate to step with batched updates
@@ -274,138 +180,19 @@ export const useBatchedRecipeUpdates = () => {
     store.resetWizard();
   }, [store]);
 
-  /**
-   * Complex workflow transition with atomic batched updates
-   * Handles complete step transitions including data, navigation, and state cleanup
-   */
-  const performWorkflowTransition = useCallback((
-    transition: {
-      fromStep: 'causes' | 'symptoms' | 'properties' | 'oils';
-      toStep: RecipeStep;
-      data: PotentialCause[] | PotentialSymptom[] | TherapeuticProperty[] | PropertyOilSuggestions[];
-      clearPreviousErrors?: boolean;
-      markPreviousCompleted?: boolean;
-      additionalUpdates?: Record<string, any>;
-    }
-  ) => {
-    const {
-      fromStep,
-      toStep,
-      data,
-      clearPreviousErrors = true,
-      markPreviousCompleted = true,
-      additionalUpdates = {}
-    } = transition;
-
-    // Build atomic updates object
-    const atomicUpdates: Parameters<typeof store.batchUpdateStepData>[0] = {
-      currentStep: toStep,
-      ...additionalUpdates
-    };
-
-    // Update data based on step
-    switch (fromStep) {
-      case 'causes':
-        atomicUpdates.potentialCauses = data as PotentialCause[];
-        break;
-      case 'symptoms':
-        atomicUpdates.potentialSymptoms = data as PotentialSymptom[];
-        break;
-      case 'properties':
-        atomicUpdates.therapeuticProperties = data as TherapeuticProperty[];
-        break;
-      case 'oils':
-        atomicUpdates.suggestedOils = data as PropertyOilSuggestions[];
-        break;
-    }
-
-    // Clear errors if specified
-    if (clearPreviousErrors) {
-      atomicUpdates.error = null;
-      atomicUpdates.streamingError = null;
-    }
-
-    // Mark previous step as completed
-    if (markPreviousCompleted) {
-      const currentCompleted = store.completedSteps;
-      const stepToComplete = getCurrentStepForType(fromStep);
-      if (!currentCompleted.includes(stepToComplete)) {
-        atomicUpdates.completedSteps = [...currentCompleted, stepToComplete];
-      }
-    }
-
-    // Perform single atomic update
-    store.batchUpdateStepData(atomicUpdates);
-
-    // Update streaming states
-    const streamingUpdates: Parameters<typeof updateStreamingStates>[0] = {};
-    switch (fromStep) {
-      case 'causes':
-        streamingUpdates.isStreamingCauses = false;
-        break;
-      case 'symptoms':
-        streamingUpdates.isStreamingSymptoms = false;
-        break;
-      case 'properties':
-        streamingUpdates.isStreamingProperties = false;
-        break;
-      case 'oils':
-        streamingUpdates.isStreamingOils = false;
-        break;
-    }
-
-    if (clearPreviousErrors) {
-      streamingUpdates.streamingError = null;
-    }
-
-    updateStreamingStates(streamingUpdates);
-  }, [store, updateStreamingStates]);
-
-  /**
-   * Batch multiple state updates with performance optimization
-   */
-  const batchMultipleUpdates = useCallback((
-    updates: {
-      stepData?: Parameters<typeof store.batchUpdateStepData>[0];
-      streamingStates?: Parameters<typeof updateStreamingStates>[0];
-      loadingAndError?: { isLoading?: boolean; error?: string | null };
-    }
-  ) => {
-    const { stepData, streamingStates, loadingAndError } = updates;
-
-    // Perform step data updates first (most important)
-    if (stepData) {
-      store.batchUpdateStepData(stepData);
-    }
-
-    // Then update streaming states
-    if (streamingStates) {
-      updateStreamingStates(streamingStates);
-    }
-
-    // Finally update loading/error states
-    if (loadingAndError) {
-      updateLoadingAndError(loadingAndError);
-    }
-  }, [store, updateStreamingStates, updateLoadingAndError]);
-
   return {
     // Batched update functions
     updateStreamingStates,
     updateStepData,
     updateLoadingAndError,
-
+    
     // Workflow-specific functions
     completeAIStreaming,
     startAIStreaming,
     handleStreamingError,
     navigateToStep,
     resetWizardOptimized,
-
-    // Advanced batching functions
-    performWorkflowTransition,
-    batchMultipleUpdates,
-
+    
     // Direct access to store for edge cases
     store
   };

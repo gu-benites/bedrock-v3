@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import type { PotentialCause, PotentialSymptom } from '../types/recipe.types';
@@ -14,15 +14,11 @@ import { cn } from '@/lib/utils';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import AIStreamingModal from '@/components/ui/ai-streaming-modal';
 import { useStreamingPrefetcher } from '@/hooks/use-route-prefetcher';
-import { ComponentKeyStrategies, useComponentKeys, useKeyStabilityMonitor } from '@/lib/utils/component-key-strategies';
-import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
-import { useFilteredAndSortedCauses, useSelectionStatistics } from '@/lib/utils/memo-calculation-hooks';
 
 /**
  * Causes Selection component
- * Optimized with React.memo for performance
  */
-const CausesSelectionComponent = () => {
+export function CausesSelection() {
   const {
     healthConcern,
     demographics,
@@ -42,24 +38,6 @@ const CausesSelectionComponent = () => {
 
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
   const [selectedCauseIds, setSelectedCauseIds] = useState<Set<string>>(new Set());
-
-  // Optimized component keys for stable rendering
-  const { sessionId, generateKey } = useComponentKeys('causes-selection');
-  useKeyStabilityMonitor('CausesSelection', `causes-${sessionId}`);
-
-  // Optimized calculations with useMemo
-  const filteredAndSortedCauses = useFilteredAndSortedCauses(
-    potentialCauses,
-    '', // No search query for now
-    'relevancy',
-    selectedCauseIds
-  );
-
-  const selectionStats = useSelectionStatistics(
-    potentialCauses,
-    filteredAndSortedCauses.selected,
-    'causes'
-  );
 
   // AI Streaming for symptoms (triggered when user clicks Continue)
   const {
@@ -441,21 +419,14 @@ const CausesSelectionComponent = () => {
           {/* Selection Counter */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              Select 1-{selectionStats.totalCount} causes that might apply to you
+              Select 1-{potentialCauses.length} causes that might apply to you
             </p>
-            <div className="flex items-center space-x-2">
-              <span className={cn(
-                "text-sm font-medium",
-                selectionStats.selectedCount > selectionStats.totalCount ? "text-destructive" : "text-foreground"
-              )}>
-                {selectionStats.selectedCount}/{selectionStats.totalCount} selected
-              </span>
-              {selectionStats.averageRelevancy > 0 && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                  Avg: {selectionStats.averageRelevancy.toFixed(1)}
-                </span>
-              )}
-            </div>
+            <span className={cn(
+              "text-sm font-medium",
+              selectedCauseIds.size > potentialCauses.length ? "text-destructive" : "text-foreground"
+            )}>
+              {selectedCauseIds.size}/{potentialCauses.length} selected
+            </span>
           </div>
 
           {/* Causes Grid */}
@@ -471,7 +442,7 @@ const CausesSelectionComponent = () => {
 
               return (
                 <div
-                  key={ComponentKeyStrategies.selectableListItem(cause, 'cause', isSelected)}
+                  key={`${cause.cause_id}-${index}`} // Use cause_id for unique keys
                   className={cn(
                     "border rounded-lg p-4 cursor-pointer transition-all duration-200",
                     "hover:shadow-md",
@@ -577,7 +548,6 @@ const CausesSelectionComponent = () => {
 
       {/* AI Streaming Modal for Symptoms */}
       <AIStreamingModal
-        key={ComponentKeyStrategies.modal('symptoms-streaming', isStreamingSymptoms, sessionId)}
         isOpen={isStreamingSymptoms}
         title="AI Analysis in Progress"
         description="Analyzing your selected causes to identify potential symptoms"
@@ -591,10 +561,4 @@ const CausesSelectionComponent = () => {
       />
     </div>
   );
-};
-
-// Memoized version with custom comparison for optimal performance
-export const CausesSelection = memo(
-  CausesSelectionComponent,
-  withMemoMonitoring('CausesSelection', MemoComparisons.selectionComponent)
-);
+}

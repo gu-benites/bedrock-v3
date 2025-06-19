@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
@@ -19,17 +19,6 @@ import { AIStreamingModal } from '@/components/ui/ai-streaming-modal';
 import { useBatchedRecipeUpdates } from '../hooks/use-batched-recipe-updates';
 import { useRenderPerformanceMonitor } from '@/hooks/use-render-performance-monitor';
 import { useStreamingPrefetcher } from '@/hooks/use-route-prefetcher';
-import { useNavigationTiming, useAIStreamingPerformance } from '@/hooks/use-navigation-timing';
-import { ReactProfilerWrapper } from '@/components/performance/react-profiler-wrapper';
-import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
-import {
-  useOptimizedFormData,
-  useOptimizedActions,
-  useOptimizedLoadingStates,
-  useSelectorPerformanceMonitor
-} from '../hooks/use-optimized-store-selectors';
-import { useRecipeStatePersistence, useFormPersistence } from '../hooks/use-recipe-state-persistence';
-import { PersistenceStatusBadge } from '@/components/storage/persistence-status-indicator';
 
 /**
  * Age category options (simplified as per user preferences)
@@ -51,49 +40,24 @@ const GENDER_OPTIONS = [
 
 /**
  * Demographics Form component
- * Optimized with React.memo for performance
  */
-const DemographicsFormComponent = () => {
+export function DemographicsForm() {
   // Performance monitoring
   useRenderPerformanceMonitor('DemographicsForm', undefined, {
     trackProps: false,
     logThreshold: 8
   });
 
-  // Navigation timing
-  const { logUserInteraction, measureAsync, logNavigation } = useNavigationTiming({
-    componentName: 'DemographicsForm'
-  });
-
-  const { startStreaming, logProgress, endStreaming } = useAIStreamingPerformance('demographics');
-
-  // Use optimized selectors to prevent unnecessary re-renders
-  const { healthConcern, demographics } = useOptimizedFormData();
   const {
+    healthConcern,
+    demographics,
     updateDemographics,
     setPotentialCauses,
+    isLoading,
+    error,
     setError,
     clearError
-  } = useOptimizedActions();
-  const { isLoading, error } = useOptimizedLoadingStates();
-
-  // Monitor selector performance in development
-  useSelectorPerformanceMonitor('DemographicsForm');
-
-  // State persistence for form recovery
-  const { saveState, getPersistenceStats } = useRecipeStatePersistence({
-    enabled: true,
-    autoSave: true,
-    saveInterval: 3000, // Save every 3 seconds
-    onRestore: (data) => {
-      console.log('📂 Demographics form data restored:', data);
-    },
-    onSave: (data) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('💾 Demographics form data saved');
-      }
-    }
-  });
+  } = useRecipeStore();
 
   // Get potential causes separately to avoid unnecessary re-renders
   const potentialCauses = useRecipeStore(state => state.potentialCauses);
@@ -116,13 +80,8 @@ const DemographicsFormComponent = () => {
   } = useRecipeStore();
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
 
-  // Use enhanced batched updates for better performance
-  const {
-    handleStreamingError,
-    performWorkflowTransition,
-    batchMultipleUpdates,
-    store
-  } = useBatchedRecipeUpdates();
+  // Use batched updates for better performance
+  const { completeAIStreaming, startAIStreaming, handleStreamingError } = useBatchedRecipeUpdates();
 
   // Route prefetching for better navigation performance
   useStreamingPrefetcher(RecipeStep.DEMOGRAPHICS, isStreamingCauses, {
@@ -234,59 +193,44 @@ const DemographicsFormComponent = () => {
    * Handle form submission and initiate AI streaming for potential causes
    */
   const onSubmit = async (data: DemographicsData) => {
-    logUserInteraction('form-submit', { formData: data });
-
     if (!healthConcern) {
       setError('Health concern is required to proceed');
       return;
     }
 
     try {
+      // Save demographics data first
+      updateDemographics(data);
+      markCurrentStepCompleted();
+
       // Reset navigation flag for new streaming session
       hasNavigatedRef.current = false;
 
-      // Use enhanced batching for form submission state updates
-      batchMultipleUpdates({
-        stepData: {
-          demographics: data,
-          completedSteps: [...store.completedSteps, RecipeStep.DEMOGRAPHICS]
-        },
-        streamingStates: {
-          isStreamingCauses: true,
-          streamingError: null
-        },
-        loadingAndError: {
-          isLoading: true,
-          error: null
-        }
-      });
-
-      // Start timing for AI streaming
-      startStreaming({ healthConcern: healthConcern.healthConcern, demographics: data });
+      // Start AI streaming for potential causes using batched updates
+      startAIStreaming('causes');
+      clearError();
+      clearStreamingError();
 
       console.log('Starting AI streaming for potential causes...');
 
-      await measureAsync('ai-streaming-request', async () => {
-        return startStream('/api/ai/streaming', {
-          feature: 'recipe-wizard',
-          step: 'potential-causes',
-          data: {
-            healthConcern: healthConcern.healthConcern,
-            demographics: {
-              gender: data.gender,
-              ageCategory: data.ageCategory,
-              specificAge: data.specificAge,
-              language: 'en' // Default language
-            }
+      await startStream('/api/ai/streaming', {
+        feature: 'recipe-wizard',
+        step: 'potential-causes',
+        data: {
+          healthConcern: healthConcern.healthConcern,
+          demographics: {
+            gender: data.gender,
+            ageCategory: data.ageCategory,
+            specificAge: data.specificAge,
+            language: 'en' // Default language
           }
-        });
-      }, { healthConcern: healthConcern.healthConcern, demographics: data });
+        }
+      });
 
       console.log('AI streaming initiated successfully');
 
     } catch (error) {
       console.error('Form submission failed:', error);
-      endStreaming(false, { error: error instanceof Error ? error.message : 'Unknown error' });
       handleStreamingError(error instanceof Error ? error.message : 'Failed to start AI analysis');
     }
   };
@@ -329,12 +273,8 @@ const DemographicsFormComponent = () => {
   useEffect(() => {
     if (transformedPartialCauses.length > 0) {
       setPotentialCauses(transformedPartialCauses);
-      // Log streaming progress
-      logProgress(transformedPartialCauses.length, {
-        causesReceived: transformedPartialCauses.length
-      });
     }
-  }, [transformedPartialCauses, setPotentialCauses, logProgress]);
+  }, [transformedPartialCauses, setPotentialCauses]);
 
   /**
    * Memoize final data processing to prevent unnecessary recalculations
@@ -368,37 +308,15 @@ const DemographicsFormComponent = () => {
   }, [isComplete, finalData]);
 
   /**
-   * Handle streaming completion - optimized with enhanced batched updates
+   * Handle streaming completion - optimized with batched updates
    */
   useEffect(() => {
     if (finalTransformedCauses && !hasNavigatedRef.current) {
       // Mark that we've navigated to prevent infinite loops
       hasNavigatedRef.current = true;
 
-      // End streaming timing
-      const streamingMetrics = endStreaming(true, {
-        totalCauses: finalTransformedCauses.length,
-        causesData: finalTransformedCauses
-      });
-
-      // Use enhanced batching for complete workflow transition
-      performWorkflowTransition({
-        fromStep: 'causes',
-        toStep: RecipeStep.CAUSES,
-        data: finalTransformedCauses,
-        clearPreviousErrors: true,
-        markPreviousCompleted: true,
-        additionalUpdates: {
-          // Add any additional state updates here
-          lastUpdated: new Date()
-        }
-      });
-
-      // Log navigation timing
-      logNavigation('demographics', 'causes', {
-        streamingMetrics,
-        causesCount: finalTransformedCauses.length
-      });
+      // Use batched updates to minimize re-renders
+      completeAIStreaming('causes', finalTransformedCauses);
 
       // Navigate immediately after state updates (no setTimeout delay)
       // The state updates above are synchronous, so navigation can happen immediately
@@ -406,18 +324,14 @@ const DemographicsFormComponent = () => {
         goToNext();
       }
     }
-  }, [finalTransformedCauses, performWorkflowTransition, canGoNext, goToNext, endStreaming, logNavigation]);
+  }, [finalTransformedCauses, completeAIStreaming, canGoNext, goToNext]);
 
   /**
-   * Handle streaming errors - optimized with enhanced batching
+   * Handle streaming errors - optimized to prevent unnecessary updates
    */
   useEffect(() => {
     if (streamError) {
-      handleStreamingError(`AI analysis failed: ${streamError}`, {
-        step: 'causes',
-        preserveData: false,
-        retryable: true
-      });
+      handleStreamingError(`AI analysis failed: ${streamError}`);
     }
   }, [streamError, handleStreamingError]);
 
@@ -445,16 +359,12 @@ const DemographicsFormComponent = () => {
   };
 
   return (
-    <ReactProfilerWrapper id="DemographicsForm" logSlowRenders={true}>
-      <div data-testid="demographics-form" className="space-y-6">
+    <div data-testid="demographics-form" className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">
-            Tell us about yourself
-          </h2>
-          <PersistenceStatusBadge />
-        </div>
+        <h2 className="text-2xl font-bold text-foreground">
+          Tell us about yourself
+        </h2>
         <p className="text-muted-foreground">
           This information helps us provide more personalized essential oil recommendations based on your demographics.
         </p>
@@ -650,13 +560,6 @@ const DemographicsFormComponent = () => {
           console.log('User requested to close modal');
         }}
       />
-      </div>
-    </ReactProfilerWrapper>
+    </div>
   );
-};
-
-// Memoized version with custom comparison for optimal performance
-export const DemographicsForm = memo(
-  DemographicsFormComponent,
-  withMemoMonitoring('DemographicsForm', MemoComparisons.formComponent)
-);
+}
