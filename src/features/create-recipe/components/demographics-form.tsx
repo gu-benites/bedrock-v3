@@ -5,16 +5,31 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecipeStore } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { demographicsSchema } from '../schemas/recipe-schemas';
 import type { DemographicsData, PotentialCause } from '../types/recipe.types';
+import { RecipeStep } from '../types/recipe.types';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import { cn } from '@/lib/utils';
 import { AIStreamingModal } from '@/components/ui/ai-streaming-modal';
+import { useBatchedRecipeUpdates } from '../hooks/use-batched-recipe-updates';
+import { useRenderPerformanceMonitor } from '@/hooks/use-render-performance-monitor';
+import { useStreamingPrefetcher } from '@/hooks/use-route-prefetcher';
+import { useNavigationTiming, useAIStreamingPerformance } from '@/hooks/use-navigation-timing';
+import { ReactProfilerWrapper } from '@/components/performance/react-profiler-wrapper';
+import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
+import {
+  useOptimizedFormData,
+  useOptimizedActions,
+  useOptimizedLoadingStates,
+  useSelectorPerformanceMonitor
+} from '../hooks/use-optimized-store-selectors';
+import { useRecipeStatePersistence, useFormPersistence } from '../hooks/use-recipe-state-persistence';
+import { PersistenceStatusBadge } from '@/components/storage/persistence-status-indicator';
 
 /**
  * Age category options (simplified as per user preferences)
@@ -36,29 +51,84 @@ const GENDER_OPTIONS = [
 
 /**
  * Demographics Form component
+ * Optimized with React.memo for performance
  */
-export function DemographicsForm() {
+const DemographicsFormComponent = () => {
+  // Performance monitoring
+  useRenderPerformanceMonitor('DemographicsForm', undefined, {
+    trackProps: false,
+    logThreshold: 8
+  });
+
+  // Navigation timing
+  const { logUserInteraction, measureAsync, logNavigation } = useNavigationTiming({
+    componentName: 'DemographicsForm'
+  });
+
+  const { startStreaming, logProgress, endStreaming } = useAIStreamingPerformance('demographics');
+
+  // Use optimized selectors to prevent unnecessary re-renders
+  const { healthConcern, demographics } = useOptimizedFormData();
   const {
-    healthConcern,
-    demographics,
     updateDemographics,
-    potentialCauses,
     setPotentialCauses,
-    isLoading,
-    error,
-    setLoading,
     setError,
     clearError
-  } = useRecipeStore();
+  } = useOptimizedActions();
+  const { isLoading, error } = useOptimizedLoadingStates();
+
+  // Monitor selector performance in development
+  useSelectorPerformanceMonitor('DemographicsForm');
+
+  // State persistence for form recovery
+  const { saveState, getPersistenceStats } = useRecipeStatePersistence({
+    enabled: true,
+    autoSave: true,
+    saveInterval: 3000, // Save every 3 seconds
+    onRestore: (data) => {
+      console.log('📂 Demographics form data restored:', data);
+    },
+    onSave: (data) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('💾 Demographics form data saved');
+      }
+    }
+  });
+
+  // Get potential causes separately to avoid unnecessary re-renders
+  const potentialCauses = useRecipeStore(state => state.potentialCauses);
+
+  // Memoize modal items to prevent unnecessary re-renders
+  const modalItems = useMemo(() => {
+    return potentialCauses.map((cause, index) => ({
+      id: `cause-${index}-${cause.cause_name?.slice(0, 10) || 'unknown'}`, // Stable ID based on content
+      title: cause.cause_name || `Potential Cause ${index + 1}`,
+      subtitle: cause.cause_suggestion || 'Analyzing recommendations...',
+      description: cause.explanation || 'Detailed analysis in progress...',
+      timestamp: new Date()
+    }));
+  }, [potentialCauses]);
 
   const {
     isStreamingCauses,
     streamingError,
-    setStreamingCauses,
-    setStreamingError,
     clearStreamingError
   } = useRecipeStore();
   const { goToNext, goToPrevious, canGoNext, canGoPrevious, markCurrentStepCompleted } = useRecipeWizardNavigation();
+
+  // Use enhanced batched updates for better performance
+  const {
+    handleStreamingError,
+    performWorkflowTransition,
+    batchMultipleUpdates,
+    store
+  } = useBatchedRecipeUpdates();
+
+  // Route prefetching for better navigation performance
+  useStreamingPrefetcher(RecipeStep.DEMOGRAPHICS, isStreamingCauses, {
+    enabled: true,
+    priority: 'high'
+  });
 
   // Ref to track if we've already navigated to avoid infinite loops
   const hasNavigatedRef = React.useRef(false);
@@ -77,7 +147,7 @@ export function DemographicsForm() {
     jsonArrayPath: 'data.potential_causes',
     onError: (error) => {
       console.error('Streaming error:', error);
-      setStreamingError(`AI analysis failed: ${error.message}`);
+      handleStreamingError(`AI analysis failed: ${error.message}`);
       return false; // Don't retry on error
     }
   });
@@ -103,9 +173,9 @@ export function DemographicsForm() {
   const watchedSpecificAge = watch('specificAge');
 
   /**
-   * Auto-save functionality
+   * Auto-save functionality - memoized to prevent unnecessary re-renders
    */
-  const autoSave = async (data: DemographicsData) => {
+  const autoSave = useCallback(async (data: DemographicsData) => {
     if (!isDirty || !isValid) return;
 
     setIsSaving(true);
@@ -122,24 +192,32 @@ export function DemographicsForm() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [isDirty, isValid, updateDemographics, markCurrentStepCompleted]);
 
   /**
-   * Auto-save on form changes
+   * Auto-save on form changes - optimized to reduce unnecessary effect runs
    */
+  const autoSaveData = useMemo(() => ({
+    gender: watchedGender,
+    ageCategory: watchedAgeCategory,
+    specificAge: watchedSpecificAge
+  }), [watchedGender, watchedAgeCategory, watchedSpecificAge]);
+
+  const shouldAutoSave = useMemo(() => {
+    return watchedGender && watchedAgeCategory && watchedSpecificAge;
+  }, [watchedGender, watchedAgeCategory, watchedSpecificAge]);
+
   useEffect(() => {
-    if (watchedGender && watchedAgeCategory && watchedSpecificAge) {
+    if (shouldAutoSave) {
       const timeoutId = setTimeout(() => {
-        autoSave({
-          gender: watchedGender,
-          ageCategory: watchedAgeCategory,
-          specificAge: watchedSpecificAge
-        });
+        autoSave(autoSaveData);
       }, 500);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [watchedGender, watchedAgeCategory, watchedSpecificAge]);
+    // No cleanup needed when shouldAutoSave is false
+    return undefined;
+  }, [shouldAutoSave, autoSaveData, autoSave]);
 
   /**
    * Initialize form with existing data
@@ -156,114 +234,171 @@ export function DemographicsForm() {
    * Handle form submission and initiate AI streaming for potential causes
    */
   const onSubmit = async (data: DemographicsData) => {
+    logUserInteraction('form-submit', { formData: data });
+
     if (!healthConcern) {
       setError('Health concern is required to proceed');
       return;
     }
 
     try {
-      // Save demographics data first
-      updateDemographics(data);
-      markCurrentStepCompleted();
-
       // Reset navigation flag for new streaming session
       hasNavigatedRef.current = false;
 
-      // Start AI streaming for potential causes
-      setStreamingCauses(true);
-      clearError();
-      clearStreamingError();
+      // Use enhanced batching for form submission state updates
+      batchMultipleUpdates({
+        stepData: {
+          demographics: data,
+          completedSteps: [...store.completedSteps, RecipeStep.DEMOGRAPHICS]
+        },
+        streamingStates: {
+          isStreamingCauses: true,
+          streamingError: null
+        },
+        loadingAndError: {
+          isLoading: true,
+          error: null
+        }
+      });
+
+      // Start timing for AI streaming
+      startStreaming({ healthConcern: healthConcern.healthConcern, demographics: data });
 
       console.log('Starting AI streaming for potential causes...');
 
-      await startStream('/api/ai/streaming', {
-        feature: 'recipe-wizard',
-        step: 'potential-causes',
-        data: {
-          healthConcern: healthConcern.healthConcern,
-          demographics: {
-            gender: data.gender,
-            ageCategory: data.ageCategory,
-            specificAge: data.specificAge,
-            language: 'en' // Default language
+      await measureAsync('ai-streaming-request', async () => {
+        return startStream('/api/ai/streaming', {
+          feature: 'recipe-wizard',
+          step: 'potential-causes',
+          data: {
+            healthConcern: healthConcern.healthConcern,
+            demographics: {
+              gender: data.gender,
+              ageCategory: data.ageCategory,
+              specificAge: data.specificAge,
+              language: 'en' // Default language
+            }
           }
-        }
-      });
+        });
+      }, { healthConcern: healthConcern.healthConcern, demographics: data });
 
       console.log('AI streaming initiated successfully');
 
     } catch (error) {
       console.error('Form submission failed:', error);
-      setStreamingError(error instanceof Error ? error.message : 'Failed to start AI analysis');
+      endStreaming(false, { error: error instanceof Error ? error.message : 'Unknown error' });
+      handleStreamingError(error instanceof Error ? error.message : 'Failed to start AI analysis');
     }
   };
 
   /**
-   * Handle streaming data updates - Only complete items
+   * Memoize transformed causes to prevent unnecessary recalculations
    */
-  React.useEffect(() => {
-    if (partialData && Array.isArray(partialData) && partialData.length > 0) {
-      console.log('📥 Received complete streaming items:', partialData.length, 'total');
-
-      // Only process items that have all required fields (complete items only)
-      const completeItems = partialData.filter((cause: any) =>
-        cause.name_localized &&
-        cause.suggestion_localized &&
-        cause.explanation_localized &&
-        cause.name_localized.length > 5 &&
-        cause.suggestion_localized.length > 10 &&
-        cause.explanation_localized.length > 15
-      );
-
-      console.log('✅ Complete items found:', completeItems.length, 'of', partialData.length);
-
-      // Transform recipe-wizard format to create-recipe format
-      // CRITICAL: Preserve AI-generated cause_id from the response
-      const transformedCauses = completeItems.map((cause: any, index: number) => ({
-        cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
-        cause_name: cause.name_localized,
-        cause_suggestion: cause.suggestion_localized,
-        explanation: cause.explanation_localized
-      }));
-
-      setPotentialCauses(transformedCauses);
+  const transformedPartialCauses = useMemo(() => {
+    if (!partialData || !Array.isArray(partialData) || partialData.length === 0) {
+      return [];
     }
-  }, [partialData, setPotentialCauses]);
+
+    console.log('📥 Received complete streaming items:', partialData.length, 'total');
+
+    // Only process items that have all required fields (complete items only)
+    const completeItems = partialData.filter((cause: any) =>
+      cause.name_localized &&
+      cause.suggestion_localized &&
+      cause.explanation_localized &&
+      cause.name_localized.length > 5 &&
+      cause.suggestion_localized.length > 10 &&
+      cause.explanation_localized.length > 15
+    );
+
+    console.log('✅ Complete items found:', completeItems.length, 'of', partialData.length);
+
+    // Transform recipe-wizard format to create-recipe format
+    // CRITICAL: Preserve AI-generated cause_id from the response
+    return completeItems.map((cause: any) => ({
+      cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
+      cause_name: cause.name_localized,
+      cause_suggestion: cause.suggestion_localized,
+      explanation: cause.explanation_localized
+    }));
+  }, [partialData]);
 
   /**
-   * Handle streaming completion
+   * Handle streaming data updates - optimized with memoization
    */
-  React.useEffect(() => {
-    if (isComplete && finalData && !hasNavigatedRef.current) {
-      console.log(`✅ [${new Date().toISOString()}] Demographics streaming completed with final data:`, finalData);
+  useEffect(() => {
+    if (transformedPartialCauses.length > 0) {
+      setPotentialCauses(transformedPartialCauses);
+      // Log streaming progress
+      logProgress(transformedPartialCauses.length, {
+        causesReceived: transformedPartialCauses.length
+      });
+    }
+  }, [transformedPartialCauses, setPotentialCauses, logProgress]);
 
-      // Extract potential causes from final data
-      let causes: any[] = [];
-      if (Array.isArray(finalData)) {
-        causes = finalData;
-      } else if (finalData && typeof finalData === 'object' && 'data' in finalData) {
-        const data = finalData as any;
-        if (data.data?.potential_causes && Array.isArray(data.data.potential_causes)) {
-          causes = data.data.potential_causes;
-        }
+  /**
+   * Memoize final data processing to prevent unnecessary recalculations
+   */
+  const finalTransformedCauses = useMemo(() => {
+    if (!isComplete || !finalData || hasNavigatedRef.current) {
+      return null;
+    }
+
+    console.log(`✅ [${new Date().toISOString()}] Demographics streaming completed with final data:`, finalData);
+
+    // Extract potential causes from final data
+    let causes: any[] = [];
+    if (Array.isArray(finalData)) {
+      causes = finalData;
+    } else if (finalData && typeof finalData === 'object' && 'data' in finalData) {
+      const data = finalData as any;
+      if (data.data?.potential_causes && Array.isArray(data.data.potential_causes)) {
+        causes = data.data.potential_causes;
       }
+    }
 
-      // Transform to create-recipe format
-      // CRITICAL: Preserve AI-generated cause_id from the response
-      const transformedCauses = causes.map((cause: any) => ({
-        cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
-        cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
-        cause_suggestion: cause.suggestion_localized || '',
-        explanation: cause.explanation_localized || ''
-      }));
+    // Transform to create-recipe format
+    // CRITICAL: Preserve AI-generated cause_id from the response
+    return causes.map((cause: any) => ({
+      cause_id: cause.cause_id || `cause_${Date.now()}_${Math.random()}`, // Fallback only if AI didn't provide ID
+      cause_name: cause.name_localized || cause.cause_id || 'Unknown cause',
+      cause_suggestion: cause.suggestion_localized || '',
+      explanation: cause.explanation_localized || ''
+    }));
+  }, [isComplete, finalData]);
 
+  /**
+   * Handle streaming completion - optimized with enhanced batched updates
+   */
+  useEffect(() => {
+    if (finalTransformedCauses && !hasNavigatedRef.current) {
       // Mark that we've navigated to prevent infinite loops
       hasNavigatedRef.current = true;
 
-      // Consolidate all state updates into a single batch to minimize re-renders
-      // This prevents multiple rapid state updates that cause navigation issues
-      setPotentialCauses(transformedCauses);
-      setStreamingCauses(false);
+      // End streaming timing
+      const streamingMetrics = endStreaming(true, {
+        totalCauses: finalTransformedCauses.length,
+        causesData: finalTransformedCauses
+      });
+
+      // Use enhanced batching for complete workflow transition
+      performWorkflowTransition({
+        fromStep: 'causes',
+        toStep: RecipeStep.CAUSES,
+        data: finalTransformedCauses,
+        clearPreviousErrors: true,
+        markPreviousCompleted: true,
+        additionalUpdates: {
+          // Add any additional state updates here
+          lastUpdated: new Date()
+        }
+      });
+
+      // Log navigation timing
+      logNavigation('demographics', 'causes', {
+        streamingMetrics,
+        causesCount: finalTransformedCauses.length
+      });
 
       // Navigate immediately after state updates (no setTimeout delay)
       // The state updates above are synchronous, so navigation can happen immediately
@@ -271,16 +406,20 @@ export function DemographicsForm() {
         goToNext();
       }
     }
-  }, [isComplete, finalData, setPotentialCauses, setStreamingCauses, canGoNext, goToNext]);
+  }, [finalTransformedCauses, performWorkflowTransition, canGoNext, goToNext, endStreaming, logNavigation]);
 
   /**
-   * Handle streaming errors
+   * Handle streaming errors - optimized with enhanced batching
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (streamError) {
-      setStreamingError(`AI analysis failed: ${streamError}`);
+      handleStreamingError(`AI analysis failed: ${streamError}`, {
+        step: 'causes',
+        preserveData: false,
+        retryable: true
+      });
     }
-  }, [streamError, setStreamingError]);
+  }, [streamError, handleStreamingError]);
 
   /**
    * Handle continue to next step
@@ -306,12 +445,16 @@ export function DemographicsForm() {
   };
 
   return (
-    <div data-testid="demographics-form" className="space-y-6">
+    <ReactProfilerWrapper id="DemographicsForm" logSlowRenders={true}>
+      <div data-testid="demographics-form" className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">
-          Tell us about yourself
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-foreground">
+            Tell us about yourself
+          </h2>
+          <PersistenceStatusBadge />
+        </div>
         <p className="text-muted-foreground">
           This information helps us provide more personalized essential oil recommendations based on your demographics.
         </p>
@@ -498,13 +641,7 @@ export function DemographicsForm() {
         isOpen={isStreamingCauses}
         title="AI Analysis in Progress"
         description="Identifying potential causes based on your demographics and health concerns"
-        items={potentialCauses.map((cause, index) => ({
-          id: `cause-${index}-${cause.cause_name?.slice(0, 10) || 'unknown'}`, // Stable ID based on content
-          title: cause.cause_name || `Potential Cause ${index + 1}`,
-          subtitle: cause.cause_suggestion || 'Analyzing recommendations...',
-          description: cause.explanation || 'Detailed analysis in progress...',
-          timestamp: new Date()
-        }))}
+        items={modalItems}
         maxVisibleItems={50}
         className="max-w-4xl"
         analysisType="causes"
@@ -513,6 +650,13 @@ export function DemographicsForm() {
           console.log('User requested to close modal');
         }}
       />
-    </div>
+      </div>
+    </ReactProfilerWrapper>
   );
-}
+};
+
+// Memoized version with custom comparison for optimal performance
+export const DemographicsForm = memo(
+  DemographicsFormComponent,
+  withMemoMonitoring('DemographicsForm', MemoComparisons.formComponent)
+);

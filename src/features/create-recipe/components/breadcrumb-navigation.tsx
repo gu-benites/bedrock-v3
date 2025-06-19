@@ -5,6 +5,7 @@
 
 'use client';
 
+import React from 'react';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useRecipeStore } from '../store/recipe-store';
 import { WIZARD_STEPS } from '../constants/recipe.constants';
@@ -24,8 +25,9 @@ interface BreadcrumbNavigationProps {
 
 /**
  * Individual breadcrumb item component
+ * Memoized to prevent unnecessary re-renders when props haven't changed
  */
-function BreadcrumbItem({
+const BreadcrumbItem = React.memo(({
   step,
   isActive,
   isCompleted,
@@ -41,7 +43,7 @@ function BreadcrumbItem({
   showStepNumber: boolean;
   allowNavigation: boolean;
   onClick?: () => void;
-}) {
+}) => {
   const baseClasses = "flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200";
   const interactiveClasses = allowNavigation && isAccessible 
     ? "cursor-pointer hover:bg-muted/50" 
@@ -114,12 +116,13 @@ function BreadcrumbItem({
   }
 
   return content;
-}
+});
 
 /**
  * Breadcrumb separator component
+ * Memoized since it's a pure component with no props
  */
-function BreadcrumbSeparator() {
+const BreadcrumbSeparator = React.memo(() => {
   return (
     <div className="flex items-center px-2">
       <svg
@@ -132,7 +135,7 @@ function BreadcrumbSeparator() {
       </svg>
     </div>
   );
-}
+});
 
 /**
  * Main breadcrumb navigation component

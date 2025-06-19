@@ -16,7 +16,7 @@ import {
   cleanItemData,
   getPrimaryDisplayField
 } from '@/lib/ai/config/streaming-data-types';
-import { vectorSearchTools } from '@/lib/ai/tools/vector-search-tool';
+import { suggestedOilsSearchTools } from '@/lib/ai/tools/suggested-oils-search-tool';
 import { StreamingLogger } from '@/lib/debug/streaming-logger';
 
 // Force dynamic rendering for this API route
@@ -448,8 +448,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Configure tools based on the step
     let agentTools: any[] = [];
     if (step === 'suggested-oils') {
-      agentTools = vectorSearchTools;
-      console.log('[Streaming API] Adding vector search tools for suggested-oils step');
+      agentTools = suggestedOilsSearchTools;
+      console.log('[Streaming API] Adding suggested oils search tools for suggested-oils step');
     }
 
     const agent = new Agent({

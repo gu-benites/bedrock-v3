@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useRecipeStore, useRecipeStreaming } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
@@ -15,11 +15,149 @@ import { fetchTherapeuticProperties } from '../services/recipe-api.service';
 
 import type { TherapeuticProperty } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
+import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
+import { usePropertiesWithAddressedItems, useOilRecommendationsSummary } from '@/lib/utils/memo-calculation-hooks';
+
+/**
+ * Memoized property card component for better performance
+ */
+const PropertyCard = React.memo(({
+  property,
+  index,
+  addressedCauses,
+  addressedSymptoms,
+  relevancyScore,
+  onAnalyzeProperty
+}: {
+  property: TherapeuticProperty;
+  index: number;
+  addressedCauses: any[];
+  addressedSymptoms: any[];
+  relevancyScore: number;
+  onAnalyzeProperty: (property: TherapeuticProperty) => void;
+}) => {
+  return (
+    <div
+      className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg"
+    >
+      {/* Relevancy Score Badge */}
+      <div className="absolute top-4 right-4 z-10">
+        <div className={cn(
+          "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset",
+          relevancyScore >= 5
+            ? "bg-green-50 text-green-700 ring-green-600/20"
+            : relevancyScore >= 4
+            ? "bg-blue-50 text-blue-700 ring-blue-600/20"
+            : relevancyScore >= 3
+            ? "bg-yellow-50 text-yellow-700 ring-yellow-600/20"
+            : "bg-gray-50 text-gray-700 ring-gray-600/20"
+        )}>
+          <svg className="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.107 10.5a.75.75 0 00-1.214 1.029l1.5 2.25a.75.75 0 001.214-.094l3.75-5.25z" clipRule="evenodd" />
+          </svg>
+          {relevancyScore}/5
+        </div>
+      </div>
+
+      <div className="p-6">
+        {/* Header */}
+        <div className="space-y-2 mb-4">
+          <h3 className="text-xl font-semibold leading-none tracking-tight">
+            {property.property_name_localized || property.property_name || 'Unknown Property'}
+          </h3>
+          {property.property_name_english && property.property_name_english !== property.property_name_localized && (
+            <p className="text-sm text-muted-foreground">
+              {property.property_name_english}
+            </p>
+          )}
+        </div>
+
+        {/* Description */}
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          {property.description_contextual_localized || property.description || 'No description available'}
+        </p>
+
+        {/* Addressed Causes and Symptoms */}
+        {(addressedCauses.length > 0 || addressedSymptoms.length > 0) && (
+          <div className="space-y-4 pt-4 border-t border-border/50">
+            {addressedCauses.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground flex items-center">
+                  <svg className="mr-2 h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Addresses Causes ({addressedCauses.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {addressedCauses.map((cause, causeIndex) => (
+                    <span
+                      key={`${cause.cause_id}-${causeIndex}`}
+                      className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-700/10"
+                      title={cause.explanation}
+                    >
+                      {cause.cause_name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {addressedSymptoms.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-foreground flex items-center">
+                  <svg className="mr-2 h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Addresses Symptoms ({addressedSymptoms.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {addressedSymptoms.map((symptom, symptomIndex) => (
+                    <span
+                      key={`${symptom.symptom_id}-${symptomIndex}`}
+                      className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                      title={symptom.explanation}
+                    >
+                      {symptom.symptom_name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Essential Oils Button */}
+        <div className="border-t pt-4 mt-4">
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 text-center space-y-3 border border-green-200/50">
+            <div className="space-y-2">
+              <svg className="mx-auto h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+              </svg>
+              <p className="text-sm font-medium text-green-800">
+                Discover Essential Oils
+              </p>
+              <p className="text-xs text-green-700">
+                Get personalized oil recommendations for this therapeutic property
+              </p>
+            </div>
+            <button
+              onClick={() => onAnalyzeProperty(property)}
+              className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              🌿 Analyze Essential Oils
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
 
 /**
  * Properties Display component
+ * Optimized with React.memo for performance
  */
-export function PropertiesDisplay() {
+const PropertiesDisplayComponent = () => {
   const {
     healthConcern,
     demographics,
@@ -44,6 +182,15 @@ export function PropertiesDisplay() {
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
   const [currentProperty, setCurrentProperty] = useState<TherapeuticProperty | null>(null);
   const processedCompletionRef = useRef<string | null>(null);
+
+  // Optimized calculations with useMemo
+  const propertiesWithAddressed = usePropertiesWithAddressedItems(
+    therapeuticProperties,
+    selectedCauses,
+    selectedSymptoms
+  );
+
+  const oilsSummary = useOilRecommendationsSummary(suggestedOils);
 
   // Debug logging for properties data
   useEffect(() => {
@@ -568,12 +715,10 @@ export function PropertiesDisplay() {
         <div className="space-y-6">
           {/* Properties Grid */}
           <div className="space-y-6">
-            {therapeuticProperties
-              .sort((a, b) => (b.relevancy_score || b.relevancy || 0) - (a.relevancy_score || a.relevancy || 0))
+            {propertiesWithAddressed
+              .sort((a, b) => b.relevancyScore - a.relevancyScore)
               .map((property, index) => {
-                const addressedCauses = getAddressedCauses(property);
-                const addressedSymptoms = getAddressedSymptoms(property);
-                const relevancyScore = property.relevancy_score || property.relevancy || 0;
+                const { addressedCauses, addressedSymptoms, relevancyScore } = property;
 
                 // Debug logging for property data
                 console.log(`🎨 Rendering property ${index}:`, {
@@ -594,143 +739,60 @@ export function PropertiesDisplay() {
                 });
 
                 return (
-                  <div
+                  <PropertyCard
                     key={`${property.property_id}-${index}`}
-                    className="group relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg"
-                  >
-                    {/* Relevancy Score Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <div className={cn(
-                        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset",
-                        relevancyScore >= 5
-                          ? "bg-green-50 text-green-700 ring-green-600/20"
-                          : relevancyScore >= 4
-                          ? "bg-blue-50 text-blue-700 ring-blue-600/20"
-                          : relevancyScore >= 3
-                          ? "bg-yellow-50 text-yellow-700 ring-yellow-600/20"
-                          : "bg-gray-50 text-gray-700 ring-gray-600/20"
-                      )}>
-                        <svg className="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.107 10.5a.75.75 0 00-1.214 1.029l1.5 2.25a.75.75 0 001.214-.094l3.75-5.25z" clipRule="evenodd" />
-                        </svg>
-                        {relevancyScore}/5
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      {/* Header */}
-                      <div className="space-y-2 mb-4">
-                        <h3 className="text-xl font-semibold leading-none tracking-tight">
-                          {property.property_name_localized || property.property_name || 'Unknown Property'}
-                        </h3>
-                        {property.property_name_english && property.property_name_english !== property.property_name_localized && (
-                          <p className="text-sm text-muted-foreground">
-                            {property.property_name_english}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-muted-foreground mb-6 leading-relaxed">
-                        {property.description_contextual_localized || property.description || 'No description available'}
-                      </p>
-
-                      {/* Addressed Causes and Symptoms */}
-                      {(addressedCauses.length > 0 || addressedSymptoms.length > 0) && (
-                        <div className="space-y-4 pt-4 border-t border-border/50">
-                          {addressedCauses.length > 0 && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium text-foreground flex items-center">
-                                <svg className="mr-2 h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Addresses Causes ({addressedCauses.length})
-                              </h4>
-                              <div className="flex flex-wrap gap-2">
-                                {addressedCauses.map((cause, causeIndex) => (
-                                  <span
-                                    key={`${cause.cause_id}-${causeIndex}`}
-                                    className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-700/10"
-                                    title={cause.explanation}
-                                  >
-                                    {cause.cause_name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {addressedSymptoms.length > 0 && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium text-foreground flex items-center">
-                                <svg className="mr-2 h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Addresses Symptoms ({addressedSymptoms.length})
-                              </h4>
-                              <div className="flex flex-wrap gap-2">
-                                {addressedSymptoms.map((symptom, symptomIndex) => (
-                                  <span
-                                    key={`${symptom.symptom_id}-${symptomIndex}`}
-                                    className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                                    title={symptom.explanation}
-                                  >
-                                    {symptom.symptom_name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Essential Oils Button */}
-                      <div className="border-t pt-4 mt-4">
-                        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 text-center space-y-3 border border-green-200/50">
-                          <div className="space-y-2">
-                            <svg className="mx-auto h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                            </svg>
-                            <p className="text-sm font-medium text-green-800">
-                              Discover Essential Oils
-                            </p>
-                            <p className="text-xs text-green-700">
-                              Get personalized oil recommendations for this therapeutic property
-                            </p>
-                          </div>
-
-                          <button
-                            onClick={() => handleAnalyzeSingleProperty(property)}
-                            disabled={!healthConcern || !demographics || isStreamingFromHook}
-                            className={cn(
-                              "inline-flex items-center px-4 py-2 rounded-md font-medium transition-colors text-sm",
-                              "focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
-                              healthConcern && demographics && !isStreamingFromHook
-                                ? "bg-green-600 text-white hover:bg-green-700 shadow-sm"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            )}
-                          >
-                            {isStreamingFromHook && currentProperty?.property_id === property.property_id ? (
-                              <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                Finding oils...
-                              </>
-                            ) : (
-                              <>
-                                <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                Find Essential Oils
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    property={property}
+                    index={index}
+                    addressedCauses={addressedCauses}
+                    addressedSymptoms={addressedSymptoms}
+                    relevancyScore={relevancyScore}
+                    onAnalyzeProperty={handleAnalyzeSingleProperty}
+                  />
                 );
               })}
           </div>
+
+          {/* Oil Recommendations Summary */}
+          {oilsSummary.hasRecommendations && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-green-900">Oil Recommendations Summary</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-green-700 font-medium">{oilsSummary.totalProperties}</span>
+                    <span className="text-green-600 ml-1">Properties analyzed</span>
+                  </div>
+                  <div>
+                    <span className="text-green-700 font-medium">{oilsSummary.uniqueOils}</span>
+                    <span className="text-green-600 ml-1">Unique oils found</span>
+                  </div>
+                  <div>
+                    <span className="text-green-700 font-medium">{oilsSummary.totalOils}</span>
+                    <span className="text-green-600 ml-1">Total recommendations</span>
+                  </div>
+                  <div>
+                    <span className="text-green-700 font-medium">{oilsSummary.averageOilsPerProperty.toFixed(1)}</span>
+                    <span className="text-green-600 ml-1">Avg per property</span>
+                  </div>
+                </div>
+                {oilsSummary.mostRecommended.length > 0 && (
+                  <div>
+                    <p className="text-xs text-green-700 mb-2">Most recommended oils:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {oilsSummary.mostRecommended.slice(0, 3).map((rec, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-md"
+                        >
+                          {rec.oil.name_localized || rec.oil.name_english} ({rec.recommendationCount}x)
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -827,4 +889,10 @@ export function PropertiesDisplay() {
       />
     </div>
   );
-}
+};
+
+// Memoized version with custom comparison for optimal performance
+export const PropertiesDisplay = memo(
+  PropertiesDisplayComponent,
+  withMemoMonitoring('PropertiesDisplay', MemoComparisons.propertiesDisplay)
+);

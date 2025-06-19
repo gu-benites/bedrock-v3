@@ -15,6 +15,10 @@
     "demo:typing": "node scripts/test-structured-typing.js",
     "test:oils": "node scripts/test-oils-integration.js",
     "test:pinecone": "node scripts/test-pinecone-search.js",
+    "performance:baseline": "node scripts/monitor-performance-baseline.js",
+    "performance:navigation": "node scripts/verify-navigation-timing.js",
+    "performance:webpack": "node scripts/validate-webpack-optimizations.js",
+    "performance:monitor": "echo 'Open browser console and run: performanceMonitor.logReport()' && npm run dev",
     "pubmed:cli": "npx tsx own-openai-examples/pubmed-research-agent/index.ts",
     "pubmed:orchestrated": "npx tsx own-openai-examples/pubmed-research-agent/fixed-cli.ts"
   },
@@ -72,6 +76,7 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
+    "web-vitals": "^5.0.3",
     "winston": "^3.13.1",
     "zod": "^3.24.2",
     "zustand": "^4.5.4"

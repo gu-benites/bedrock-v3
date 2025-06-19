@@ -13,6 +13,69 @@ import type { StepProcessingOptions } from '../utils/dynamic-step-processor';
 import { cn } from '@/lib/utils';
 
 /**
+ * Memoized item component for better performance with large lists
+ */
+const SelectableItem = React.memo(({
+  item,
+  isSelected,
+  onToggle,
+  itemId
+}: {
+  item: any;
+  isSelected: boolean;
+  onToggle: () => void;
+  itemId: string;
+}) => {
+  return (
+    <div
+      className={cn(
+        "border rounded-lg p-4 cursor-pointer transition-all duration-200",
+        "hover:shadow-md",
+        isSelected
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "border-input hover:border-primary/50"
+      )}
+      onClick={onToggle}
+    >
+      <div className="flex items-start space-x-3">
+        <div className="flex-shrink-0 mt-1">
+          <div className={cn(
+            "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
+            isSelected
+              ? "border-primary bg-primary"
+              : "border-input"
+          )}>
+            {isSelected && (
+              <svg className="w-3 h-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-2">
+          <h3 className="font-medium text-foreground">
+            {item.cause_name || item.symptom_name || item.property_name || item.name || 'Unknown'}
+          </h3>
+
+          {(item.cause_suggestion || item.symptom_suggestion || item.description) && (
+            <p className="text-sm text-muted-foreground">
+              {item.cause_suggestion || item.symptom_suggestion || item.description}
+            </p>
+          )}
+
+          {item.explanation && (
+            <p className="text-xs text-muted-foreground italic">
+              {item.explanation}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+/**
  * Generic step selector props
  */
 interface GenericStepSelectorProps {
@@ -323,52 +386,13 @@ export function GenericStepSelector({
               }
 
               return (
-                <div
+                <SelectableItem
                   key={`${itemId}-${index}`}
-                  className={cn(
-                    "border rounded-lg p-4 cursor-pointer transition-all duration-200",
-                    "hover:shadow-md",
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-input hover:border-primary/50"
-                  )}
-                  onClick={() => handleItemToggle(item)}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className={cn(
-                        "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
-                        isSelected
-                          ? "border-primary bg-primary"
-                          : "border-input"
-                      )}>
-                        {isSelected && (
-                          <svg className="w-3 h-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex-1 space-y-2">
-                      <h3 className="font-medium text-foreground">
-                        {item.cause_name || item.symptom_name || item.property_name || item.name || 'Unknown'}
-                      </h3>
-
-                      {(item.cause_suggestion || item.symptom_suggestion || item.description) && (
-                        <p className="text-sm text-muted-foreground">
-                          {item.cause_suggestion || item.symptom_suggestion || item.description}
-                        </p>
-                      )}
-
-                      {item.explanation && (
-                        <p className="text-xs text-muted-foreground italic">
-                          {item.explanation}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  item={item}
+                  isSelected={isSelected}
+                  onToggle={() => handleItemToggle(item)}
+                  itemId={itemId}
+                />
               );
             })}
           </div>

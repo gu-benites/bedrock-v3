@@ -5,7 +5,9 @@
  */
 
 import { create } from 'zustand';
+import { useCallback } from 'react';
 import { RecipeStep } from '../types/recipe.types';
+import { stateMonitoringMiddleware } from '@/lib/debug/state-change-monitor';
 import type {
   RecipeWizardState,
   RecipeWizardActions,
@@ -83,24 +85,31 @@ const initialState: Omit<RecipeWizardState, keyof RecipeWizardActions> = {
 /**
  * Main recipe wizard store WITHOUT persistence for reset-on-refresh behavior
  * Data is intentionally not persisted so browser refresh clears all state
+ * Includes state change monitoring for development debugging
  */
-export const useRecipeStore = create<RecipeStore>()((set, get) => ({
+export const useRecipeStore = create<RecipeStore>()(
+  stateMonitoringMiddleware('recipe-store')(
+    (set, get) => ({
   ...initialState,
       
-      // Step navigation actions
+      // Step navigation actions - optimized to reduce unnecessary re-renders
       setCurrentStep: (step: RecipeStep) => {
-        set((state) => ({
-          currentStep: step,
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if step actually changed
+          if (state.currentStep === step) return state;
+          return {
+            currentStep: step,
+            lastUpdated: new Date()
+          };
+        });
       },
-      
+
       markStepCompleted: (step: RecipeStep) => {
         set((state) => {
-          const completedSteps = [...state.completedSteps];
-          if (!completedSteps.includes(step)) {
-            completedSteps.push(step);
-          }
+          // Only update if step isn't already completed
+          if (state.completedSteps.includes(step)) return state;
+
+          const completedSteps = [...state.completedSteps, step];
           return {
             completedSteps,
             lastUpdated: new Date()
@@ -198,60 +207,88 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
         }));
       },
       
-      // State management actions
+      // State management actions - optimized to prevent unnecessary re-renders
       setLoading: (loading: boolean) => {
-        set((state) => ({
-          isLoading: loading,
-          lastUpdated: new Date()
-        }));
-      },
-      
-      setError: (error: string | null) => {
-        set((state) => ({
-          error,
-          isLoading: false, // Clear loading when setting error
-          lastUpdated: new Date()
-        }));
-      },
-      
-      clearError: () => {
-        set((state) => ({
-          error: null,
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if loading state actually changed
+          if (state.isLoading === loading) return state;
+          return {
+            isLoading: loading,
+            lastUpdated: new Date()
+          };
+        });
       },
 
-      // AI Streaming state management actions
+      setError: (error: string | null) => {
+        set((state) => {
+          // Only update if error actually changed
+          if (state.error === error && !state.isLoading) return state;
+          return {
+            error,
+            isLoading: false, // Clear loading when setting error
+            lastUpdated: new Date()
+          };
+        });
+      },
+
+      clearError: () => {
+        set((state) => {
+          // Only update if there's actually an error to clear
+          if (!state.error) return state;
+          return {
+            error: null,
+            lastUpdated: new Date()
+          };
+        });
+      },
+
+      // AI Streaming state management actions - optimized to reduce re-renders
       setStreamingCauses: (isStreaming: boolean) => {
-        set((state) => ({
-          isStreamingCauses: isStreaming,
-          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if streaming state actually changed
+          if (state.isStreamingCauses === isStreaming) return state;
+          return {
+            isStreamingCauses: isStreaming,
+            streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+            lastUpdated: new Date()
+          };
+        });
       },
 
       setStreamingSymptoms: (isStreaming: boolean) => {
-        set((state) => ({
-          isStreamingSymptoms: isStreaming,
-          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if streaming state actually changed
+          if (state.isStreamingSymptoms === isStreaming) return state;
+          return {
+            isStreamingSymptoms: isStreaming,
+            streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+            lastUpdated: new Date()
+          };
+        });
       },
 
       setStreamingProperties: (isStreaming: boolean) => {
-        set((state) => ({
-          isStreamingProperties: isStreaming,
-          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if streaming state actually changed
+          if (state.isStreamingProperties === isStreaming) return state;
+          return {
+            isStreamingProperties: isStreaming,
+            streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+            lastUpdated: new Date()
+          };
+        });
       },
 
       setStreamingOils: (isStreaming: boolean) => {
-        set((state) => ({
-          isStreamingOils: isStreaming,
-          streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
-          lastUpdated: new Date()
-        }));
+        set((state) => {
+          // Only update if streaming state actually changed
+          if (state.isStreamingOils === isStreaming) return state;
+          return {
+            isStreamingOils: isStreaming,
+            streamingError: isStreaming ? null : state.streamingError, // Clear error when starting new stream
+            lastUpdated: new Date()
+          };
+        });
       },
 
       setStreamingError: (error: string | null) => {
@@ -270,6 +307,111 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
           streamingError: null,
           lastUpdated: new Date()
         }));
+      },
+
+      // Batched update actions to minimize re-renders
+      batchUpdateStreamingState: (updates: {
+        isStreamingCauses?: boolean;
+        isStreamingSymptoms?: boolean;
+        isStreamingProperties?: boolean;
+        isStreamingOils?: boolean;
+        streamingError?: string | null;
+      }) => {
+        set((state) => {
+          const newState = { ...state };
+          let hasChanges = false;
+
+          // Only update fields that have actually changed
+          if (updates.isStreamingCauses !== undefined && state.isStreamingCauses !== updates.isStreamingCauses) {
+            newState.isStreamingCauses = updates.isStreamingCauses;
+            hasChanges = true;
+          }
+          if (updates.isStreamingSymptoms !== undefined && state.isStreamingSymptoms !== updates.isStreamingSymptoms) {
+            newState.isStreamingSymptoms = updates.isStreamingSymptoms;
+            hasChanges = true;
+          }
+          if (updates.isStreamingProperties !== undefined && state.isStreamingProperties !== updates.isStreamingProperties) {
+            newState.isStreamingProperties = updates.isStreamingProperties;
+            hasChanges = true;
+          }
+          if (updates.isStreamingOils !== undefined && state.isStreamingOils !== updates.isStreamingOils) {
+            newState.isStreamingOils = updates.isStreamingOils;
+            hasChanges = true;
+          }
+          if (updates.streamingError !== undefined && state.streamingError !== updates.streamingError) {
+            newState.streamingError = updates.streamingError;
+            hasChanges = true;
+          }
+
+          // Only update lastUpdated if there were actual changes
+          if (hasChanges) {
+            newState.lastUpdated = new Date();
+            return newState;
+          }
+
+          return state; // No changes, return existing state
+        });
+      },
+
+      batchUpdateStepData: (updates: {
+        currentStep?: RecipeStep;
+        completedSteps?: RecipeStep[];
+        healthConcern?: HealthConcernData | null;
+        demographics?: DemographicsData | null;
+        selectedCauses?: PotentialCause[];
+        selectedSymptoms?: PotentialSymptom[];
+        therapeuticProperties?: TherapeuticProperty[];
+        suggestedOils?: PropertyOilSuggestions[];
+        potentialCauses?: PotentialCause[];
+        potentialSymptoms?: PotentialSymptom[];
+      }) => {
+        set((state) => {
+          const newState = { ...state };
+          let hasChanges = false;
+
+          // Only update fields that have actually changed
+          Object.entries(updates).forEach(([key, value]) => {
+            if (value !== undefined && JSON.stringify(state[key as keyof RecipeWizardState]) !== JSON.stringify(value)) {
+              (newState as any)[key] = value;
+              hasChanges = true;
+            }
+          });
+
+          // Only update lastUpdated if there were actual changes
+          if (hasChanges) {
+            newState.lastUpdated = new Date();
+            return newState;
+          }
+
+          return state; // No changes, return existing state
+        });
+      },
+
+      batchUpdateLoadingAndError: (updates: {
+        isLoading?: boolean;
+        error?: string | null;
+      }) => {
+        set((state) => {
+          const newState = { ...state };
+          let hasChanges = false;
+
+          if (updates.isLoading !== undefined && state.isLoading !== updates.isLoading) {
+            newState.isLoading = updates.isLoading;
+            hasChanges = true;
+          }
+          if (updates.error !== undefined && state.error !== updates.error) {
+            newState.error = updates.error;
+            hasChanges = true;
+          }
+
+          // Only update lastUpdated if there were actual changes
+          if (hasChanges) {
+            newState.lastUpdated = new Date();
+            return newState;
+          }
+
+          return state; // No changes, return existing state
+        });
       },
       
       /**
@@ -413,56 +555,169 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
 
         console.log('✅ Recipe wizard reset completed - all data and states cleared');
       }
-    }));
+    })
+  )
+);
 
 /**
- * Selector hooks for specific parts of the state
+ * Optimized selector hooks for specific parts of the state
+ * These hooks use shallow comparison to prevent unnecessary re-renders
  */
-export const useRecipeNavigationStore = () => useRecipeStore((state) => ({
-  currentStep: state.currentStep,
-  completedSteps: state.completedSteps,
-  setCurrentStep: state.setCurrentStep,
-  markStepCompleted: state.markStepCompleted,
-  canNavigateToStep: state.canNavigateToStep
-}));
 
-export const useRecipeData = () => useRecipeStore((state) => ({
-  healthConcern: state.healthConcern,
-  demographics: state.demographics,
-  selectedCauses: state.selectedCauses,
-  selectedSymptoms: state.selectedSymptoms,
-  therapeuticProperties: state.therapeuticProperties,
-  suggestedOils: state.suggestedOils
-}));
+// Navigation-specific selectors with memoization
+export const useRecipeNavigationStore = () => useRecipeStore(
+  useCallback((state) => ({
+    currentStep: state.currentStep,
+    completedSteps: state.completedSteps,
+    setCurrentStep: state.setCurrentStep,
+    markStepCompleted: state.markStepCompleted,
+    canNavigateToStep: state.canNavigateToStep
+  }), [])
+);
 
-export const useRecipeApiData = () => useRecipeStore((state) => ({
-  potentialCauses: state.potentialCauses,
-  potentialSymptoms: state.potentialSymptoms,
-  setPotentialCauses: state.setPotentialCauses,
-  setPotentialSymptoms: state.setPotentialSymptoms
-}));
+// Data-specific selectors with shallow comparison
+export const useRecipeData = () => useRecipeStore(
+  useCallback((state) => ({
+    healthConcern: state.healthConcern,
+    demographics: state.demographics,
+    selectedCauses: state.selectedCauses,
+    selectedSymptoms: state.selectedSymptoms,
+    therapeuticProperties: state.therapeuticProperties,
+    suggestedOils: state.suggestedOils
+  }), [])
+);
 
-export const useRecipeStatus = () => useRecipeStore((state) => ({
-  isLoading: state.isLoading,
-  error: state.error,
-  setLoading: state.setLoading,
-  setError: state.setError,
-  clearError: state.clearError
-}));
+// API data selectors with optimized comparison
+export const useRecipeApiData = () => useRecipeStore(
+  useCallback((state) => ({
+    potentialCauses: state.potentialCauses,
+    potentialSymptoms: state.potentialSymptoms,
+    setPotentialCauses: state.setPotentialCauses,
+    setPotentialSymptoms: state.setPotentialSymptoms
+  }), [])
+);
 
-export const useRecipeStreaming = () => useRecipeStore((state) => ({
-  isStreamingCauses: state.isStreamingCauses,
-  isStreamingSymptoms: state.isStreamingSymptoms,
-  isStreamingProperties: state.isStreamingProperties,
-  isStreamingOils: state.isStreamingOils,
-  streamingError: state.streamingError,
-  setStreamingCauses: state.setStreamingCauses,
-  setStreamingSymptoms: state.setStreamingSymptoms,
-  setStreamingProperties: state.setStreamingProperties,
-  setStreamingOils: state.setStreamingOils,
-  setStreamingError: state.setStreamingError,
-  clearStreamingError: state.clearStreamingError
-}));
+// Status selectors with minimal re-renders
+export const useRecipeStatus = () => useRecipeStore(
+  useCallback((state) => ({
+    isLoading: state.isLoading,
+    error: state.error,
+    setLoading: state.setLoading,
+    setError: state.setError,
+    clearError: state.clearError
+  }), [])
+);
+
+// Streaming selectors with optimized updates
+export const useRecipeStreaming = () => useRecipeStore(
+  useCallback((state) => ({
+    isStreamingCauses: state.isStreamingCauses,
+    isStreamingSymptoms: state.isStreamingSymptoms,
+    isStreamingProperties: state.isStreamingProperties,
+    isStreamingOils: state.isStreamingOils,
+    streamingError: state.streamingError,
+    setStreamingCauses: state.setStreamingCauses,
+    setStreamingSymptoms: state.setStreamingSymptoms,
+    setStreamingProperties: state.setStreamingProperties,
+    setStreamingOils: state.setStreamingOils,
+    setStreamingError: state.setStreamingError,
+    clearStreamingError: state.clearStreamingError
+  }), [])
+);
+
+/**
+ * Granular selectors for specific use cases to minimize re-renders
+ */
+
+// Current step only selector
+export const useCurrentStep = () => useRecipeStore(
+  useCallback((state) => state.currentStep, [])
+);
+
+// Loading state only selector
+export const useIsLoading = () => useRecipeStore(
+  useCallback((state) => state.isLoading, [])
+);
+
+// Error state only selector
+export const useRecipeError = () => useRecipeStore(
+  useCallback((state) => state.error, [])
+);
+
+// Specific streaming state selectors
+export const useIsStreamingCauses = () => useRecipeStore(
+  useCallback((state) => state.isStreamingCauses, [])
+);
+
+export const useIsStreamingSymptoms = () => useRecipeStore(
+  useCallback((state) => state.isStreamingSymptoms, [])
+);
+
+export const useIsStreamingProperties = () => useRecipeStore(
+  useCallback((state) => state.isStreamingProperties, [])
+);
+
+export const useIsStreamingOils = () => useRecipeStore(
+  useCallback((state) => state.isStreamingOils, [])
+);
+
+// Potential data selectors with length optimization
+export const usePotentialCauses = () => useRecipeStore(
+  useCallback((state) => state.potentialCauses, [])
+);
+
+export const usePotentialSymptoms = () => useRecipeStore(
+  useCallback((state) => state.potentialSymptoms, [])
+);
+
+// Count-only selectors for performance
+export const usePotentialCausesCount = () => useRecipeStore(
+  useCallback((state) => state.potentialCauses.length, [])
+);
+
+export const usePotentialSymptomsCount = () => useRecipeStore(
+  useCallback((state) => state.potentialSymptoms.length, [])
+);
+
+export const useSelectedCausesCount = () => useRecipeStore(
+  useCallback((state) => state.selectedCauses.length, [])
+);
+
+export const useSelectedSymptomsCount = () => useRecipeStore(
+  useCallback((state) => state.selectedSymptoms.length, [])
+);
+
+// Actions-only selectors to prevent re-renders when data changes
+export const useRecipeActions = () => useRecipeStore(
+  useCallback((state) => ({
+    updateHealthConcern: state.updateHealthConcern,
+    updateDemographics: state.updateDemographics,
+    updateSelectedCauses: state.updateSelectedCauses,
+    updateSelectedSymptoms: state.updateSelectedSymptoms,
+    updateTherapeuticProperties: state.updateTherapeuticProperties,
+    updateSuggestedOils: state.updateSuggestedOils,
+    setPotentialCauses: state.setPotentialCauses,
+    setPotentialSymptoms: state.setPotentialSymptoms,
+    setCurrentStep: state.setCurrentStep,
+    markStepCompleted: state.markStepCompleted,
+    setLoading: state.setLoading,
+    setError: state.setError,
+    clearError: state.clearError,
+    resetWizard: state.resetWizard
+  }), [])
+);
+
+// Streaming actions-only selector
+export const useRecipeStreamingActions = () => useRecipeStore(
+  useCallback((state) => ({
+    setStreamingCauses: state.setStreamingCauses,
+    setStreamingSymptoms: state.setStreamingSymptoms,
+    setStreamingProperties: state.setStreamingProperties,
+    setStreamingOils: state.setStreamingOils,
+    setStreamingError: state.setStreamingError,
+    clearStreamingError: state.clearStreamingError
+  }), [])
+);
 
 /**
  * Utility function to clear all recipe data

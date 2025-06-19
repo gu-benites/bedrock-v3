@@ -1,0 +1,189 @@
+{
+  "timestamp": "2025-06-19T01:16:54.170Z",
+  "data": {
+    "sessionStart": "2025-06-19T01:16:54.170Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:56.678Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 729,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Consolidation of Essential Oils for Anti-Inflammatory Property\",\"request_id\":\"abc1234d-5678-90ef-1234-56789abcdef0\",\"timestamp_utc\":\"2023-10-04T15:20:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"Success\",\"message\":\"Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\",\"property_na",
+    "bufferSuffix": "eduzir a inflamação na pele, aliviando a coceira e o desconforto associados à psoríase.\"},\"suggested"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:57.463Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1461,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Consolidation of Essential Oils for Anti-Inflammatory Property\",\"request_id\":\"abc1234d-5678-90ef-1234-56789abcdef0\",\"timestamp_utc\":\"2023-10-04T15:20:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"Success\",\"message\":\"Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\",\"property_na",
+    "bufferSuffix": "caz na redução de inchaço e inflamação na pele.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"004\",\""
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:58.396Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2205,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"Consolidation of Essential Oils for Anti-Inflammatory Property\",\"request_id\":\"abc1234d-5678-90ef-1234-56789abcdef0\",\"timestamp_utc\":\"2023-10-04T15:20:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"Success\",\"message\":\"Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\",\"property_na",
+    "bufferSuffix": "evancy_to_property_score\":4},{\"oil_id\":\"007\",\"name_english\":\"Frankincense\",\"name_botanical\":\"Boswell"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:58.956Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2660,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"Consolidation of Essential Oils for Anti-Inflammatory Property\",\"request_id\":\"abc1234d-5678-90ef-1234-56789abcdef0\",\"timestamp_utc\":\"2023-10-04T15:20:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"Success\",\"message\":\"Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\",\"property_name_localized\":\"Propriedades anti-inflamatórias\",\"property_name_english\":\"Anti-inflammatory Properties\",\"description_localized\":\"Reduzir a inflamação na pele, aliviando a coceira e o desconforto associados à psoríase.\"},\"suggested_oils\":[{\"oil_id\":\"001\",\"name_english\":\"Lavender\",\"name_botanical\":\"Lavandula angustifolia\",\"name_localized\":\"Lavanda\",\"match_rationale_localized\":\"Reconhecida por suas propriedades anti-inflamatórias e calmantes na pele.\" ,\"relevancy_to_property_score\":5},{\"oil_id\":\"002\",\"name_english\":\"Chamomile\",\"name_botanical\":\"Matricaria chamomilla\",\"name_localized\":\"Camomila\",\"match_rationale_localized\":\"Possui compostos que reduzem a inflamação e acalmam a pele irritada.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"003\",\"name_english\":\"Inula\",\"name_botanical\":\"Inula helenium\",\"name_localized\":\"Inula\",\"match_rationale_localized\":\"Eficaz na redução de inchaço e inflamação na pele.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"004\",\"name_english\":\"Turmeric\",\"name_botanical\":\"Curcuma longa\",\"name_localized\":\"Cúrcuma\",\"match_rationale_localized\":\"Contém curcumina, poderosa substância anti-inflamatória.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"005\",\"name_english\":\"Myrrh\",\"name_botanical\":\"Commiphora myrrha\",\"name_localized\":\"Mirra\",\"match_rationale_localized\":\"Usada tradicionalmente para reduzir inflamações e cicatrizar a pele.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"006\",\"name_english\":\"Boswellia\",\"name_botanical\":\"Boswellia serrata\",\"name_localized\":\"BOSWELLA\",\"match_rationale_localized\":\"Conhecida por suas propriedades anti-inflamatórias eficazes.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"007\",\"name_english\":\"Frankincense\",\"name_botanical\":\"Boswellia carterii\",\"name_localized\":\"Incenso\",\"match_rationale_localized\":\"Reduz inflamação e promove a regeneração da pele.\" ,\"relevancy_to_property_score\":4}]}},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"adult\",\"age_specific\":\"52\",\"age_unit\":\"years\"},\"selected_cause_ids\":[\"Dietary Influences\"],\"selected_symptom_ids\":[\"Coceira na pele\"],\"therapeutic_property_ids\":[\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:58.987Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_685366b7cd0c81999e4307fb414be1850291b1e6124601b8",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"Consolidation of Essential Oils for Anti-Inflammatory Property\",\"request_id\":\"abc1234d-5678-90ef-1234-56789abcdef0\",\"timestamp_utc\":\"2023-10-04T15:20:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"Success\",\"message\":\"Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase.\"},\"data\":{\"property_oil_suggestion\":{\"therapeutic_property_context\":{\"property_id\":\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\",\"property_name_localized\":\"Propriedades anti-inflamatórias\",\"property_name_english\":\"Anti-inflammatory Properties\",\"description_localized\":\"Reduzir a inflamação na pele, aliviando a coceira e o desconforto associados à psoríase.\"},\"suggested_oils\":[{\"oil_id\":\"001\",\"name_english\":\"Lavender\",\"name_botanical\":\"Lavandula angustifolia\",\"name_localized\":\"Lavanda\",\"match_rationale_localized\":\"Reconhecida por suas propriedades anti-inflamatórias e calmantes na pele.\" ,\"relevancy_to_property_score\":5},{\"oil_id\":\"002\",\"name_english\":\"Chamomile\",\"name_botanical\":\"Matricaria chamomilla\",\"name_localized\":\"Camomila\",\"match_rationale_localized\":\"Possui compostos que reduzem a inflamação e acalmam a pele irritada.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"003\",\"name_english\":\"Inula\",\"name_botanical\":\"Inula helenium\",\"name_localized\":\"Inula\",\"match_rationale_localized\":\"Eficaz na redução de inchaço e inflamação na pele.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"004\",\"name_english\":\"Turmeric\",\"name_botanical\":\"Curcuma longa\",\"name_localized\":\"Cúrcuma\",\"match_rationale_localized\":\"Contém curcumina, poderosa substância anti-inflamatória.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"005\",\"name_english\":\"Myrrh\",\"name_botanical\":\"Commiphora myrrha\",\"name_localized\":\"Mirra\",\"match_rationale_localized\":\"Usada tradicionalmente para reduzir inflamações e cicatrizar a pele.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"006\",\"name_english\":\"Boswellia\",\"name_botanical\":\"Boswellia serrata\",\"name_localized\":\"BOSWELLA\",\"match_rationale_localized\":\"Conhecida por suas propriedades anti-inflamatórias eficazes.\" ,\"relevancy_to_property_score\":4},{\"oil_id\":\"007\",\"name_english\":\"Frankincense\",\"name_botanical\":\"Boswellia carterii\",\"name_localized\":\"Incenso\",\"match_rationale_localized\":\"Reduz inflamação e promove a regeneração da pele.\" ,\"relevancy_to_property_score\":4}]}},\"echo\":{\"health_concern_input\":\"psoriase\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"adult\",\"age_specific\":\"52\",\"age_unit\":\"years\"},\"selected_cause_ids\":[\"Dietary Influences\"],\"selected_symptom_ids\":[\"Coceira na pele\"],\"therapeutic_property_ids\":[\"a1b2c3d4-e5f6-7890-1234-56789abcdef0\"]}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-suggested-oils-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:59.004Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "Consolidation of Essential Oils for Anti-Inflammatory Property",
+        "request_id": "abc1234d-5678-90ef-1234-56789abcdef0",
+        "timestamp_utc": "2023-10-04T15:20:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "Success",
+        "message": "Selected 7 unique essential oils based on relevance and efficacy for anti-inflammatory properties related to psoriase."
+      },
+      "data": {
+        "property_oil_suggestion": {
+          "therapeutic_property_context": {
+            "property_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+            "property_name_localized": "Propriedades anti-inflamatórias",
+            "property_name_english": "Anti-inflammatory Properties",
+            "description_localized": "Reduzir a inflamação na pele, aliviando a coceira e o desconforto associados à psoríase."
+          },
+          "suggested_oils": [
+            {
+              "oil_id": "001",
+              "name_english": "Lavender",
+              "name_botanical": "Lavandula angustifolia",
+              "name_localized": "Lavanda",
+              "match_rationale_localized": "Reconhecida por suas propriedades anti-inflamatórias e calmantes na pele.",
+              "relevancy_to_property_score": 5
+            },
+            {
+              "oil_id": "002",
+              "name_english": "Chamomile",
+              "name_botanical": "Matricaria chamomilla",
+              "name_localized": "Camomila",
+              "match_rationale_localized": "Possui compostos que reduzem a inflamação e acalmam a pele irritada.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "003",
+              "name_english": "Inula",
+              "name_botanical": "Inula helenium",
+              "name_localized": "Inula",
+              "match_rationale_localized": "Eficaz na redução de inchaço e inflamação na pele.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "004",
+              "name_english": "Turmeric",
+              "name_botanical": "Curcuma longa",
+              "name_localized": "Cúrcuma",
+              "match_rationale_localized": "Contém curcumina, poderosa substância anti-inflamatória.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "005",
+              "name_english": "Myrrh",
+              "name_botanical": "Commiphora myrrha",
+              "name_localized": "Mirra",
+              "match_rationale_localized": "Usada tradicionalmente para reduzir inflamações e cicatrizar a pele.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "006",
+              "name_english": "Boswellia",
+              "name_botanical": "Boswellia serrata",
+              "name_localized": "BOSWELLA",
+              "match_rationale_localized": "Conhecida por suas propriedades anti-inflamatórias eficazes.",
+              "relevancy_to_property_score": 4
+            },
+            {
+              "oil_id": "007",
+              "name_english": "Frankincense",
+              "name_botanical": "Boswellia carterii",
+              "name_localized": "Incenso",
+              "match_rationale_localized": "Reduz inflamação e promove a regeneração da pele.",
+              "relevancy_to_property_score": 4
+            }
+          ]
+        }
+      },
+      "echo": {
+        "health_concern_input": "psoriase",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "adult",
+          "age_specific": "52",
+          "age_unit": "years"
+        },
+        "selected_cause_ids": [
+          "Dietary Influences"
+        ],
+        "selected_symptom_ids": [
+          "Coceira na pele"
+        ],
+        "therapeutic_property_ids": [
+          "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-19T01:16:59.009Z",
+  "data": {
+    "sessionEnd": "2025-06-19T01:16:59.009Z"
+  }
+}
+---

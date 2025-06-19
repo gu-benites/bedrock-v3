@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import {
   Brain,
@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useAutoScroll } from '@/hooks/use-auto-scroll';
 import { cn } from '@/lib/utils';
+import { MemoComparisons, withMemoMonitoring } from '@/lib/utils/memo-comparison-functions';
 import {
   Dialog,
   DialogContent,
@@ -44,7 +45,7 @@ interface AIStreamingModalProps {
 
 /**
  * AI Streaming Modal with chat-like auto-scroll behavior
- * 
+ *
  * Features:
  * - Modal overlay with backdrop blur
  * - Real-time streaming item display
@@ -52,8 +53,9 @@ interface AIStreamingModalProps {
  * - Progress indication
  * - Smooth animations
  * - Professional enterprise feel
+ * - Optimized with React.memo for performance
  */
-export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
+const AIStreamingModalComponent: React.FC<AIStreamingModalProps> = ({
   isOpen,
   title,
   description,
@@ -322,5 +324,11 @@ export const AIStreamingModal: React.FC<AIStreamingModalProps> = ({
     </Dialog>
   );
 };
+
+// Memoized version with custom comparison for optimal performance
+export const AIStreamingModal = memo(
+  AIStreamingModalComponent,
+  withMemoMonitoring('AIStreamingModal', MemoComparisons.aiStreamingModal)
+);
 
 export default AIStreamingModal;

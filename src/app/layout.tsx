@@ -9,6 +9,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createClient } from '@/lib/supabase/server';
 import { getServerAuthState } from '@/features/auth/services/auth-state.service';
 import { getServerLogger } from '@/lib/logger';
+import { WebVitalsProvider } from '@/components/monitoring/web-vitals-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -59,9 +60,11 @@ export default async function RootLayout({
           >
             <AuthSessionProvider preloadedUser={user}>
               <QueryClientProvider>
-                {children}
-                <Toaster />
-                {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+                <WebVitalsProvider>
+                  {children}
+                  <Toaster />
+                  {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+                </WebVitalsProvider>
               </QueryClientProvider>
             </AuthSessionProvider>
           </ThemeProvider>
@@ -86,9 +89,11 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <QueryClientProvider>
-              {children}
-              <Toaster />
-              {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+              <WebVitalsProvider>
+                {children}
+                <Toaster />
+                {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+              </WebVitalsProvider>
             </QueryClientProvider>
           </ThemeProvider>
         </body>

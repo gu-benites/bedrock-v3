@@ -1,0 +1,46 @@
+[
+  {
+    "configurationValid": true,
+    "baselineMetrics": {
+      "navigation": {
+        "target": 2000,
+        "excellent": 500,
+        "good": 1000,
+        "baseline": 856
+      },
+      "build": {
+        "initial": 30000,
+        "hotReload": 2000,
+        "fileChange": 500
+      },
+      "streaming": {
+        "firstChunk": 2000,
+        "itemDisplay": 100,
+        "completion": 10000
+      }
+    },
+    "timestamp": "2025-06-19T01:08:09.586Z"
+  },
+  {
+    "configurationValid": true,
+    "baselineMetrics": {
+      "navigation": {
+        "target": 2000,
+        "excellent": 500,
+        "good": 1000,
+        "baseline": 856
+      },
+      "build": {
+        "initial": 30000,
+        "hotReload": 2000,
+        "fileChange": 500
+      },
+      "streaming": {
+        "firstChunk": 2000,
+        "itemDisplay": 100,
+        "completion": 10000
+      }
+    },
+    "timestamp": "2025-06-19T01:08:38.741Z"
+  }
+]

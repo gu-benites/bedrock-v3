@@ -4,7 +4,7 @@
 
 import { Agent } from '@openai/agents';
 import { z } from 'zod';
-import { vectorSearchTools } from '../tools/vector-search-tool';
+import { suggestedOilsSearchTools } from '../tools/suggested-oils-search-tool';
 
 /**
  * Context interface for oil selection agent
@@ -145,7 +145,7 @@ For the given therapeutic property, use the \`get_recommended_essential_oils\` t
     max_tokens: 4000
   },
   
-  tools: vectorSearchTools,
+  tools: suggestedOilsSearchTools,
   
   outputType: OilSuggestionOutputSchema
 });
