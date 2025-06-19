@@ -1,10 +1,9 @@
+'use client';
+
 /**
  * Normalization Performance Monitor
  * Visual interface for monitoring state normalization performance
  */
-
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { normalizationPerformanceMonitor } from '@/lib/state/normalization-engine';
 import { cn } from '@/lib/utils';
@@ -75,9 +74,11 @@ export const NormalizationPerformanceMonitor: React.FC<NormalizationPerformanceM
   };
 
   const totalOperations = report.reduce((sum, r) => sum + r.totalOperations, 0);
-  const overallAverageTime = report.length > 0 
-    ? report.reduce((sum, r) => sum + r.averageTime, 0) / report.length 
-    : 0;
+  let overallAverageTime = 0;
+  if (report.length > 0) {
+    const timeSum = report.reduce((sum, r) => sum + r.averageTime, 0);
+    overallAverageTime = timeSum / report.length;
+  }
 
   if (!isVisible) {
     return (
@@ -301,7 +302,7 @@ export const NormalizationPerformanceMonitor: React.FC<NormalizationPerformanceM
       {/* Footer */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="text-xs text-gray-500 space-y-1">
-          <div>💡 Tip: Target <2ms for normalization, <5ms for complex operations</div>
+          <div>💡 Tip: Target {'<'}2ms for normalization, {'<'}5ms for complex operations</div>
           <div>🎯 Monitor operations that run frequently or take >10ms</div>
         </div>
       </div>

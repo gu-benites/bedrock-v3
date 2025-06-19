@@ -3,7 +3,6 @@
  * Visual interface for monitoring state persistence performance and debugging
  */
 
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import { persistencePerformanceMonitor } from '@/features/create-recipe/hooks/use-optimized-persistence';
