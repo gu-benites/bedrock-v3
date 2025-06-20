@@ -126,9 +126,9 @@ export function TherapeuticPropertiesTable({
       cell: ({ row }) => {
         const property = row.original;
         return (
-          <div className="max-w-[300px] truncate">
+          <p className="text-xs text-muted-foreground whitespace-normal">
             {property.description_contextual_localized || property.description || 'No description available'}
-          </div>
+          </p>
         );
       },
     },

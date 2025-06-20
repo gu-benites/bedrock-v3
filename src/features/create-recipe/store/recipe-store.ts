@@ -171,7 +171,8 @@ export const useRecipeStore = create<RecipeStore>()((set, get) => ({
         }));
       },
       
-      updateTherapeuticProperties: (properties: TherapeuticProperty[]) => {
+      updateTherapeuticProperties: (properties: TherapeuticProperty[], source: string) => {
+        console.log(`Updating therapeutic properties from ${source}:`, properties);
         set((state) => ({
           therapeuticProperties: properties,
           // Clear dependent data when properties change

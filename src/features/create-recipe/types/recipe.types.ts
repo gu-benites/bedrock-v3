@@ -75,6 +75,10 @@ export interface TherapeuticProperty {
   property_name_in_english?: string; // Legacy field
   description: string;
   description_localized?: string;
+  /**
+   * Contextual description in the original (non-localized) language
+   */
+  description_contextual?: string;
   description_contextual_localized?: string; // AI response field
   causes_addressed?: string; // Legacy field
   symptoms_addressed?: string; // Legacy field
@@ -262,7 +266,7 @@ export interface RecipeWizardActions {
   updateDemographics: (data: DemographicsData) => void;
   updateSelectedCauses: (causes: PotentialCause[]) => void;
   updateSelectedSymptoms: (symptoms: PotentialSymptom[]) => void;
-  updateTherapeuticProperties: (properties: TherapeuticProperty[]) => void;
+  updateTherapeuticProperties: (properties: TherapeuticProperty[], source: string) => void;
   updateSuggestedOils: (oils: PropertyOilSuggestions[]) => void;
   
   // API data updates

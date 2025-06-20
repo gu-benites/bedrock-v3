@@ -96,7 +96,7 @@ export const useBatchedRecipeUpdates = () => {
       store.updateSelectedSymptoms(updates.selectedSymptoms);
     }
     if (updates.therapeuticProperties !== undefined) {
-      store.updateTherapeuticProperties(updates.therapeuticProperties);
+      store.updateTherapeuticProperties(updates.therapeuticProperties, 'useBatchedRecipeUpdates');
     }
     if (updates.suggestedOils !== undefined) {
       store.updateSuggestedOils(updates.suggestedOils);

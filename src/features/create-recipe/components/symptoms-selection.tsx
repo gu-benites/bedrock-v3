@@ -242,7 +242,10 @@ export function SymptomsSelection() {
         };
       });
 
-      updateTherapeuticProperties(transformedProperties);
+      updateTherapeuticProperties(
+        transformedProperties,
+        'SymptomsSelection (Streaming)'
+      );
     }
   }, [propertiesPartialData, updateTherapeuticProperties]);
 
@@ -278,8 +281,9 @@ export function SymptomsSelection() {
             property_name: property.property_name_localized || property.property_name || 'Unknown property',
             property_name_english: property.property_name_english || property.property_name || 'Unknown property',
             property_name_localized: property.property_name_localized || property.property_name || 'Unknown property',
-            description: property.description_localized || property.description || '',
-            description_localized: property.description_localized || property.description || '',
+            description: property.description_contextual_localized || property.description_localized || property.description || '',
+            description_localized: property.description_contextual_localized || property.description_localized || '',
+            description_contextual_localized: property.description_contextual_localized || '',
             relevancy: property.relevancy || property.relevancy_score || 0,
             relevancy_score: property.relevancy_score || 0,
             addresses_cause_ids: property.addresses_cause_ids || [],
@@ -296,8 +300,9 @@ export function SymptomsSelection() {
             property_name: property.property_name_localized || property.property_name || 'Unknown property',
             property_name_english: property.property_name_english || property.property_name || 'Unknown property',
             property_name_localized: property.property_name_localized || property.property_name || 'Unknown property',
-            description: property.description_localized || property.description || '',
-            description_localized: property.description_localized || property.description || '',
+            description: property.description_contextual_localized || property.description_localized || property.description || '',
+            description_localized: property.description_contextual_localized || property.description_localized || '',
+            description_contextual_localized: property.description_contextual_localized || '',
             relevancy: property.relevancy || property.relevancy_score || 0,
             relevancy_score: property.relevancy_score || 0,
             addresses_cause_ids: property.addresses_cause_ids || [],
@@ -309,8 +314,9 @@ export function SymptomsSelection() {
 
       // Update with final complete data if we have it
       if (finalProperties.length > 0) {
+
         console.log('🔄 Updating properties with final complete data:', finalProperties.length, 'properties');
-        updateTherapeuticProperties(finalProperties);
+        updateTherapeuticProperties(finalProperties, 'SymptomsSelection (Final)');
       }
 
       // Synchronize modal closing and navigation to happen simultaneously
