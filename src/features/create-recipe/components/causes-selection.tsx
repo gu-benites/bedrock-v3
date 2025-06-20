@@ -23,11 +23,9 @@ export function CausesSelection() {
     selectedCauses,
     potentialCauses,
     updateSelectedCauses,
-    setPotentialCauses,
     setPotentialSymptoms,
     isLoading,
     error,
-    setLoading,
     setError,
     clearError,
     isStreamingCauses,
@@ -44,7 +42,7 @@ export function CausesSelection() {
     isStreaming: isStreamingSymptoms,
     isComplete: isSymptomsComplete,
     finalData: symptomsFinalData,
-    error: symptomsStreamingError
+    error: _streamError // Prefix with underscore to indicate it's intentionally unused
   } = useAIStreaming({
     jsonArrayPath: 'data.potential_symptoms'
   });
@@ -187,7 +185,11 @@ export function CausesSelection() {
         }
       }
 
-      // Navigate to symptoms page
+      // Complete streaming to close modal and navigate in the same event loop cycle
+      // This ensures the modal closing and navigation happen simultaneously
+      console.log('🔄 Synchronizing modal closing and navigation to symptoms page');
+      
+      // Navigate to symptoms page immediately in the same event loop cycle
       if (canGoNext()) {
         goToNext();
       }

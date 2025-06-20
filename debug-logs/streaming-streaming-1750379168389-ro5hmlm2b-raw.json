@@ -1,0 +1,215 @@
+{
+  "timestamp": "2025-06-20T00:26:08.390Z",
+  "data": {
+    "sessionStart": "2025-06-20T00:26:08.390Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:10.379Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 728,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Aj",
+    "bufferSuffix": " cabeça relacionada ao estresse e sensibilidade exacerbada.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:11.340Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1326,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Aj",
+    "bufferSuffix": "adiga.\",\"addresses_cause_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"addresses_symptom_ids\":[\"b2"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:12.487Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 1893,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Aj",
+    "bufferSuffix": "14m15n16o17\"],\"addresses_symptom_ids\":[],\"relevancy_score\":3},{\"property_id\":\"c1d2e3f4-g5h6-7i8j-9k0"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:13.324Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 800,
+    "bufferLength": 2523,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Aj",
+    "bufferSuffix": "123456789abc\",\"property_name_localized\":\"Propriedades equilibrantes do humor\",\"property_name_english"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:14.496Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 1000,
+    "bufferLength": 3231,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Aj",
+    "bufferSuffix": "ica, ajudando a combater fadiga e dificuldades de concentração, que podem estar relacionadas a dores"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:15.446Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3654,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Ajuda a reduzir a ansiedade, o estresse e a sensibilidade à luz e som, promovendo relaxamento mental e emocional, útil para dor de cabeça relacionada ao estresse e sensibilidade exacerbada.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":5},{\"property_id\":\"a1b2c3d4-e5f6-7g8h-9i0j-123456789abc\",\"property_name_localized\":\"Propriedades relaxantes musculares\",\"property_name_english\":\"Muscle Relaxant Properties\",\"description_contextual_localized\":\"Auxilia na diminuição da tensão muscular e dor, contribuindo para aliviar dores de cabeça causadas por tensão e estresse, especialmente útil para dores relacionadas à postura ou fadiga.\",\"addresses_cause_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":4},{\"property_id\":\"f9g8h7i6-j5k4-3l2m-1n0o-123456789abc\",\"property_name_localized\":\"Propriedades fortalecedoras\",\"property_name_english\":\"Strengthening Properties\",\"description_contextual_localized\":\"Contribui a melhorar a resistência física e a vitalidade, ajudando a lidar com o desgaste físico e emocional que podem desencadear ou agravar dores de cabeça.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[],\"relevancy_score\":3},{\"property_id\":\"c1d2e3f4-g5h6-7i8j-9k0l-123456789abc\",\"property_name_localized\":\"Propriedades neuroprotetoras\",\"property_name_english\":\"Neuroprotective Properties\",\"description_contextual_localized\":\"Protege o sistema nervoso, ajudando a prevenir migração de sinais de dor e reduzindo a frequência de dores de cabeça relacionadas a estados de sensibilidade e fadiga nervosa.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":4},{\"property_id\":\"h7i6j5k4-l3m2-1n0o-9p8q-123456789abc\",\"property_name_localized\":\"Propriedades equilibrantes do humor\",\"property_name_english\":\"Mood Balancing Properties\",\"description_contextual_localized\":\"Ajuda a equilibrar emoções, promovendo estabilidade emocional, o que beneficia pessoas com dores de cabeça relacionadas a alterações hormonais e estresse emocional.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"relevancy_score\":4},{\"property_id\":\"i7j8k9l0-m1n2-3o4p-5q6r-123456789abc\",\"property_name_localized\":\"Propriedades energizantes\",\"property_name_english\":\"Energizing Properties\",\"description_contextual_localized\":\"Estimula a energia mental e física, ajudando a combater fadiga e dificuldades de concentração, que podem estar relacionadas a dores de cabeça frequentes e problemas de sono.\",\"addresses_cause_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\",\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"relevancy_score\":3}]},\"echo\":{\"health_concern\":\"dor de cabeça\",\"gender\":\"feminino\",\"age_category\":\"adulto\",\"age_specific\":\"50\",\"user_language\":\"PT_BR\",\"selected_causes_count\":2,\"selected_symptoms_count\":2}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:15.460Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6854ac52117c819b9a89013e8990b1c702a149a6270c0437",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"identify_therapeutic_properties\",\"request_id\":\"abc123456789\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados.\"},\"data\":{\"therapeutic_properties\":[{\"property_id\":\"d4e5f6a7-b8c9-4d0f-8e2d-123456789abc\",\"property_name_localized\":\"Propriedades calmantes\",\"property_name_english\":\"Calming Properties\",\"description_contextual_localized\":\"Ajuda a reduzir a ansiedade, o estresse e a sensibilidade à luz e som, promovendo relaxamento mental e emocional, útil para dor de cabeça relacionada ao estresse e sensibilidade exacerbada.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":5},{\"property_id\":\"a1b2c3d4-e5f6-7g8h-9i0j-123456789abc\",\"property_name_localized\":\"Propriedades relaxantes musculares\",\"property_name_english\":\"Muscle Relaxant Properties\",\"description_contextual_localized\":\"Auxilia na diminuição da tensão muscular e dor, contribuindo para aliviar dores de cabeça causadas por tensão e estresse, especialmente útil para dores relacionadas à postura ou fadiga.\",\"addresses_cause_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":4},{\"property_id\":\"f9g8h7i6-j5k4-3l2m-1n0o-123456789abc\",\"property_name_localized\":\"Propriedades fortalecedoras\",\"property_name_english\":\"Strengthening Properties\",\"description_contextual_localized\":\"Contribui a melhorar a resistência física e a vitalidade, ajudando a lidar com o desgaste físico e emocional que podem desencadear ou agravar dores de cabeça.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[],\"relevancy_score\":3},{\"property_id\":\"c1d2e3f4-g5h6-7i8j-9k0l-123456789abc\",\"property_name_localized\":\"Propriedades neuroprotetoras\",\"property_name_english\":\"Neuroprotective Properties\",\"description_contextual_localized\":\"Protege o sistema nervoso, ajudando a prevenir migração de sinais de dor e reduzindo a frequência de dores de cabeça relacionadas a estados de sensibilidade e fadiga nervosa.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\"],\"relevancy_score\":4},{\"property_id\":\"h7i6j5k4-l3m2-1n0o-9p8q-123456789abc\",\"property_name_localized\":\"Propriedades equilibrantes do humor\",\"property_name_english\":\"Mood Balancing Properties\",\"description_contextual_localized\":\"Ajuda a equilibrar emoções, promovendo estabilidade emocional, o que beneficia pessoas com dores de cabeça relacionadas a alterações hormonais e estresse emocional.\",\"addresses_cause_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"relevancy_score\":4},{\"property_id\":\"i7j8k9l0-m1n2-3o4p-5q6r-123456789abc\",\"property_name_localized\":\"Propriedades energizantes\",\"property_name_english\":\"Energizing Properties\",\"description_contextual_localized\":\"Estimula a energia mental e física, ajudando a combater fadiga e dificuldades de concentração, que podem estar relacionadas a dores de cabeça frequentes e problemas de sono.\",\"addresses_cause_ids\":[\"b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15\",\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"addresses_symptom_ids\":[\"e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17\"],\"relevancy_score\":3}]},\"echo\":{\"health_concern\":\"dor de cabeça\",\"gender\":\"feminino\",\"age_category\":\"adulto\",\"age_specific\":\"50\",\"user_language\":\"PT_BR\",\"selected_causes_count\":2,\"selected_symptoms_count\":2}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-therapeutic-properties-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:15.465Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "identify_therapeutic_properties",
+        "request_id": "abc123456789",
+        "timestamp_utc": "2023-10-01T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Propriedades terapêuticas selecionadas com base nos sintomas e causas apresentados."
+      },
+      "data": {
+        "therapeutic_properties": [
+          {
+            "property_id": "d4e5f6a7-b8c9-4d0f-8e2d-123456789abc",
+            "property_name_localized": "Propriedades calmantes",
+            "property_name_english": "Calming Properties",
+            "description_contextual_localized": "Ajuda a reduzir a ansiedade, o estresse e a sensibilidade à luz e som, promovendo relaxamento mental e emocional, útil para dor de cabeça relacionada ao estresse e sensibilidade exacerbada.",
+            "addresses_cause_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "addresses_symptom_ids": [
+              "b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15"
+            ],
+            "relevancy_score": 5
+          },
+          {
+            "property_id": "a1b2c3d4-e5f6-7g8h-9i0j-123456789abc",
+            "property_name_localized": "Propriedades relaxantes musculares",
+            "property_name_english": "Muscle Relaxant Properties",
+            "description_contextual_localized": "Auxilia na diminuição da tensão muscular e dor, contribuindo para aliviar dores de cabeça causadas por tensão e estresse, especialmente útil para dores relacionadas à postura ou fadiga.",
+            "addresses_cause_ids": [
+              "b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15"
+            ],
+            "addresses_symptom_ids": [
+              "b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15"
+            ],
+            "relevancy_score": 4
+          },
+          {
+            "property_id": "f9g8h7i6-j5k4-3l2m-1n0o-123456789abc",
+            "property_name_localized": "Propriedades fortalecedoras",
+            "property_name_english": "Strengthening Properties",
+            "description_contextual_localized": "Contribui a melhorar a resistência física e a vitalidade, ajudando a lidar com o desgaste físico e emocional que podem desencadear ou agravar dores de cabeça.",
+            "addresses_cause_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "addresses_symptom_ids": [],
+            "relevancy_score": 3
+          },
+          {
+            "property_id": "c1d2e3f4-g5h6-7i8j-9k0l-123456789abc",
+            "property_name_localized": "Propriedades neuroprotetoras",
+            "property_name_english": "Neuroprotective Properties",
+            "description_contextual_localized": "Protege o sistema nervoso, ajudando a prevenir migração de sinais de dor e reduzindo a frequência de dores de cabeça relacionadas a estados de sensibilidade e fadiga nervosa.",
+            "addresses_cause_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "addresses_symptom_ids": [
+              "b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15"
+            ],
+            "relevancy_score": 4
+          },
+          {
+            "property_id": "h7i6j5k4-l3m2-1n0o-9p8q-123456789abc",
+            "property_name_localized": "Propriedades equilibrantes do humor",
+            "property_name_english": "Mood Balancing Properties",
+            "description_contextual_localized": "Ajuda a equilibrar emoções, promovendo estabilidade emocional, o que beneficia pessoas com dores de cabeça relacionadas a alterações hormonais e estresse emocional.",
+            "addresses_cause_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "addresses_symptom_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "relevancy_score": 4
+          },
+          {
+            "property_id": "i7j8k9l0-m1n2-3o4p-5q6r-123456789abc",
+            "property_name_localized": "Propriedades energizantes",
+            "property_name_english": "Energizing Properties",
+            "description_contextual_localized": "Estimula a energia mental e física, ajudando a combater fadiga e dificuldades de concentração, que podem estar relacionadas a dores de cabeça frequentes e problemas de sono.",
+            "addresses_cause_ids": [
+              "b2c3d4d5-e6f7-8h9i-10j11-k12l13m14n15",
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "addresses_symptom_ids": [
+              "e5f6g7h8-e9h10-11i12-j13k-l14m15n16o17"
+            ],
+            "relevancy_score": 3
+          }
+        ]
+      },
+      "echo": {
+        "health_concern": "dor de cabeça",
+        "gender": "feminino",
+        "age_category": "adulto",
+        "age_specific": "50",
+        "user_language": "PT_BR",
+        "selected_causes_count": 2,
+        "selected_symptoms_count": 2
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:26:15.469Z",
+  "data": {
+    "sessionEnd": "2025-06-20T00:26:15.469Z"
+  }
+}
+---

@@ -1,0 +1,150 @@
+{
+  "timestamp": "2025-06-20T00:07:09.166Z",
+  "data": {
+    "sessionStart": "2025-06-20T00:07:09.166Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:10.918Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 617,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s\",\"name_localized\":\"Dor de cabeça comum\",\"suggestion_localized\":\"Monitorar a intensidade e frequência da dor.\",\"e",
+    "bufferSuffix": "zed\":\"A dor de cabeça é um sintoma central, frequentemente ativado por causas como desidratação e má"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:11.858Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1302,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s\",\"name_localized\":\"Dor de cabeça comum\",\"suggestion_localized\":\"Monitorar a intensidade e frequência da dor.\",\"e",
+    "bufferSuffix": " piorar a experiência de dores de cabeça, especialmente em episódios associados a distúrbios do sono"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:12.879Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 1947,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s\",\"name_localized\":\"Dor de cabeça comum\",\"suggestion_localized\":\"Monitorar a intensidade e frequência da dor.\",\"e",
+    "bufferSuffix": " um efeito secundário do desconforto e da privação de sono, além de fatores emocionais associados ao"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:13.573Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 2218,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s\",\"name_localized\":\"Dor de cabeça comum\",\"suggestion_localized\":\"Monitorar a intensidade e frequência da dor.\",\"explanation_localized\":\"A dor de cabeça é um sintoma central, frequentemente ativado por causas como desidratação e má qualidade do sono.\"},{\"symptom_id\":\"t8u9v0w1-x2y3-4z5a-b6c7-d8e9f0g1h2i3\",\"name_localized\":\"Tensão muscular na cabeça ou pescoço\",\"suggestion_localized\":\"Praticar técnicas de relaxamento muscular ou massagens.\",\"explanation_localized\":\"A tensão muscular pode contribuir para dores de cabeça, especialmente quando há estresse ou esforço físico inadequado.\"},{\"symptom_id\":\"j4k5l6m7-n8o9-0p1q-2r3s-t4u5v6w7x8y9\",\"name_localized\":\"Sensibilidade à luz e ao som\",\"suggestion_localized\":\"Evitar ambientes muito brilhantes ou barulhentos.\",\"explanation_localized\":\"Estímulos sensoriais podem piorar a experiência de dores de cabeça, especialmente em episódios associados a distúrbios do sono ou desidratação.\"},{\"symptom_id\":\"z0a1b2c3-d4e5-6f7g-8h9i-0j1k2l3m4n5o\",\"name_localized\":\"Fadiga e sonolência\",\"suggestion_localized\":\"Garantir um padrão regular de sono e descanso.\",\"explanation_localized\":\"Fadiga é tanto causa quanto efeito de dores de cabeça, especialmente relacionada ao sono de má qualidade.\"},{\"symptom_id\":\"p6q7r8s9-t0u1-2v3w-4x5y-6z7a8b9c0d1e\",\"name_localized\":\"Alterações de humor ou irritabilidade\",\"suggestion_localized\":\"Praticar técnicas de gestão do estresse.\",\"explanation_localized\":\"Mudanças de humor podem ser um efeito secundário do desconforto e da privação de sono, além de fatores emocionais associados ao envelhecimento.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"senior\",\"age_specific\":\"60\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"c3d4e5f6-g7h8-9i10-j11k12l13m14n15\"]}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:13.606Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6854a7de7a7c81988a927e3ceafd3e2f058289dc98b38340",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"identify_potential_symptoms\",\"request_id\":\"a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d\",\"timestamp_utc\":\"2023-10-01T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"PT_BR\",\"status\":\"success\",\"message\":\"Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas.\"},\"data\":{\"potential_symptoms\":[{\"symptom_id\":\"d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s\",\"name_localized\":\"Dor de cabeça comum\",\"suggestion_localized\":\"Monitorar a intensidade e frequência da dor.\",\"explanation_localized\":\"A dor de cabeça é um sintoma central, frequentemente ativado por causas como desidratação e má qualidade do sono.\"},{\"symptom_id\":\"t8u9v0w1-x2y3-4z5a-b6c7-d8e9f0g1h2i3\",\"name_localized\":\"Tensão muscular na cabeça ou pescoço\",\"suggestion_localized\":\"Praticar técnicas de relaxamento muscular ou massagens.\",\"explanation_localized\":\"A tensão muscular pode contribuir para dores de cabeça, especialmente quando há estresse ou esforço físico inadequado.\"},{\"symptom_id\":\"j4k5l6m7-n8o9-0p1q-2r3s-t4u5v6w7x8y9\",\"name_localized\":\"Sensibilidade à luz e ao som\",\"suggestion_localized\":\"Evitar ambientes muito brilhantes ou barulhentos.\",\"explanation_localized\":\"Estímulos sensoriais podem piorar a experiência de dores de cabeça, especialmente em episódios associados a distúrbios do sono ou desidratação.\"},{\"symptom_id\":\"z0a1b2c3-d4e5-6f7g-8h9i-0j1k2l3m4n5o\",\"name_localized\":\"Fadiga e sonolência\",\"suggestion_localized\":\"Garantir um padrão regular de sono e descanso.\",\"explanation_localized\":\"Fadiga é tanto causa quanto efeito de dores de cabeça, especialmente relacionada ao sono de má qualidade.\"},{\"symptom_id\":\"p6q7r8s9-t0u1-2v3w-4x5y-6z7a8b9c0d1e\",\"name_localized\":\"Alterações de humor ou irritabilidade\",\"suggestion_localized\":\"Praticar técnicas de gestão do estresse.\",\"explanation_localized\":\"Mudanças de humor podem ser um efeito secundário do desconforto e da privação de sono, além de fatores emocionais associados ao envelhecimento.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"feminino\",\"age_category\":\"senior\",\"age_specific\":\"60\",\"age_unit\":\"anos\"},\"selected_cause_ids\":[\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"c3d4e5f6-g7h8-9i10-j11k12l13m14n15\"]}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "create-recipe-potential-symptoms-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:13.617Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "identify_potential_symptoms",
+        "request_id": "a4f7b2d5-e9f3-4f0a-8d3b-9e4f1a2b3c4d",
+        "timestamp_utc": "2023-10-01T12:00:00Z",
+        "version": "1.0",
+        "user_language": "PT_BR",
+        "status": "success",
+        "message": "Lista de sintomas potenciais gerada com base na preocupação de saúde e causas selecionadas."
+      },
+      "data": {
+        "potential_symptoms": [
+          {
+            "symptom_id": "d2e3f4g5-h6i7-8j9k-l01m-2n3o4p5q6r7s",
+            "name_localized": "Dor de cabeça comum",
+            "suggestion_localized": "Monitorar a intensidade e frequência da dor.",
+            "explanation_localized": "A dor de cabeça é um sintoma central, frequentemente ativado por causas como desidratação e má qualidade do sono."
+          },
+          {
+            "symptom_id": "t8u9v0w1-x2y3-4z5a-b6c7-d8e9f0g1h2i3",
+            "name_localized": "Tensão muscular na cabeça ou pescoço",
+            "suggestion_localized": "Praticar técnicas de relaxamento muscular ou massagens.",
+            "explanation_localized": "A tensão muscular pode contribuir para dores de cabeça, especialmente quando há estresse ou esforço físico inadequado."
+          },
+          {
+            "symptom_id": "j4k5l6m7-n8o9-0p1q-2r3s-t4u5v6w7x8y9",
+            "name_localized": "Sensibilidade à luz e ao som",
+            "suggestion_localized": "Evitar ambientes muito brilhantes ou barulhentos.",
+            "explanation_localized": "Estímulos sensoriais podem piorar a experiência de dores de cabeça, especialmente em episódios associados a distúrbios do sono ou desidratação."
+          },
+          {
+            "symptom_id": "z0a1b2c3-d4e5-6f7g-8h9i-0j1k2l3m4n5o",
+            "name_localized": "Fadiga e sonolência",
+            "suggestion_localized": "Garantir um padrão regular de sono e descanso.",
+            "explanation_localized": "Fadiga é tanto causa quanto efeito de dores de cabeça, especialmente relacionada ao sono de má qualidade."
+          },
+          {
+            "symptom_id": "p6q7r8s9-t0u1-2v3w-4x5y-6z7a8b9c0d1e",
+            "name_localized": "Alterações de humor ou irritabilidade",
+            "suggestion_localized": "Praticar técnicas de gestão do estresse.",
+            "explanation_localized": "Mudanças de humor podem ser um efeito secundário do desconforto e da privação de sono, além de fatores emocionais associados ao envelhecimento."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "dor de cabeça",
+        "user_info_input": {
+          "gender": "feminino",
+          "age_category": "senior",
+          "age_specific": "60",
+          "age_unit": "anos"
+        },
+        "selected_cause_ids": [
+          "b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15",
+          "c3d4e5f6-g7h8-9i10-j11k12l13m14n15"
+        ]
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:07:13.729Z",
+  "data": {
+    "sessionEnd": "2025-06-20T00:07:13.729Z"
+  }
+}
+---

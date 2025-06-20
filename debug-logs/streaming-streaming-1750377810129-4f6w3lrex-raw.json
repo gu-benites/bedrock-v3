@@ -1,0 +1,164 @@
+{
+  "timestamp": "2025-06-20T00:03:30.130Z",
+  "data": {
+    "sessionStart": "2025-06-20T00:03:30.130Z"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:32.223Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 200,
+    "bufferLength": 711,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"12345678-1234-5678-1234-567812345678\",\"timestamp_utc\":\"2023-10-04T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic stress or mental fatigue\",\"suggestion_localized\":\"Practice relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stre",
+    "bufferSuffix": "s who may experience increased worry or mental load.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:33.137Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 400,
+    "bufferLength": 1504,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"12345678-1234-5678-1234-567812345678\",\"timestamp_utc\":\"2023-10-04T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic stress or mental fatigue\",\"suggestion_localized\":\"Practice relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stre",
+    "bufferSuffix": " poor posture\",\"suggestion_localized\":\"Practice gentle neck and shoulder stretches and be mindful of"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:33.959Z",
+  "data": {
+    "type": "bufferSnapshot",
+    "chunkCount": 600,
+    "bufferLength": 2317,
+    "bufferPreview": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"12345678-1234-5678-1234-567812345678\",\"timestamp_utc\":\"2023-10-04T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic stress or mental fatigue\",\"suggestion_localized\":\"Practice relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stre",
+    "bufferSuffix": "cially in seniors, can have headaches as side effects or interactions.\"},{\"cause_id\":\"g7h8i9j10-k11l"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:34.932Z",
+  "data": {
+    "type": "finalBuffer",
+    "bufferLength": 3135,
+    "fullBuffer": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"12345678-1234-5678-1234-567812345678\",\"timestamp_utc\":\"2023-10-04T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic stress or mental fatigue\",\"suggestion_localized\":\"Practice relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and mental fatigue are common factors that can contribute to persistent headaches, especially in older adults who may experience increased worry or mental load.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"name_localized\":\"Dehydration or poor hydration\",\"suggestion_localized\":\"Ensure adequate water intake throughout the day.\",\"explanation_localized\":\"Dehydration can lead to headaches, and older adults might be at higher risk due to changes in sensation and decreased fluid intake.\"},{\"cause_id\":\"c3d4e5f6-g7h8-9i10-j11k-12l13m14n15o16\",\"name_localized\":\"Sleep disturbances or poor sleep quality\",\"suggestion_localized\":\"Establish a calming bedtime routine and maintain a consistent sleep schedule.\",\"explanation_localized\":\"Sleep problems are common in seniors and can cause or worsen headaches.\"},{\"cause_id\":\"d4e5f6g7-h8i9-10j11-k12l-13m14n15o16p17\",\"name_localized\":\"Muscle tension or poor posture\",\"suggestion_localized\":\"Practice gentle neck and shoulder stretches and be mindful of posture.\",\"explanation_localized\":\"Tension in neck and shoulder muscles from poor posture or stress can trigger headaches.\"},{\"cause_id\":\"e5f6g7h8-i9j10-11k12-l13m-14n15o16p17q18\",\"name_localized\":\"Environmental factors like noise or light levels\",\"suggestion_localized\":\"Create a quiet, dim environment during rest periods.\",\"explanation_localized\":\"Unfavorable environmental conditions can contribute to headache occurrence, especially if sensitive to light or noise.\"},{\"cause_id\":\"f6g7h8i9-j10k-11l12-m13n-14o15p16q17r18\",\"name_localized\":\"Medication side effects or interactions\",\"suggestion_localized\":\"Review current medications with a healthcare provider.\",\"explanation_localized\":\"Some medications, especially in seniors, can have headaches as side effects or interactions.\"},{\"cause_id\":\"g7h8i9j10-k11l-12m13-n14o-15p16q17r18s19\",\"name_localized\":\"Dietary factors like caffeine or irregular eating habits\",\"suggestion_localized\":\"Maintain regular meal times and monitor caffeine intake.\",\"explanation_localized\":\"Dietary habits may influence headache frequency, with caffeine withdrawal or excess potentially playing a role.\"},{\"cause_id\":\"h8i9j10k11-l12m13-n14o15-p16q17r18s19t20\",\"name_localized\":\"Underlying health issues such as hypertension\",\"suggestion_localized\":\"Regular check-ups to monitor blood pressure and health.\",\"explanation_localized\":\"Older adults are more susceptible to health conditions like hypertension, which can cause headaches if unmanaged.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"senior\",\"age_specific\":\"60\",\"age_unit\":\"years\"}}}"
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:34.946Z",
+  "data": {
+    "type": "newItems",
+    "count": 1,
+    "items": [
+      {
+        "type": "message_output_item",
+        "rawItem": {
+          "providerData": {},
+          "id": "msg_6854a703c0e0819ab5fb773e3be9a7ce0e71c3f57fdd4a12",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "{\"meta\":{\"step_name\":\"generate_potential_causes\",\"request_id\":\"12345678-1234-5678-1234-567812345678\",\"timestamp_utc\":\"2023-10-04T12:00:00Z\",\"version\":\"1.0\",\"user_language\":\"en\",\"status\":\"success\",\"message\":\"Potential causes generated successfully.\"},\"data\":{\"potential_causes\":[{\"cause_id\":\"a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14\",\"name_localized\":\"Chronic stress or mental fatigue\",\"suggestion_localized\":\"Practice relaxation techniques and stress management strategies.\",\"explanation_localized\":\"Stress and mental fatigue are common factors that can contribute to persistent headaches, especially in older adults who may experience increased worry or mental load.\"},{\"cause_id\":\"b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15\",\"name_localized\":\"Dehydration or poor hydration\",\"suggestion_localized\":\"Ensure adequate water intake throughout the day.\",\"explanation_localized\":\"Dehydration can lead to headaches, and older adults might be at higher risk due to changes in sensation and decreased fluid intake.\"},{\"cause_id\":\"c3d4e5f6-g7h8-9i10-j11k-12l13m14n15o16\",\"name_localized\":\"Sleep disturbances or poor sleep quality\",\"suggestion_localized\":\"Establish a calming bedtime routine and maintain a consistent sleep schedule.\",\"explanation_localized\":\"Sleep problems are common in seniors and can cause or worsen headaches.\"},{\"cause_id\":\"d4e5f6g7-h8i9-10j11-k12l-13m14n15o16p17\",\"name_localized\":\"Muscle tension or poor posture\",\"suggestion_localized\":\"Practice gentle neck and shoulder stretches and be mindful of posture.\",\"explanation_localized\":\"Tension in neck and shoulder muscles from poor posture or stress can trigger headaches.\"},{\"cause_id\":\"e5f6g7h8-i9j10-11k12-l13m-14n15o16p17q18\",\"name_localized\":\"Environmental factors like noise or light levels\",\"suggestion_localized\":\"Create a quiet, dim environment during rest periods.\",\"explanation_localized\":\"Unfavorable environmental conditions can contribute to headache occurrence, especially if sensitive to light or noise.\"},{\"cause_id\":\"f6g7h8i9-j10k-11l12-m13n-14o15p16q17r18\",\"name_localized\":\"Medication side effects or interactions\",\"suggestion_localized\":\"Review current medications with a healthcare provider.\",\"explanation_localized\":\"Some medications, especially in seniors, can have headaches as side effects or interactions.\"},{\"cause_id\":\"g7h8i9j10-k11l-12m13-n14o-15p16q17r18s19\",\"name_localized\":\"Dietary factors like caffeine or irregular eating habits\",\"suggestion_localized\":\"Maintain regular meal times and monitor caffeine intake.\",\"explanation_localized\":\"Dietary habits may influence headache frequency, with caffeine withdrawal or excess potentially playing a role.\"},{\"cause_id\":\"h8i9j10k11-l12m13-n14o15-p16q17r18s19t20\",\"name_localized\":\"Underlying health issues such as hypertension\",\"suggestion_localized\":\"Regular check-ups to monitor blood pressure and health.\",\"explanation_localized\":\"Older adults are more susceptible to health conditions like hypertension, which can cause headaches if unmanaged.\"}]},\"echo\":{\"health_concern_input\":\"dor de cabeça\",\"user_info_input\":{\"gender\":\"female\",\"age_category\":\"senior\",\"age_specific\":\"60\",\"age_unit\":\"years\"}}}"
+            }
+          ]
+        },
+        "agent": {
+          "name": "recipe-wizard-potential-causes-agent"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:34.950Z",
+  "data": {
+    "type": "finalOutput",
+    "output": {
+      "meta": {
+        "step_name": "generate_potential_causes",
+        "request_id": "12345678-1234-5678-1234-567812345678",
+        "timestamp_utc": "2023-10-04T12:00:00Z",
+        "version": "1.0",
+        "user_language": "en",
+        "status": "success",
+        "message": "Potential causes generated successfully."
+      },
+      "data": {
+        "potential_causes": [
+          {
+            "cause_id": "a1b2c3d4-e5f6-7g8h-9i10-j11k12l13m14",
+            "name_localized": "Chronic stress or mental fatigue",
+            "suggestion_localized": "Practice relaxation techniques and stress management strategies.",
+            "explanation_localized": "Stress and mental fatigue are common factors that can contribute to persistent headaches, especially in older adults who may experience increased worry or mental load."
+          },
+          {
+            "cause_id": "b2c3d4e5-f6g7-8h9i-10j11-k12l13m14n15",
+            "name_localized": "Dehydration or poor hydration",
+            "suggestion_localized": "Ensure adequate water intake throughout the day.",
+            "explanation_localized": "Dehydration can lead to headaches, and older adults might be at higher risk due to changes in sensation and decreased fluid intake."
+          },
+          {
+            "cause_id": "c3d4e5f6-g7h8-9i10-j11k-12l13m14n15o16",
+            "name_localized": "Sleep disturbances or poor sleep quality",
+            "suggestion_localized": "Establish a calming bedtime routine and maintain a consistent sleep schedule.",
+            "explanation_localized": "Sleep problems are common in seniors and can cause or worsen headaches."
+          },
+          {
+            "cause_id": "d4e5f6g7-h8i9-10j11-k12l-13m14n15o16p17",
+            "name_localized": "Muscle tension or poor posture",
+            "suggestion_localized": "Practice gentle neck and shoulder stretches and be mindful of posture.",
+            "explanation_localized": "Tension in neck and shoulder muscles from poor posture or stress can trigger headaches."
+          },
+          {
+            "cause_id": "e5f6g7h8-i9j10-11k12-l13m-14n15o16p17q18",
+            "name_localized": "Environmental factors like noise or light levels",
+            "suggestion_localized": "Create a quiet, dim environment during rest periods.",
+            "explanation_localized": "Unfavorable environmental conditions can contribute to headache occurrence, especially if sensitive to light or noise."
+          },
+          {
+            "cause_id": "f6g7h8i9-j10k-11l12-m13n-14o15p16q17r18",
+            "name_localized": "Medication side effects or interactions",
+            "suggestion_localized": "Review current medications with a healthcare provider.",
+            "explanation_localized": "Some medications, especially in seniors, can have headaches as side effects or interactions."
+          },
+          {
+            "cause_id": "g7h8i9j10-k11l-12m13-n14o-15p16q17r18s19",
+            "name_localized": "Dietary factors like caffeine or irregular eating habits",
+            "suggestion_localized": "Maintain regular meal times and monitor caffeine intake.",
+            "explanation_localized": "Dietary habits may influence headache frequency, with caffeine withdrawal or excess potentially playing a role."
+          },
+          {
+            "cause_id": "h8i9j10k11-l12m13-n14o15-p16q17r18s19t20",
+            "name_localized": "Underlying health issues such as hypertension",
+            "suggestion_localized": "Regular check-ups to monitor blood pressure and health.",
+            "explanation_localized": "Older adults are more susceptible to health conditions like hypertension, which can cause headaches if unmanaged."
+          }
+        ]
+      },
+      "echo": {
+        "health_concern_input": "dor de cabeça",
+        "user_info_input": {
+          "gender": "female",
+          "age_category": "senior",
+          "age_specific": "60",
+          "age_unit": "years"
+        }
+      }
+    }
+  }
+}
+---
+{
+  "timestamp": "2025-06-20T00:03:34.956Z",
+  "data": {
+    "sessionEnd": "2025-06-20T00:03:34.956Z"
+  }
+}
+---

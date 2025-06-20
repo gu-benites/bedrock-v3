@@ -30,11 +30,8 @@ export function SymptomsSelection() {
     updateTherapeuticProperties,
     isLoading,
     error,
-    setLoading,
     setError,
     clearError,
-    isStreamingSymptoms,
-    setStreamingSymptoms,
     isStreamingProperties,
     setStreamingProperties
   } = useRecipeStore();
@@ -51,7 +48,7 @@ export function SymptomsSelection() {
   const hasAutoLoadedRef = useRef(false);
 
   // AI Streaming setup for symptoms
-  const { startStream, partialData, isStreaming, isComplete, finalData, error: streamingError } = useAIStreaming({
+  const { startStream, partialData, isStreaming, isComplete, finalData, error: _symptomsStreamingError } = useAIStreaming({
     jsonArrayPath: 'data.potential_symptoms'
   });
 
@@ -277,51 +274,36 @@ export function SymptomsSelection() {
           });
 
           return {
-            property_id: property.property_id,
-            property_name: property.property_name_localized,
-            property_name_localized: property.property_name_localized,
-            property_name_english: property.property_name_english,
-            description: property.description_contextual_localized,
-            description_localized: property.description_contextual_localized,
-            description_contextual_localized: property.description_contextual_localized,
-            relevancy: property.relevancy_score,
-            relevancy_score: property.relevancy_score,
+            property_id: property.property_id || `property_${Date.now()}_${index}`,
+            property_name: property.property_name_localized || property.property_name || 'Unknown property',
+            property_name_english: property.property_name_english || property.property_name || 'Unknown property',
+            property_name_localized: property.property_name_localized || property.property_name || 'Unknown property',
+            description: property.description_localized || property.description || '',
+            description_localized: property.description_localized || property.description || '',
+            relevancy: property.relevancy || property.relevancy_score || 0,
+            relevancy_score: property.relevancy_score || 0,
             addresses_cause_ids: property.addresses_cause_ids || [],
-            addresses_symptom_ids: property.addresses_symptom_ids || []
+            addresses_symptom_ids: property.addresses_symptom_ids || [],
+            suggested_oils: property.suggested_oils || []
           };
         });
       } else if (propertiesFinalData && typeof propertiesFinalData === 'object' && 'data' in propertiesFinalData) {
-        // Nested structure
+        // Extract from data.therapeutic_properties if available
         const data = propertiesFinalData as any;
         if (data.data?.therapeutic_properties && Array.isArray(data.data.therapeutic_properties)) {
-          const properties = data.data.therapeutic_properties;
-          finalProperties = properties.map((property: any, index: number) => {
-            console.log(`🔄 Nested final transform property ${index}:`, {
-              original: property,
-              property_id: property.property_id,
-              property_name_localized: property.property_name_localized,
-              relevancy_score: property.relevancy_score,
-              addresses_cause_ids: property.addresses_cause_ids,
-              addresses_symptom_ids: property.addresses_symptom_ids,
-              // CRITICAL: Show ALL fields in the nested property to see what's actually there
-              allNestedFields: Object.keys(property),
-              fullNestedProperty: property
-            });
-
-            return {
-              property_id: property.property_id,
-              property_name: property.property_name_localized,
-              property_name_localized: property.property_name_localized,
-              property_name_english: property.property_name_english,
-              description: property.description_contextual_localized,
-              description_localized: property.description_contextual_localized,
-              description_contextual_localized: property.description_contextual_localized,
-              relevancy: property.relevancy_score,
-              relevancy_score: property.relevancy_score,
-              addresses_cause_ids: property.addresses_cause_ids || [],
-              addresses_symptom_ids: property.addresses_symptom_ids || []
-            };
-          });
+          finalProperties = data.data.therapeutic_properties.map((property: any, index: number) => ({
+            property_id: property.property_id || `property_${Date.now()}_${index}`,
+            property_name: property.property_name_localized || property.property_name || 'Unknown property',
+            property_name_english: property.property_name_english || property.property_name || 'Unknown property',
+            property_name_localized: property.property_name_localized || property.property_name || 'Unknown property',
+            description: property.description_localized || property.description || '',
+            description_localized: property.description_localized || property.description || '',
+            relevancy: property.relevancy || property.relevancy_score || 0,
+            relevancy_score: property.relevancy_score || 0,
+            addresses_cause_ids: property.addresses_cause_ids || [],
+            addresses_symptom_ids: property.addresses_symptom_ids || [],
+            suggested_oils: property.suggested_oils || []
+          }));
         }
       }
 
@@ -331,10 +313,13 @@ export function SymptomsSelection() {
         updateTherapeuticProperties(finalProperties);
       }
 
-      // Stop streaming state
+      // Synchronize modal closing and navigation to happen simultaneously
+      console.log('🔄 Synchronizing modal closing and navigation to properties page');
+      
+      // Stop streaming state to close modal
       setStreamingProperties(false);
 
-      // Navigate immediately after state updates
+      // Navigate immediately in the same event loop cycle
       if (canGoNext()) {
         goToNext();
       }
@@ -357,9 +342,8 @@ export function SymptomsSelection() {
    * Sync streaming state with store
    */
   useEffect(() => {
-    setStreamingSymptoms(isStreaming);
     setStreamingProperties(isStreamingPropertiesData);
-  }, [isStreaming, setStreamingSymptoms, isStreamingPropertiesData, setStreamingProperties]);
+  }, [isStreamingPropertiesData, setStreamingProperties]);
 
   /**
    * Load potential symptoms using AI streaming (auto-triggered on mount)

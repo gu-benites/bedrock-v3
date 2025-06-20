@@ -5,15 +5,15 @@
 
 import { useCallback } from 'react';
 import { useRecipeStore } from '../store/recipe-store';
+import { RecipeStep } from '../types/recipe.types';
 import type { 
-  RecipeStep, 
   HealthConcernData, 
   DemographicsData, 
   PotentialCause, 
   PotentialSymptom,
   TherapeuticProperty,
   PropertyOilSuggestions
-} from '../types/recipe-types';
+} from '../types/recipe.types';
 
 export const useBatchedRecipeUpdates = () => {
   const store = useRecipeStore();
@@ -28,7 +28,26 @@ export const useBatchedRecipeUpdates = () => {
     isStreamingOils?: boolean;
     streamingError?: string | null;
   }) => {
-    store.batchUpdateStreamingState(updates);
+    // Use individual setters instead of non-existent batch method
+    if (updates.isStreamingCauses !== undefined) {
+      store.setStreamingCauses(updates.isStreamingCauses);
+    }
+    if (updates.isStreamingSymptoms !== undefined) {
+      store.setStreamingSymptoms(updates.isStreamingSymptoms);
+    }
+    if (updates.isStreamingProperties !== undefined) {
+      store.setStreamingProperties(updates.isStreamingProperties);
+    }
+    if (updates.isStreamingOils !== undefined) {
+      store.setStreamingOils(updates.isStreamingOils);
+    }
+    if (updates.streamingError !== undefined) {
+      if (updates.streamingError === null) {
+        store.clearStreamingError();
+      } else {
+        store.setStreamingError(updates.streamingError);
+      }
+    }
   }, [store]);
 
   /**
@@ -46,7 +65,48 @@ export const useBatchedRecipeUpdates = () => {
     potentialCauses?: PotentialCause[];
     potentialSymptoms?: PotentialSymptom[];
   }) => {
-    store.batchUpdateStepData(updates);
+    // Use individual setters instead of non-existent batch method
+    if (updates.currentStep !== undefined) {
+      store.setCurrentStep(updates.currentStep);
+    }
+    if (updates.completedSteps !== undefined) {
+      // No direct setter for completedSteps, mark each step individually
+      updates.completedSteps.forEach(step => {
+        store.markStepCompleted(step);
+      });
+    }
+    if (updates.healthConcern !== undefined) {
+      if (updates.healthConcern === null) {
+        store.clearStepData(RecipeStep.HEALTH_CONCERN);
+      } else {
+        store.updateHealthConcern(updates.healthConcern);
+      }
+    }
+    if (updates.demographics !== undefined) {
+      if (updates.demographics === null) {
+        store.clearStepData(RecipeStep.DEMOGRAPHICS);
+      } else {
+        store.updateDemographics(updates.demographics);
+      }
+    }
+    if (updates.selectedCauses !== undefined) {
+      store.updateSelectedCauses(updates.selectedCauses);
+    }
+    if (updates.selectedSymptoms !== undefined) {
+      store.updateSelectedSymptoms(updates.selectedSymptoms);
+    }
+    if (updates.therapeuticProperties !== undefined) {
+      store.updateTherapeuticProperties(updates.therapeuticProperties);
+    }
+    if (updates.suggestedOils !== undefined) {
+      store.updateSuggestedOils(updates.suggestedOils);
+    }
+    if (updates.potentialCauses !== undefined) {
+      store.setPotentialCauses(updates.potentialCauses);
+    }
+    if (updates.potentialSymptoms !== undefined) {
+      store.setPotentialSymptoms(updates.potentialSymptoms);
+    }
   }, [store]);
 
   /**
@@ -56,40 +116,53 @@ export const useBatchedRecipeUpdates = () => {
     isLoading?: boolean;
     error?: string | null;
   }) => {
-    store.batchUpdateLoadingAndError(updates);
+    // Use individual setters instead of non-existent batch method
+    if (updates.isLoading !== undefined) {
+      store.setLoading(updates.isLoading);
+    }
+    if (updates.error !== undefined) {
+      if (updates.error === null) {
+        store.clearError();
+      } else {
+        store.setError(updates.error);
+      }
+    }
   }, [store]);
 
   /**
    * Complete AI streaming workflow with batched updates
    * This is commonly used when AI streaming completes
+   * CRITICAL: All state updates are batched to ensure modal closing and navigation happen in the same event loop
    */
   const completeAIStreaming = useCallback((
     step: 'causes' | 'symptoms' | 'properties' | 'oils',
     data: PotentialCause[] | PotentialSymptom[] | TherapeuticProperty[] | PropertyOilSuggestions[],
     nextStep?: RecipeStep
   ) => {
+    // Create a single batch update for all streaming states
     const streamingUpdates: Parameters<typeof updateStreamingStates>[0] = {
+      isStreamingCauses: step === 'causes' ? false : undefined,
+      isStreamingSymptoms: step === 'symptoms' ? false : undefined,
+      isStreamingProperties: step === 'properties' ? false : undefined,
+      isStreamingOils: step === 'oils' ? false : undefined,
       streamingError: null
     };
 
+    // Create a single batch update for all step data
     const stepUpdates: Parameters<typeof updateStepData>[0] = {};
 
-    // Set the appropriate streaming state to false and update data
+    // Set the appropriate data based on step
     switch (step) {
       case 'causes':
-        streamingUpdates.isStreamingCauses = false;
         stepUpdates.potentialCauses = data as PotentialCause[];
         break;
       case 'symptoms':
-        streamingUpdates.isStreamingSymptoms = false;
         stepUpdates.potentialSymptoms = data as PotentialSymptom[];
         break;
       case 'properties':
-        streamingUpdates.isStreamingProperties = false;
         stepUpdates.therapeuticProperties = data as TherapeuticProperty[];
         break;
       case 'oils':
-        streamingUpdates.isStreamingOils = false;
         stepUpdates.suggestedOils = data as PropertyOilSuggestions[];
         break;
     }
@@ -99,7 +172,10 @@ export const useBatchedRecipeUpdates = () => {
       stepUpdates.currentStep = nextStep;
     }
 
-    // Batch all updates together
+    console.log(`🔄 [${new Date().toISOString()}] Batching all updates for ${step} completion`);
+    
+    // Batch all updates together in a single execution cycle
+    // This ensures the modal closing and navigation happen synchronously
     updateStreamingStates(streamingUpdates);
     updateStepData(stepUpdates);
     updateLoadingAndError({ isLoading: false, error: null });
@@ -158,19 +234,16 @@ export const useBatchedRecipeUpdates = () => {
     step: RecipeStep,
     markCompleted?: RecipeStep[]
   ) => {
-    const updates: Parameters<typeof updateStepData>[0] = {
-      currentStep: step
-    };
+    // Set current step
+    store.setCurrentStep(step);
 
-    if (markCompleted) {
-      // Get current completed steps and add new ones
-      const currentCompleted = store.getState().completedSteps;
-      const newCompleted = [...new Set([...currentCompleted, ...markCompleted])];
-      updates.completedSteps = newCompleted;
+    // Mark steps as completed if provided
+    if (markCompleted && markCompleted.length > 0) {
+      markCompleted.forEach(completedStep => {
+        store.markStepCompleted(completedStep);
+      });
     }
-
-    updateStepData(updates);
-  }, [updateStepData, store]);
+  }, [store]);
 
   /**
    * Reset wizard with optimized state clearing

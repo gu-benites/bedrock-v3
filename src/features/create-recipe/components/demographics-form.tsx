@@ -300,11 +300,12 @@ export function DemographicsForm() {
       // Mark that we've navigated to prevent infinite loops
       hasNavigatedRef.current = true;
 
-      // Use batched updates to minimize re-renders
+      console.log(`✅ [${new Date().toISOString()}] Demographics streaming completed - synchronizing modal closing and navigation`);
+
+      // Use batched updates to minimize re-renders and ensure modal closing and navigation happen together
       completeAIStreaming('causes', finalTransformedCauses);
 
-      // Navigate immediately after state updates (no setTimeout delay)
-      // The state updates above are synchronous, so navigation can happen immediately
+      // Navigate immediately in the same event loop cycle
       if (canGoNext()) {
         goToNext();
       }

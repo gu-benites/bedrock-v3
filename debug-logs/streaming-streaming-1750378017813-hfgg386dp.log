@@ -1,0 +1,27 @@
+[2025-06-20T00:06:57.813Z] === STREAMING SESSION STARTED ===
+[2025-06-20T00:06:57.821Z] Request started with traceId: streaming-1750378017813-hfgg386dp
+[2025-06-20T00:06:57.860Z] Agent execution started
+[2025-06-20T00:06:57.861Z] Starting real-time streaming for step: potential-causes
+[2025-06-20T00:06:59.724Z] Buffer content at chunk 200 (675 chars):
+[2025-06-20T00:07:00.601Z] Buffer content at chunk 400 (1457 chars):
+[2025-06-20T00:07:01.270Z] Buffer content at chunk 600 (2255 chars):
+[2025-06-20T00:07:02.545Z] Final buffer content (3052 chars):
+[2025-06-20T00:07:02.549Z] === AGENT RESULT ANALYSIS ===
+[2025-06-20T00:07:02.550Z] Result keys: state, currentTurn, maxTurns
+[2025-06-20T00:07:02.553Z] Has newItems: true
+[2025-06-20T00:07:02.558Z] Has finalOutput: true
+[2025-06-20T00:07:02.559Z] NewItems count: 1
+[2025-06-20T00:07:02.560Z] --- NEW ITEM 0 ---
+[2025-06-20T00:07:02.562Z] Type: message_output_item
+[2025-06-20T00:07:02.563Z] Role: unknown
+[2025-06-20T00:07:02.565Z] Content preview: {
+  "meta": {
+    "step_name": "Potential Causes Analysis",
+    "request_id": "123e4567-e89b-12d3-a456-426614174000",
+    "timestamp_utc": "2023-10-01T12:00:00Z",
+    "version": "1.0",
+    "user_langu...
+[2025-06-20T00:07:02.568Z] === FINAL OUTPUT ===
+[2025-06-20T00:07:02.569Z] Final output type: object
+[2025-06-20T00:07:02.571Z] Final output keys: meta, data, echo
+[2025-06-20T00:07:02.574Z] === STREAMING SESSION ENDED ===
