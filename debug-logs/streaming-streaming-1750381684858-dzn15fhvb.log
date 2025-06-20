@@ -1,0 +1,21 @@
+[2025-06-20T01:08:04.858Z] === STREAMING SESSION STARTED ===
+[2025-06-20T01:08:04.870Z] Request started with traceId: streaming-1750381684858-dzn15fhvb
+[2025-06-20T01:08:05.091Z] Agent execution started
+[2025-06-20T01:08:05.103Z] Starting real-time streaming for step: potential-symptoms
+[2025-06-20T01:08:07.071Z] Buffer content at chunk 200 (626 chars):
+[2025-06-20T01:08:08.136Z] Buffer content at chunk 400 (1302 chars):
+[2025-06-20T01:08:10.355Z] Buffer content at chunk 600 (2074 chars):
+[2025-06-20T01:08:10.954Z] Final buffer content (2142 chars):
+[2025-06-20T01:08:10.977Z] === AGENT RESULT ANALYSIS ===
+[2025-06-20T01:08:10.988Z] Result keys: state, currentTurn, maxTurns
+[2025-06-20T01:08:10.993Z] Has newItems: true
+[2025-06-20T01:08:11.005Z] Has finalOutput: true
+[2025-06-20T01:08:11.022Z] NewItems count: 1
+[2025-06-20T01:08:11.027Z] --- NEW ITEM 0 ---
+[2025-06-20T01:08:11.039Z] Type: message_output_item
+[2025-06-20T01:08:11.062Z] Role: unknown
+[2025-06-20T01:08:11.070Z] Content preview: {"meta":{"step_name":"identify_potential_symptoms","request_id":"12345678-1234-5678-1234-567812345678","timestamp_utc":"2023-10-01T12:00:00Z","version":"1.0","user_language":"PT_BR","status":"success"...
+[2025-06-20T01:08:11.091Z] === FINAL OUTPUT ===
+[2025-06-20T01:08:11.121Z] Final output type: object
+[2025-06-20T01:08:11.125Z] Final output keys: meta, data, echo
+[2025-06-20T01:08:11.172Z] === STREAMING SESSION ENDED ===

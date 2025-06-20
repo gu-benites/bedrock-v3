@@ -10,9 +10,10 @@ import { useRecipeStore, useRecipeStreaming } from '../store/recipe-store';
 import { useRecipeWizardNavigation } from '../hooks/use-recipe-navigation';
 import { useAIStreaming } from '@/lib/ai/hooks/use-ai-streaming';
 import { AIStreamingModal } from '@/components/ui/ai-streaming-modal';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { fetchTherapeuticProperties } from '../services/recipe-api.service';
-
+import { TherapeuticPropertiesTable } from './therapeutic-properties-table';
 import type { TherapeuticProperty } from '../types/recipe.types';
 import { cn } from '@/lib/utils';
 
@@ -21,14 +22,12 @@ import { cn } from '@/lib/utils';
  */
 const PropertyCard = React.memo(({
   property,
-  index,
   addressedCauses,
   addressedSymptoms,
   relevancyScore,
   onAnalyzeProperty
 }: {
   property: TherapeuticProperty;
-  index: number;
   addressedCauses: any[];
   addressedSymptoms: any[];
   relevancyScore: number;
@@ -151,8 +150,11 @@ const PropertyCard = React.memo(({
   );
 });
 
+// Define view types
+type ViewType = 'card' | 'table' | 'compact';
+
 /**
- * Properties Display component
+ * Properties Display component with multiple view options
  */
 export function PropertiesDisplay() {
   const {
@@ -178,6 +180,7 @@ export function PropertiesDisplay() {
   const [isLoadingProperties, setIsLoadingProperties] = useState(false);
   const [streamingItems, setStreamingItems] = useState<any[]>([]);
   const [currentProperty, setCurrentProperty] = useState<TherapeuticProperty | null>(null);
+  const [viewType, setViewType] = useState<ViewType>('card');
   const processedCompletionRef = useRef<string | null>(null);
 
   // Debug logging for properties data
@@ -235,8 +238,6 @@ export function PropertiesDisplay() {
     timeout: 90000, // 90 seconds for oil analysis
     maxRetries: 2
   });
-
-
 
   // Handle streaming data updates (for partial data during streaming)
   // Note: Suggested oils uses structured-only streaming, so partialData is usually empty
@@ -483,8 +484,8 @@ export function PropertiesDisplay() {
           health_concern: healthConcern.healthConcern,
           demographics: {
             gender: demographics.gender,
-            age_category: demographics.ageCategory,  // ✅ Map ageCategory → age_category for template variables
-            age_specific: demographics.specificAge.toString()  // ✅ Map specificAge → age_specific for template variables
+            age_category: demographics.ageCategory,  // Map ageCategory → age_category for template variables
+            age_specific: demographics.specificAge.toString()  // Map specificAge → age_specific for template variables
           },
           selected_causes: selectedCauses.map((cause, index) => ({
             cause_id: `cause-${index}-${cause.cause_name.toLowerCase().replace(/\s+/g, '-')}`,
@@ -556,8 +557,6 @@ export function PropertiesDisplay() {
     loadTherapeuticProperties();
   };
 
-
-
   /**
    * Get addressed causes for a property
    */
@@ -619,15 +618,27 @@ export function PropertiesDisplay() {
   };
 
   return (
-    <div data-testid="properties-display" className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">
-          Recommended Therapeutic Properties
-        </h2>
-        <p className="text-muted-foreground">
-          Based on your health concern, causes, and symptoms, here are the therapeutic properties that may help you.
-        </p>
+    <div className="space-y-6">
+      <div className="flex flex-col space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Therapeutic Properties</h2>
+            <p className="text-muted-foreground">
+              Review the therapeutic properties that address your health concern.
+            </p>
+          </div>
+          
+          <Tabs 
+            value={viewType} 
+            onValueChange={(value) => setViewType(value as ViewType)}
+            className="w-full sm:w-auto"
+          >
+            <TabsList className="grid w-full grid-cols-2 sm:flex">
+              <TabsTrigger value="card">Card View</TabsTrigger>
+              <TabsTrigger value="table">Table View</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       {/* Summary */}
@@ -701,46 +712,49 @@ export function PropertiesDisplay() {
       {/* Properties Display */}
       {!isLoadingProperties && therapeuticProperties.length > 0 && (
         <div className="space-y-6">
-          {/* Properties Grid */}
-          <div className="space-y-6">
-            {therapeuticProperties
-              .sort((a, b) => (b.relevancy_score || b.relevancy || 0) - (a.relevancy_score || a.relevancy || 0))
-              .map((property, index) => {
-                const addressedCauses = getAddressedCauses(property);
-                const addressedSymptoms = getAddressedSymptoms(property);
-                const relevancyScore = property.relevancy_score || property.relevancy || 0;
+          {/* View Content */}
+          {viewType === 'card' ? (
+            /* Card View */
+            <div className="space-y-6">
+              {therapeuticProperties
+                .sort((a, b) => (b.relevancy_score || b.relevancy || 0) - (a.relevancy_score || a.relevancy || 0))
+                .map((property, index) => {
+                  const addressedCauses = getAddressedCauses(property);
+                  const addressedSymptoms = getAddressedSymptoms(property);
+                  const relevancyScore = property.relevancy_score || property.relevancy || 0;
 
-                // Debug logging for property data
-                console.log(`🎨 Rendering property ${index}:`, {
-                  property_id: property.property_id,
-                  property_name_localized: property.property_name_localized,
-                  property_name: property.property_name,
-                  relevancy_score: property.relevancy_score,
-                  relevancy: property.relevancy,
-                  calculated_relevancy_score: relevancyScore,
-                  typeof_relevancy_score: typeof property.relevancy_score,
-                  typeof_relevancy: typeof property.relevancy,
-                  addresses_cause_ids: property.addresses_cause_ids,
-                  addresses_symptom_ids: property.addresses_symptom_ids,
-                  addressedCausesFound: addressedCauses.length,
-                  addressedSymptomsFound: addressedSymptoms.length,
-                  // Show the ENTIRE property object to see what fields exist
-                  fullPropertyObject: property
-                });
+                  // Debug logging for property data
+                  console.log(`🎨 Rendering property card ${index}:`, {
+                    property_id: property.property_id,
+                    property_name: property.property_name_localized || property.property_name,
+                    relevancy_score: relevancyScore,
+                    addressedCausesCount: addressedCauses.length,
+                    addressedSymptomsCount: addressedSymptoms.length
+                  });
 
-                return (
-                  <PropertyCard
-                    key={`${property.property_id}-${index}`}
-                    property={property}
-                    index={index}
-                    addressedCauses={addressedCauses}
-                    addressedSymptoms={addressedSymptoms}
-                    relevancyScore={relevancyScore}
-                    onAnalyzeProperty={handleAnalyzeSingleProperty}
-                  />
-                );
-              })}
-          </div>
+                  return (
+                    <PropertyCard
+                      key={`${property.property_id}-${index}`}
+                      property={property}
+                      addressedCauses={addressedCauses}
+                      addressedSymptoms={addressedSymptoms}
+                      relevancyScore={relevancyScore}
+                      onAnalyzeProperty={handleAnalyzeSingleProperty}
+                    />
+                  );
+                })}
+            </div>
+          ) : (
+            /* Table View */
+            <div className="rounded-md border">
+              <TherapeuticPropertiesTable 
+                properties={therapeuticProperties}
+                selectedCauses={selectedCauses}
+                selectedSymptoms={selectedSymptoms}
+                onAnalyzeProperty={handleAnalyzeSingleProperty}
+              />
+            </div>
+          )}
 
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -753,7 +767,7 @@ export function PropertiesDisplay() {
               <div className="space-y-1">
                 <h4 className="text-sm font-medium text-blue-900">Essential Oil Recommendations</h4>
                 <p className="text-sm text-blue-700">
-                  Click the "Find Oils" button in each property card above to get personalized essential oil recommendations for that specific therapeutic property.
+                  Click the "Find Oils" button in each property {viewType === 'card' ? 'card' : 'row'} to get personalized essential oil recommendations for that specific therapeutic property.
                 </p>
               </div>
             </div>
